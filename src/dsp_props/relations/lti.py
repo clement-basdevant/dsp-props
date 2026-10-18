@@ -90,8 +90,10 @@ class Causality(Relation):
 class TransferConsistency(Relation):
     """The measured frequency response matches the declared transfer function B(z)/A(z).
 
-    The impulse response is measured over L samples (long enough for it to
-    decay), and its DFT is compared with H(e^{jw}) on the same grid.
+    The impulse response is measured over L samples and its DFT is compared
+    with H(e^{jw}) on the same grid. L is capped at 2^16, so with a pole close
+    to the unit circle the response has not decayed by then: the comparison
+    then carries the truncated tail, bounded by ``tail_l1_bound``.
     """
 
     name = "transfer function"
@@ -105,18 +107,23 @@ class TransferConsistency(Relation):
     def check(self, spec, _):
         from scipy.signal import freqz
 
-        from ..core.iir import recursion_gain
+        from ..core.iir import tail_l1_bound
 
         b, a = (np.asarray(c, dtype=float) for c in spec.transfer)
         poles = np.roots(a / a[0]) if len(a) > 1 else np.array([])
         r = float(np.max(np.abs(poles))) if poles.size else 0.0
         L = int(min(1 << 16, (np.log(1e-17) / np.log(r) if r > 0 else 1) * len(a) + len(b) + 16))
+        L = max(L, len(a) + len(b))  # tail_l1_bound needs the recursion alone beyond L
         impulse = np.zeros(L)
         impulse[0] = 1.0
         measured = np.fft.fft(np.asarray(spec.func(impulse)))
         _, declared = freqz(b, a, worN=L, whole=True)
-        # Parseval: ||H_meas - H||_2 = sqrt(L) ||h_meas - h||_2 ; the impulse has norm 1.
-        tail = 1e-17 * recursion_gain(a, b)
+        # On the L-point grid, H(e^{jw_k}) is the DFT of the aliased response
+        # sum_q h[m + qL], i.e. of h[:L] plus t[m] = sum_{q>=1} h[m + qL]. So
+        # ||H_meas - H||_2 <= sqrt(L) (||h_meas - h[:L]||_2 + ||t||_2) (Parseval,
+        # the impulse has norm 1), with ||t||_2 <= ||t||_1 <= sum_{n>=L} |h[n]|.
+        # That tail is not small when L is capped (r^L = 1.4e-3 for r = 0.9999).
+        tail = tail_l1_bound(b, a, L)
         tol = np.sqrt(L) * (spec.tolerance.bound(L, np.float64, 1.0) + tail)
         err = norm(measured - declared)
         if not err <= tol:
