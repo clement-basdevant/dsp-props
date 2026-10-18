@@ -21,9 +21,8 @@ bibliography: paper.bib
 
 Signal processing code is hard to test because its correct output is rarely
 known: the result of a filter, a transform or a resampler on an arbitrary
-input has no independent oracle [@barr2015oracle]. Tests therefore compare
-against a handful of hand-computed cases, or against another implementation
-that may share the same assumptions. `dsp-props` replaces those cases with
+input has no independent oracle [@barr2015oracle]. Tests compare against a few
+hand-computed cases, or another implementation sharing the same assumptions. `dsp-props` replaces those cases with
 the mathematical properties every correct implementation must satisfy:
 linearity, the shift and convolution theorems, Parseval's identity, time
 invariance, causality, consistency with a declared transfer function,
@@ -31,9 +30,8 @@ periodic time invariance of a rational resampler, and invariance of a
 streaming processor to the way its input is cut into blocks
 [@oppenheim2010dtsp; @vaidyanathan1993multirate]. The user declares what an
 operator is in one decorator; `dsp-props` draws adversarial signals with
-Hypothesis [@maciver2019hypothesis], checks every applicable relation with a
-floating-point tolerance derived from the operator's error model, and
-reports the smallest input that breaks one.
+Hypothesis [@maciver2019hypothesis], checks every applicable relation within
+a floating-point tolerance, and reports the smallest input that breaks one.
 
 ```python
 import numpy as np
@@ -49,37 +47,43 @@ dp.verify(my_fft)   # raises PropertyViolation with a minimal counterexample
 # Statement of need
 
 Property-based testing [@claessen2000quickcheck] and metamorphic testing
-[@chen2018metamorphic] address the oracle problem in general, and Hypothesis
-makes them practical in Python. Applying them to numerical signal processing
-still requires three pieces of domain knowledge that every project
-re-implements, usually partially:
+[@chen2018metamorphic] address the oracle problem, and Hypothesis makes them
+practical in Python. Applying them to signal processing still requires three
+pieces of domain knowledge that projects re-implement, usually partially:
 
 1. **Which relations hold.** The catalogue depends on the operator: a complex
    DFT satisfies the circular shift theorem, a real-input DFT returns
    `N // 2 + 1` bins whose DC and Nyquist bins are real, an IIR filter applied
    from rest is causal and time-invariant, a resampler by `L/M` is only
-   periodically time-varying, and a block processor must give the same output
-   for any split of its input, including empty and one-sample blocks.
+   periodically time-varying, and a block processor must not depend on how its
+   input is split.
 2. **Which signals expose bugs.** Uniform random arrays rarely do. `dsp-props`
    generates impulses, constants, off-grid and near-Nyquist tones, close tone
    pairs, sparse signals and white noise, over pathological lengths (1, 2,
    primes, powers of two plus or minus one), amplitudes from 1e-100 to
-   1e100, and block splits that include empty and one-sample blocks.
+   1e100, and block splits: arbitrary cuts (up to `max(N, 16)` blocks,
+   empty and one-sample blocks included), one-sample blocks, fixed-size
+   blocks.
 3. **How close is close enough.** A fixed `rtol` is either too loose to catch
-   a single-precision intermediate or too tight for a large transform. The
-   FFT model follows the $O(\varepsilon \log N)$ bound of
-   @schatzman1996accuracy; recursive filters use a forward-error bound that
-   grows with the order and the $\ell_1$ norms of the recursion's impulse
-   responses [@higham2002accuracy]; and `dp.calibrate` measures an
-   implementation against an extended-precision reference, length by length,
-   refusing to calibrate an operator whose error is implausibly large instead
-   of absorbing the bug into the tolerance.
+   a single-precision intermediate or too tight for a large transform.
+   The default tolerance, $c\,\varepsilon \log_2 N$ relative to the result,
+   has the shape of the worst-case FFT bound [@higham2002accuracy, Theorem
+   24.2]; the root-mean-square error grows only as
+   $O(\varepsilon \sqrt{\log N})$ [@schatzman1996accuracy]. The constant
+   ($c = 20$ for transforms, $c = 1000$ for filters without a declared
+   transfer function, resamplers and streaming processors) is an engineering
+   choice against false alarms, not a derived bound. Only recursive filters
+   get a derived forward-error bound (direct form I), growing with the order
+   and the $\ell_1$ norms of the recursion's impulse responses.
+   `dp.calibrate` instead measures an implementation against an
+   extended-precision reference, length by length, and refuses errors too
+   large to be rounding.
 
 `dsp-props` packages these three pieces for NumPy, SciPy, PyTorch and similar
 libraries [@harris2020numpy; @virtanen2020scipy; @paszke2019pytorch], and for C
-code through `ctypes` adapters. It targets library developers who want to
-test new kernels, users who need to trust a third-party implementation, and
-researchers who need executable specifications of DSP operators.
+code through `ctypes` adapters. It targets library developers testing new
+kernels, users who must trust a third-party implementation, and researchers
+who need executable specifications of DSP operators.
 
 # Features
 
@@ -87,11 +91,11 @@ researchers who need executable specifications of DSP operators.
   transforms such as the DCT), LTI filters with an optional transfer function
   and declared gain bound, rational resamplers, and streaming or stateful
   block processors.
-- Error models for the FFT and recursive filters, and calibration against a
-  `long double` reference.
-- Reports that keep the shrunk counterexample [@maciver2020reduction] and the
-  number of inputs generated before the first failure, exported as text,
-  JSON, Markdown or HTML.
+- Calibration against `long double`, or a double-double DFT where
+  `long double` is not extended. The expected precision is the declared
+  input dtype, so an operator that silently loses precision fails.
+- Reports with the shrunk counterexample [@maciver2020reduction] and the
+  number of inputs before the first failure, as text, JSON, Markdown or HTML.
 - A command line, `dsp-props check module_or_file.py`, that discovers declared
   operators and exits non-zero on failure, for continuous integration.
 - A mutation suite [@jia2011mutation] that measures how well the relations
@@ -101,31 +105,29 @@ researchers who need executable specifications of DSP operators.
 
 The repository includes 31 deliberately faulty operators in six families
 (complex FFT, real FFT, DCT-II, a fourth-order resonant IIR filter, a 2/3
-resampler and streaming processors): a forgotten 1/N, a twiddle sign error,
-single-precision intermediates, a filter redesigned mid-signal, a missing
-interpolation gain, a weak anti-aliasing filter, state reset between blocks
-and others. All 31 are detected with the default 200 inputs per relation. For
-27 of the 30 mutants whose counterexample is a signal, the shrunk signal has
-at most three samples (median: two), and 27 of the 31 fail within the first
-three generated inputs. The only documented blind spot is a filter that is
-wrong but still linear, time-invariant and causal; it is caught as soon as
-its transfer function is declared.
+resampler and streaming processors), such as a forgotten 1/N,
+single-precision intermediates or state reset between blocks. All 31 are detected with the default 200 inputs per relation.
+With Hypothesis seed 0, 26 of the 30 signal counterexamples shrink to at
+most three samples (median: two) and 28 of the 31 mutants fail within the
+first three inputs (26–27 and 25–28 over seeds 0 to 3). The only documented blind spot
+is a filter that is wrong but still linear, time-invariant and causal; it is
+caught as soon as its transfer function is declared.
 
 Applied to 46 targets in SciPy, NumPy, PyTorch, librosa [@mcfee2015librosa]
-and torchaudio, the relations found that `scipy.signal.lfilter` returns an
-uninitialised final state, and `sosfilt` raises, when given an empty block
-with an initial state, so block processing silently diverges after an empty
-block (reported as scipy/scipy#26406). The `lfilter` part turned out to be an
-independent rediscovery of a known issue (scipy/scipy#22571, fixed in the
-development version after SciPy 1.18.1); the `sosfilt` failure, which occurs on
-any input that is empty along the filtered axis, was new. The FIR case of
-`lfilter` propagates to librosa's streaming pre-emphasis. They also found two documented-but-surprising
+and torchaudio, the relations found that, given an empty block and an initial state,
+`scipy.signal.lfilter` returns a wrong final state (recursive filters) or
+raises (FIR filters, which breaks librosa's streaming pre-emphasis), and
+`sosfilt` raises (scipy/scipy#26406, not yet confirmed by a maintainer). The
+`lfilter` part rediscovers scipy/scipy#22571, already fixed in the
+development version after SciPy 1.18.1; the `sosfilt` part is new, but is an
+exception rather than a silent divergence. They also flagged two documented
 behaviours: `tf2sos` drops pure delays, and torchaudio's `deemphasis` clips
-its output to [-1, 1], so it does not invert `preemphasis`. An error profile
-over lengths 2 to 1200 shows that PyTorch's CPU FFT reaches 195 ε for some
-lengths with large prime factors (N = 596 = 4 × 149), against at most about
-4 ε for NumPy and SciPy, which illustrates why tolerances must be calibrated
-per implementation rather than fixed.
+to [-1, 1] by default, so it does not invert `preemphasis`. An error profile
+over lengths 2 to 1200 shows PyTorch's CPU FFT reaching about 200 ε at some
+lengths with a large prime factor (195 ε at N = 596 in the committed profile,
+214 ε at N = 1048 on another x86-64 machine), against at most about 4 ε for
+NumPy and SciPy: tolerances must be calibrated per implementation and
+platform rather than fixed.
 
 # Related work
 
@@ -135,7 +137,8 @@ domain layer on top of it. Differential testing of numerical libraries
 least two of them; metamorphic relations need none. Recent work uses language
 models to propose properties across the Python ecosystem
 [@maaz2025agentic]; `dsp-props` instead provides a curated, verified
-catalogue for one domain, with tolerances grounded in error analysis.
+catalogue for one domain, with explicit tolerances that can be replaced by
+calibrated ones.
 
 # Acknowledgements
 
