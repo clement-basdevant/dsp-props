@@ -1,8 +1,14 @@
 """Operator-aware tolerances.
 
-Phase 1 ships a single analytic model for FFT-like transforms, based on the
-classical O(eps * log2 N) relative error bound of the FFT (Schatzman 1996).
-Phase 2 will add per-operator models calibrated against extended precision.
+``FFTTolerance`` has the shape of the worst-case O(eps * log2 N) normwise
+error bound of the FFT (Higham, Accuracy and Stability of Numerical
+Algorithms, 2nd ed., Theorem 24.2; Schatzman 1996 shows that the
+root-mean-square error grows only as O(eps * sqrt(log2 N))). Its constant is
+not derived: ``c = 20`` for transforms and ``c = 1000`` for the operators that
+have no dedicated model (see ``dsp_props.api``) are engineering choices,
+large enough to avoid false alarms on correct implementations. The derived
+model is ``IIRTolerance`` (``core.iir``); ``dp.calibrate`` (``core.calibration``)
+measures an implementation when a tight tolerance is needed.
 """
 
 from __future__ import annotations
@@ -27,8 +33,9 @@ class ToleranceModel:
 class FFTTolerance(ToleranceModel):
     """||y_hat - y||_2 <= c * eps * max(log2 N, 1) * ||y||_2 + floor.
 
-    ``c`` absorbs the constants of the analysis and the number of chained
-    transforms in a relation; it will be calibrated empirically in phase 2.
+    ``c`` is an engineering constant, not the constant of an error analysis:
+    it covers the unknown constant of the implementation and the few
+    transforms a relation chains. ``dp.calibrate`` measures it instead.
     """
 
     c: float = 20.0

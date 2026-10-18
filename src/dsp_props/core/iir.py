@@ -1,5 +1,12 @@
 """Error model for recursive (IIR) filters.
 
+This is the one derived tolerance of the package (the FFT and default models
+of ``core.tolerance`` are engineering constants). It is a first-order bound
+for the direct form I recursion below; ``proofs/IIRBound.v`` checks its
+exact-arithmetic part. Other structures are not covered by the derivation:
+``scipy.signal.lfilter`` computes a transposed direct form II, which the
+tests only check against the bound empirically (``tests/test_iir.py``).
+
 Rounding errors injected at each step of y[n] = sum b x - sum a y are
 filtered by 1/A(z), so they are amplified by the gain of the recursion.
 Each step rounds the products b_k x[n-k] and a_k y[n-k], so the injected
@@ -138,6 +145,9 @@ def tail_l1_bound(b, a, n):
 class IIRTolerance(ToleranceModel):
     """Tolerance for lfilter-like recursions; see module docstring.
 
+    ``c = 4`` is a margin chosen on top of the first-order bound, not a
+    constant of the derivation.
+
     The model bounds the error relative to ||x||, so relations should pass
     ``ref_norm`` equal to the norm of the *input* signal(s).
     """
@@ -165,7 +175,13 @@ class IIRTolerance(ToleranceModel):
 
 
 def longdouble_lfilter(b, a, x):
-    """Reference recursion in extended precision (slow, for calibration and tests)."""
+    """Reference direct form I recursion in ``long double`` (slow, for calibration and tests).
+
+    ``long double`` is extended precision on Linux x86-64 only; it is float64
+    under MSVC and on macOS arm64, where this reference is no more accurate
+    than the filter it checks. Unlike the DFT reference of ``dp.calibrate``,
+    it has no double-double fallback.
+    """
     b = np.asarray(b, dtype=np.longdouble)
     a = np.asarray(a, dtype=np.longdouble)
     b, a = b / a[0], a / a[0]

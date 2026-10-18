@@ -18,7 +18,11 @@ def _signal_and_splits(draw, max_n, dtype=np.float64):
 
 
 class BlockInvariance(Relation):
-    """Processing in blocks of arbitrary sizes (including 0 and 1) equals one-shot processing."""
+    """Processing in blocks equals one-shot processing, for the splits ``block_splits`` draws.
+
+    Arbitrary cuts (empty and one-sample blocks included), blocks of one
+    sample and blocks of a fixed size; not every possible split.
+    """
 
     name = "block invariance"
 

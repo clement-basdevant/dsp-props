@@ -56,8 +56,8 @@ norm of the *input*, which is what filter error models bound.
 | `linearity` | H(αx + βy) = αHx + βHy, real α, β | always |
 | `time invariance` | H(D_s x) = D_s(Hx), s in [1, 32]; for a non-causal filter, the first s output samples are dropped before comparing | always |
 | `causality` | changing x[n] for n ≥ k leaves y[n] unchanged for n < k | `causal=True` (default) |
-| `transfer function` | the DFT of the impulse response, measured over enough samples to decay, equals B(e^{iθ})/A(e^{iθ}) on the DFT grid | `transfer=(b, a)` (needs SciPy) |
-| `bounded gain` | the worst-case input with \|x[n]\| ≤ 1 gives \|y[n]\| ≤ G | `max_gain=G` |
+| `transfer function` | the DFT of the impulse response, measured over L samples (enough to decay, but at most 2^16), equals B(e^{iθ})/A(e^{iθ}) on the DFT grid, within the tolerance plus a bound on the truncated tail | `transfer=(b, a)` (needs SciPy) |
+| `bounded gain` | for each generated length N ≤ `max_n`, the worst-case input with \|x[n]\| ≤ 1 gives \|y[n]\| ≤ G (a bounded gain on N ≤ `max_n`, not BIBO stability) | `max_gain=G` |
 
 ## Rational resamplers: `dp.resampler(up, down)`
 
@@ -85,7 +85,7 @@ transients.
 
 | Relation | Checked property |
 | --- | --- |
-| `block invariance` | for any cut points (up to 7, so up to 8 blocks, including empty blocks and single samples), concatenating `process(block)` over the blocks of a fresh processor equals `process(x)` on another fresh processor |
+| `block invariance` | for a split drawn by `block_splits`, concatenating `process(block)` over the blocks of a fresh processor equals `process(x)` on another fresh processor. A split is one of three kinds: arbitrary cut points (up to max(N, 16) blocks, empty blocks and single samples included), blocks of one sample, or blocks of a fixed size B (the last one possibly shorter) |
 
 ## Generated signals
 
@@ -104,8 +104,11 @@ Every relation draws its signals from
 | complex exponential (any frequency in [-0.5, 0.5]), x + iy from two real signals, complex noise | code that drops or mixes up the imaginary part; transforms only, unless declared `real_input_only` |
 
 Amplitudes are drawn from {1, 1e-3, 1e3, 1e-100, 1e100}, to reach underflow
-and overflow paths. Lengths mix uniform values up to `max_n` with
-1, 2, 3, 5, 7, 8, 15, 16, 17, 31, 32, 33, 97, 127, 128, 129, 255, 256 and 257.
+and overflow paths ({1, 1e-3, 1e3} for an operator declared with
+`precision=np.float32`). Lengths mix uniform values up to `max_n` with
+1, 2, 3, 5, 7, 8, 15, 16, 17, 31, 32, 33, 97, 127, 128, 129, 255, 256 and 257;
+in runs of 200 examples with `max_n = 512`, about 15 % of the lengths drawn are
+in that list.
 The families are ordered so that shrinking converges to short impulses of unit
 amplitude, which is why counterexamples are usually one to three samples long.
 

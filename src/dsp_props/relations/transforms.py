@@ -1,4 +1,4 @@
-"""Relations for discrete transforms (phase 1: the DFT family)."""
+"""Relations for discrete transforms: the DFT family, and linear transforms in general."""
 
 from __future__ import annotations
 

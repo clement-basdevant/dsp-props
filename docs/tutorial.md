@@ -88,9 +88,9 @@ dsp-props report for lowpass
   default tolerance to `IIRTolerance(b, a)`, which grows with the order of the
   filter and the conditioning of its recursion (see
   [Choosing a tolerance](tolerances.md)). This relation needs SciPy.
-- `max_gain=G` adds the **bounded gain** relation (BIBO stability with a
-  declared bound): for each generated length `N`, dsp-props builds the
-  worst-case input bounded by 1, `x[k] = sign(h[N-1-k])`, and checks that no
+- `max_gain=G` adds the **bounded gain** relation (a bounded gain on
+  N ≤ `max_n`, not a proof of BIBO stability): for each generated length `N`,
+  dsp-props builds the worst-case input bounded by 1, `x[k] = sign(h[N-1-k])`, and checks that no
   output sample exceeds `G`. The tightest valid bound is the ℓ1 norm of the
   impulse response, which `dsp_props.core.recursion_gain(a, b)` computes.
 
@@ -210,8 +210,10 @@ frequency instead. This is the main blind spot of the method; see
 Real-time code processes a signal block by block and carries state between
 calls. `dp.streaming()` declares a class (or any zero-argument factory) whose
 instances have a `process(block)` method. The **block invariance** relation then
-checks that any split of the input into blocks, including empty blocks and
-single samples, gives the same output as one call on the whole signal.
+checks that splitting the input into blocks gives the same output as one call
+on the whole signal. The splits drawn are arbitrary cut points (up to
+max(N, 16) blocks, empty blocks and single samples included), blocks of one
+sample, and blocks of a fixed size.
 
 The obvious implementation with `lfilter` and its `zi` state fails:
 
