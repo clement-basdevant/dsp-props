@@ -45,8 +45,10 @@ spread over \surveyScipyTolDecades{} orders of magnitude. We propose a method
 that derives the test from a statement of what an operator is: metamorphic
 relations proved for transforms, linear time-invariant filters, rational
 resamplers and streaming processors replace the expected output; inputs are
-drawn from signal families known to break DSP code; tolerances follow forward
-error bounds instead of being chosen by hand. We evaluate it with a protocol
+drawn from signal families known to break DSP code; tolerances take the form
+of forward error bounds, with one constant per operator class instead of one
+value per test, a derived bound for linear recursions, and an optional
+calibration against extended precision. We evaluate it with a protocol
 that measures its power and its soundness. On \nFunctional{} functional faults
 injected by mutation, it detects \killFuncDsp{} and the ported test suites of
 NumPy and SciPy \killFuncSop{}; the two detect different faults and together
@@ -121,8 +123,9 @@ contributions are, in order of importance:
 \item \emph{A method} that replaces the expected output by metamorphic relations
 proved for four classes of DSP operators (transforms, linear time-invariant
 filters, rational resamplers, streaming processors), draws inputs from the
-signal families that break DSP code, and derives each tolerance from a
-forward error bound instead of choosing it (Section~\ref{sec:method}).
+signal families that break DSP code, and gives each tolerance the form of a
+forward error bound, with one constant per operator class instead of one value
+per test (Section~\ref{sec:method}).
 \item \emph{An evaluation protocol} that compares the method with the test
 suites of NumPy and SciPy on automatically generated faults, isolates the
 contribution of the generators and of the tolerances by ablation, and validates
@@ -256,7 +259,7 @@ generators and tolerances together for the operators of a DSP library, which is
 the gap this article addresses.
 
 \begin{table}[t]
-\caption{What each approach supplies to the developer: P1, no need for expected values; P2, generated inputs; P3, a derived tolerance}
+\caption{What each approach supplies to the developer: P1, no need for expected values; P2, generated inputs; P3, a tolerance from an error model}
 \label{tab:positioning}
 \centering\scriptsize
 \begin{tabular}{@{}llll@{}}
@@ -456,8 +459,10 @@ sparse signals and white noise. Amplitudes are drawn from
 $\{10^{-100},10^{-3},1,10^{3},10^{100}\}$ to reach underflow and overflow paths.
 Lengths are biased towards the values that change the code path of an FFT or
 a filter: 1, 2, small primes, and $2^k-1$, $2^k$, $2^k+1$, mixed with uniform
-lengths up to 512. Block splits for streaming code include empty and
-one-sample blocks.
+lengths up to 512. Block splits for streaming code mix three kinds: arbitrary
+cut points, which give up to $\max(N,16)$ blocks including empty and one-sample
+ones, every block of a single sample, and blocks of a fixed drawn size, so that
+a processor that loses its state only after many calls is reached.
 
 The families are ordered so that Hypothesis' shrinking converges to short
 impulses of unit amplitude, which yields counterexamples a DSP engineer can read
@@ -477,13 +482,22 @@ normwise, and avoids spurious failures on output samples close to zero.
 \label{eq:fft}
 \end{equation}
 the form of the forward error bound of the radix-2
-FFT~\cite[Thm.~24.2]{higham2002accuracy}, with a constant $c$ that covers the
-few chained transforms in a relation, and a floor at $N$ times the smallest
+FFT~\cite[Thm.~24.2]{higham2002accuracy}, with a constant $c=20$ that covers
+the few chained transforms in a relation, and a floor at $N$ times the smallest
 normal number $\mathrm{tiny}$. The floor keeps exact zeros strict while
 tolerating underflow on signals of amplitude $10^{-100}$ or subnormal values,
-where a purely relative tolerance would be zero.
+where a purely relative tolerance would be zero. The constant is an
+engineering choice, not a derived value: it was set to avoid false alarms on
+correct libraries, and Section~\ref{sec:rq3} measures the resulting margin.
+Filters without a declared transfer function, resamplers and streaming
+processors use the same form with $c=1000$, a looser default that covers
+implementations by direct convolution or overlap-add, whose error grows faster
+than $\log N$; the user can replace it by a calibrated model. In every case
+$\eps$ is the unit roundoff of the input (or of a declared precision), not of
+the output: an operator that returns single precision for a double-precision
+input is reported instead of being granted a single-precision tolerance.
 
-\emph{Linear recursions.} For a filter $y=(B/A)x$ computed by a direct-form
+\emph{Linear recursions.} For a filter $y=(B/A)x$ computed by the direct form~I
 recursion, Appendix~\ref{app:iir} derives
 \begin{equation}
 \|\hat y-y\|_2 \le c\,\eps\,k\,\|h_A\|_1\bigl(\|b\|_1+\|a_{1:}\|_1\|h_{B/A}\|_1\bigr)\|x\|_2,
@@ -493,13 +507,17 @@ to first order in $\eps$, where $k$ is the number of coefficients other than $a_
 $h_{B/A}$ are the impulse responses of $1/A$ and $B/A$, and $a_{1:}$ are the
 feedback coefficients. The bound grows as poles approach the unit circle, which
 is where recursions lose accuracy, and reduces to the error of a dot product for
-a FIR filter.
+a FIR filter. It is the only derived tolerance of the library. Other
+structures, such as the transposed direct form~II of \code{scipy.signal.lfilter},
+are checked against it empirically (Section~\ref{sec:rq3}), not by proof.
 
 \emph{Calibration.} An analytic bound cannot describe every library: an FFT
 may switch algorithm with the factorisation of $N$, and its error then varies by
 two orders of magnitude between neighbouring lengths (Fig.~\ref{fig:profile}).
 \code{dp.calibrate} measures the error of an implementation against an
-extended-precision reference for every length, over several random inputs, and
+extended-precision reference (a DFT in \code{long double} where that type is
+wider than double, a double-double DFT elsewhere, \eg on Windows and on
+macOS arm64) for every length, over several random inputs, and
 turns the worst error times a margin of 8 into a per-length tolerance. It
 refuses to calibrate when the error exceeds what rounding can explain
 ($10^6\eps$), so that a fault cannot be absorbed into the tolerance.
@@ -512,7 +530,7 @@ DFT~\cite{ergun1995testing,fftwverify}, it covers filters, resamplers and
 streaming code, and its tolerance follows the operator. Compared with
 differential testing~\cite{vanover2020fpdiff}, it needs a single implementation.
 Compared with the test suites of Section~\ref{sec:survey}, it needs no expected
-values and no hand-chosen tolerance.
+values and no tolerance chosen test by test.
 
 % ===========================================================================
 \section{Evaluation protocol}
@@ -750,7 +768,12 @@ and causal, a resampler that ignores the last input sample consistently,
 satisfy every structural relation. The transfer-function relation closes the
 first gap at the cost of one declaration; the second remains. Relations are
 thus strongest on faults of structure (state, edges, indexing, normalisation)
-and weakest on faults of value, where expected outputs remain useful.
+and weakest on faults of value, where expected outputs remain useful. The
+tolerances leave a gap in accuracy too: a fault that degrades a transform to a
+few tens or hundreds of $\eps$, such as recursively computed twiddle factors,
+passes the default constant, and \code{dp.calibrate} only refuses errors above
+$10^6\eps$; a single-precision intermediate is caught, a slow loss of accuracy
+is not.
 
 \paragraph*{Parameters are part of the input} The misses of RQ1 all come from
 parameter values that no declaration exercised. A practitioner should declare
@@ -788,8 +811,8 @@ tolerances spread over \surveyScipyTolDecades{} orders of magnitude.
 We proposed a method that answers each problem from a single statement of what
 an operator is: metamorphic relations proved for four classes of DSP operators
 replace the expected output, signal generators target the inputs that break DSP
-code, and tolerances follow forward error bounds or a calibration that refuses
-to absorb faults. We evaluated it with a protocol that measures both its power
+code, and tolerances take the form of forward error bounds, derived for linear
+recursions, or come from a calibration that refuses to absorb faults. We evaluated it with a protocol that measures both its power
 and its soundness. \conclusionResult{} On correct implementations it raised no
 false alarm in \fpRuns{} runs, with references and generators that we audited.
 
@@ -885,8 +908,15 @@ $\sum_{n\ge L}h[n]\omega_L^{kn}$, whose modulus is at most $\sum_{n\ge L}|h[n]|$
 \end{proposition}
 \begin{proof} $H(e^{i\theta})=\sum_{n\ge0}h[n]e^{-i\theta n}$ converges
 absolutely for a stable filter; split the sum at $L$.\end{proof}
-The library chooses $L$ so that $r^L<10^{-17}$, with $r$ the largest pole
-modulus, and adds the tail to the tolerance.
+The library chooses $L$ so that $r^L\approx10^{-17}$, with $r$ the largest
+pole modulus, capped at $2^{16}$ samples. Since the cap leaves a large tail when
+$r$ is close to 1 ($r^{L}\approx1.4\times10^{-3}$ for $r=0.9999$), the
+tolerance includes a bound on $\sum_{n\ge L}|h[n]|$ rather than assuming it
+small: beyond the numerator, $h$ follows the recursion $s_{n+1}=Fs_n$ with $F$
+the companion matrix of $A$, and for $r<\rho<1$ the solution $P$ of
+$F^{\mathsf T}PF-\rho^2P=-I$ gives
+$\sum_{n\ge L}|h[n]|\le\|c\|_{P^{-1}}\|s_L\|_P/(1-\rho)$, with
+$c=-a_{1:}/a_0$, whatever the multiplicity of the poles.
 
 \begin{proposition}[Bounded gain] For an LTI filter with $\|h\|_1\le G$,
 every input with $|x[n]|\le1$ gives $|y[n]|\le G$, and the input
