@@ -24,6 +24,20 @@ class ForgetfulMovingSum(MovingSum):
         return super().process(block)
 
 
+class ForgetsAtTenthCall(MovingSum):
+    """Mutant: history is lost at the tenth call only (counter or ring buffer overflow)."""
+
+    def __init__(self):
+        super().__init__()
+        self.calls = 0
+
+    def process(self, block):
+        self.calls += 1
+        if self.calls == 10:
+            self.hist = np.zeros(2)
+        return super().process(block)
+
+
 def test_correct_block_processor_passes():
     assert dp.verify(dp.streaming()(MovingSum), max_examples=100).ok
 
@@ -31,6 +45,13 @@ def test_correct_block_processor_passes():
 def test_state_reset_mutant_is_detected():
     report = dp.verify(dp.streaming()(ForgetfulMovingSum), max_examples=100, raise_on_failure=False)
     assert not report.ok
+
+
+def test_state_lost_after_many_blocks_is_detected():
+    report = dp.verify(dp.streaming()(ForgetsAtTenthCall), max_examples=100, raise_on_failure=False)
+    assert not report.ok
+    x, cuts = report.failures[0].example
+    assert len(cuts) + 1 >= 10
 
 
 def test_stateful_wrapper():

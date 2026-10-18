@@ -167,12 +167,31 @@ def signal_pairs(draw, max_n: int = 512, complex: bool = False, dtype=np.float64
 
 
 @st.composite
-def block_splits(draw, n: int, max_blocks: int = 8):
+def block_splits(draw, n: int, max_blocks: int | None = None):
     """Cut points splitting a length-``n`` signal into blocks.
 
-    Includes empty blocks and blocks of a single sample, the cases that
-    expose state-handling bugs in streaming code.
+    Three kinds of split are mixed:
+
+    - arbitrary cut points, up to ``max_blocks`` blocks (default
+      ``max(n, 16)``, so that even short signals can be cut into more than ten
+      blocks by adding empty ones);
+    - every block of a single sample (``n`` blocks);
+    - blocks of a fixed size ``B``, the last one possibly shorter.
+
+    Arbitrary cuts come first so that counterexamples shrink towards few
+    blocks. They include empty blocks and blocks of a single sample, the
+    cases that expose state-handling bugs in streaming code; the two regular
+    splits reach large numbers of calls, which a few arbitrary cuts rarely
+    do (a processor that loses its state at its tenth call, say).
     """
+    if max_blocks is None:
+        max_blocks = max(n, 16)
+    kind = draw(st.sampled_from(["arbitrary", "ones", "fixed"]))
+    if kind == "ones":
+        return list(range(1, n))
+    if kind == "fixed":
+        size = draw(st.integers(1, max(n, 1)))
+        return list(range(size, n, size))
     return sorted(draw(st.lists(st.integers(0, n), max_size=max_blocks - 1)))
 
 
