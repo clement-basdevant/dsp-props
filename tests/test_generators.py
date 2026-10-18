@@ -1,7 +1,7 @@
 import numpy as np
 from hypothesis import given, settings
 
-from dsp_props.generators import complex_signals, lengths, signal_pairs, signals
+from dsp_props.generators import block_splits, complex_signals, lengths, signal_pairs, signals, split_blocks
 from hypothesis import strategies as st
 
 
@@ -40,3 +40,20 @@ def test_complex_signals_include_complex_input():
 
     record()
     assert any(seen)
+
+
+def test_block_splits_cover_signal_and_go_beyond_eight_blocks():
+    counts, sizes = [], []
+
+    @settings(max_examples=300, deadline=None, database=None)
+    @given(st.integers(0, 64).flatmap(lambda n: st.tuples(st.just(n), block_splits(n))))
+    def record(item):
+        n, cuts = item
+        blocks = split_blocks(np.arange(n), cuts)
+        assert np.array_equal(np.concatenate(blocks), np.arange(n))
+        counts.append(len(blocks))
+        sizes.extend(len(b) for b in blocks)
+
+    record()
+    assert max(counts) > 8
+    assert 0 in sizes and 1 in sizes
