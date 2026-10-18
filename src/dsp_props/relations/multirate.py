@@ -10,16 +10,16 @@ from __future__ import annotations
 import numpy as np
 from hypothesis import strategies as st
 
-from ..core.tolerance import assert_close, norm
+from ..core.tolerance import assert_close, check_precision, norm
 from ..generators import lengths, signals
 from .base import Relation
 from .lti import LTILinearity
 
 
 @st.composite
-def _signal(draw, max_n):
+def _signal(draw, max_n, dtype=np.float64):
     n = draw(lengths(max_n))
-    return draw(signals(n))
+    return draw(signals(n, dtype))
 
 
 def _long_length(spec):
@@ -45,7 +45,7 @@ class OutputLength(Relation):
         return lengths(spec.max_n)
 
     def check(self, spec, n):
-        got = len(np.asarray(spec.func(np.zeros(n))))
+        got = len(np.asarray(spec.func(np.zeros(n, spec.precision))))
         want = spec.expected_length(n)
         if got != want:
             raise AssertionError(f"{self.name}: N = {n} gave {got} output samples, expected {want}")
@@ -57,19 +57,19 @@ class PeriodicShift(Relation):
     name = "periodic time invariance"
 
     def inputs(self, spec):
-        return st.tuples(_signal(spec.max_n), st.integers(1, 8))
+        return st.tuples(_signal(spec.max_n, spec.precision), st.integers(1, 8))
 
     def check(self, spec, inputs):
         x, s = inputs
         L, M = spec.up, spec.down
         y = np.asarray(spec.func(x))
-        yd = np.asarray(spec.func(np.concatenate([np.zeros(M * s), x])))
+        yd = np.asarray(spec.func(np.concatenate([np.zeros(M * s, x.dtype), x])))
         what = f"{self.name} (input delay {M * s}, output delay {L * s})"
         if len(yd) != len(y) + L * s:
             raise AssertionError(f"{what}: delayed output has {len(yd)} samples, expected {len(y) + L * s}")
         expected = np.concatenate([np.zeros(L * s), y]) if spec.causal else y
         actual = yd if spec.causal else yd[L * s :]
-        assert_close(actual, expected, spec.tolerance, ref_norm=norm(x), what=what)
+        assert_close(actual, expected, spec.tolerance, ref_norm=norm(x), what=what, precision=spec.precision)
 
 
 class DCGain(Relation):
@@ -85,7 +85,9 @@ class DCGain(Relation):
 
     def check(self, spec, inputs):
         n, c = inputs
-        y = _interior(np.asarray(spec.func(np.full(n, c))))
+        y = np.asarray(spec.func(np.full(n, c, spec.precision)))
+        check_precision(y, spec.precision, self.name)
+        y = _interior(y)
         err = float(np.max(np.abs(y - spec.dc_gain * c))) if len(y) else 0.0
         if not err <= spec.ripple * abs(spec.dc_gain * c):
             raise AssertionError(
@@ -109,8 +111,10 @@ class AliasRejection(Relation):
 
     def check(self, spec, inputs):
         n, f, phase = inputs
-        x = np.cos(np.pi * f * np.arange(n) + phase)  # f in units of the input Nyquist
-        y = _interior(np.asarray(spec.func(x)))
+        x = np.cos(np.pi * f * np.arange(n) + phase).astype(spec.precision)  # f in units of the input Nyquist
+        y = np.asarray(spec.func(x))
+        check_precision(y, spec.precision, self.name)
+        y = _interior(y)
         rms = float(np.sqrt(np.mean(y ** 2))) if len(y) else 0.0
         limit = spec.stopband / np.sqrt(2)
         if not rms <= limit:

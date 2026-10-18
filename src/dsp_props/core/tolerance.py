@@ -55,10 +55,37 @@ def norm(v) -> float:
     return scale * float(np.linalg.norm(v / scale))
 
 
-def assert_close(actual, expected, model: ToleranceModel, *, ref_norm=None, what=""):
-    """Compare two arrays with an operator-aware tolerance (L2 norm)."""
+def precision_of(dtype):
+    """The real floating dtype whose epsilon governs ``dtype`` (float32 for complex64, at least float32)."""
+    return np.finfo(np.result_type(dtype, np.float32)).dtype
+
+
+def check_precision(actual, expected, what=""):
+    """Raise ``ToleranceError`` when the output ``actual`` is less precise than the dtype ``expected``.
+
+    An operator that silently computes in lower precision (complex64 out of
+    float64 in) must not be judged with the epsilon of its own output.
+    """
+    got = np.asarray(actual).dtype
+    if np.finfo(precision_of(got)).eps > np.finfo(precision_of(expected)).eps:
+        raise ToleranceError(
+            f"{what}: output dtype {got} is less precise than the expected {np.dtype(expected)} "
+            "(the precision of the input, or the one declared)"
+        )
+
+
+def assert_close(actual, expected, model: ToleranceModel, *, ref_norm=None, what="", precision=None):
+    """Compare two arrays with an operator-aware tolerance (L2 norm).
+
+    ``precision`` is the dtype the operator is expected to keep (its input's,
+    or the declared one): a less precise ``actual`` is an error, and the
+    tolerance uses its epsilon. Without it, the tolerance uses the epsilon of
+    ``actual`` itself.
+    """
     actual = np.asarray(actual)
     expected = np.asarray(expected)
+    if precision is not None:
+        check_precision(actual, precision, what)
     if actual.shape != expected.shape:
         raise ToleranceError(f"{what}: shape {actual.shape} != {expected.shape}")
     if not np.all(np.isfinite(actual)):
@@ -67,7 +94,7 @@ def assert_close(actual, expected, model: ToleranceModel, *, ref_norm=None, what
         ref_norm = norm(expected)
     n = max(actual.size, 1)
     err = norm(actual - expected)
-    tol = model.bound(n, actual.dtype, ref_norm)
+    tol = model.bound(n, actual.dtype if precision is None else precision, ref_norm)
     if not err <= tol:
         raise ToleranceError(
             f"{what}: L2 error {err:.3e} exceeds tolerance {tol:.3e} (N={n}, ref norm {ref_norm:.3e})"

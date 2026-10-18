@@ -24,12 +24,23 @@ $$
 $$
 
 where `bound` is the `bound(n, dtype, ref_norm)` method of a
-[`ToleranceModel`](api/core.md), ε is the machine epsilon of the dtype of the
-actual output (float32 at the coarsest: a float16 output is measured with the
-float32 ε), and the reference norm is chosen by the relation: the norm of the
-expected output for transforms, the norm of the input for filters and
-resamplers. The output must also have the expected shape and contain only finite
-values. Using norms rather than element-wise comparisons follows the form of
+[`ToleranceModel`](api/core.md), ε is the machine epsilon of the *expected*
+precision (float32 at the coarsest), and the reference norm is chosen by the
+relation: the norm of the expected output for transforms, the norm of the input
+for filters and resamplers. The output must also have the expected shape,
+contain only finite values, and be at least as precise as expected.
+
+The expected precision is that of the inputs, which the generators draw in the
+dtype given by the declaration's optional `precision` argument (`np.float64`
+by default). It never comes from the output: an operator that silently returns
+complex64 for float64 input fails with
+`output dtype complex64 is less precise than the expected float64`, instead of
+being judged with the float32 ε of its own output. An operator meant to run in
+single precision is declared as such, for instance
+`@dp.transform(inverse=np.fft.ifft, precision=np.float32)`: it then receives
+float32 (or complex64) inputs, with the amplitudes float32 can hold (1, 1e-3
+and 1e3, not 1e-100 or 1e100), and is checked with the float32 ε. A more
+precise output than expected is always accepted. Using norms rather than element-wise comparisons follows the form of
 the error bounds, which are normwise, and avoids spurious failures on output
 samples close to zero.
 
@@ -171,7 +182,7 @@ dp.calibrate(op, reference=longdouble_dft, lengths=range(1, 257), trials=6, *,
 | `seed` | seed of the probe signals, so calibration is reproducible |
 
 For each length, the worst relative error over the probe signals,
-‖op(x) − ref(x)‖ / (ε ‖ref(x)‖) with ε that of `op`'s output dtype, is recorded
+‖op(x) − ref(x)‖ / (ε ‖ref(x)‖) with ε that of the input's dtype, is recorded
 as a ratio in units of ε. The result is a `CalibratedTolerance`:
 
 $$
@@ -251,12 +262,12 @@ not compute what the reference computes.
   (for example Windows and Apple silicon). There, the reference is no more
   accurate than a float64 operator, and the measured ratios understate its
   error. Check `np.finfo(np.longdouble).eps` before trusting a calibration.
-- **ε is that of the operator's output dtype.** An implementation that computes
-  in float32 but returns float64 is measured against the float64 ε: its error
-  (about 2e8 ε for an FFT) exceeds `max_plausible` and calibration refuses it,
-  since a float64 interface promises float64 accuracy. One that returns
-  complex64 is measured against the float32 ε, the right yardstick for a
-  float32 operator.
+- **ε is that of the input's dtype.** The probe signals are float64, so an
+  implementation that computes in float32 is measured against the float64 ε,
+  whether it returns float64 or complex64: its error (of order 1e8 ε for an FFT)
+  exceeds `max_plausible` and calibration refuses it, since float64 input
+  promises float64 accuracy. Calibration does not yet take a `precision`
+  argument: check a float32 operator with `dp.verify` and `precision=np.float32`.
 - **The default reference is a DFT.** To calibrate another operator, pass its
   own extended-precision reference, for instance
   `reference=lambda x: longdouble_lfilter(b, a, x)` for a recursive filter.
