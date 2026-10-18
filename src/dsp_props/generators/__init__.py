@@ -1,5 +1,6 @@
 from .signals import (
     lengths,
+    amplitudes,
     impulse,
     dc,
     offgrid_sine,
@@ -18,6 +19,7 @@ from .signals import (
 
 __all__ = [
     "lengths",
+    "amplitudes",
     "impulse",
     "dc",
     "offgrid_sine",

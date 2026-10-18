@@ -63,9 +63,12 @@ def _eps(dtype):
 
 
 def relative_error(op, reference, x):
-    """||op(x) - reference(x)|| / (eps * ||reference(x)||), eps of op's output dtype.
+    """||op(x) - reference(x)|| / (eps * ||reference(x)||), eps of the input's dtype.
 
-    ``reference`` returns an array, or a ``DoubleDouble`` (hi, lo) pair.
+    The input sets the precision expected of ``op``: an operator that returns
+    complex64 for float64 input is measured in float64 epsilons (and refused
+    as implausible), not in its own. ``reference`` returns an array, or a
+    ``DoubleDouble`` (hi, lo) pair.
     """
     y = np.asarray(op(x))
     ref = reference(x)
@@ -79,7 +82,7 @@ def relative_error(op, reference, x):
         diff = ((y - ref.hi) - ref.lo).astype(np.complex128)  # y - hi is exact when close (Sterbenz)
     else:
         diff = (y.astype(np.clongdouble) - ref).astype(np.complex128)
-    return float(norm(diff)) / (_eps(y.dtype) * ref_norm)
+    return float(norm(diff)) / (_eps(np.asarray(x).dtype) * ref_norm)
 
 
 @dataclass
