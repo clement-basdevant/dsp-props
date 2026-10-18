@@ -140,11 +140,13 @@ class TransferConsistency(Relation):
 
 
 class BoundedGain(Relation):
-    """No bounded input can be amplified more than the declared gain (BIBO stability).
+    """No input bounded by 1 is amplified beyond the declared gain, for N <= max_n.
 
     The worst input of length N is sign(h[N-1-k]) (h measured from the
     impulse response): it drives y[N-1] to sum |h[:N]|, the largest possible
-    output for |x| <= 1.
+    output for |x| <= 1. Only lengths up to ``max_n`` are tried, so this is a
+    bounded gain on N <= max_n, not BIBO stability: a response that grows
+    beyond max_n samples is not seen.
     """
 
     name = "bounded gain"

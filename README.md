@@ -4,7 +4,7 @@
 
 **Property-based testing for digital signal processing code**
 
-DSP code is usually tested by comparing its output with a reference (MATLAB, SciPy) on a few signals, with a hand-picked tolerance. `dsp-props` instead checks **relations that must always hold** (linearity, shift theorem, Parseval, Hermitian symmetry, invertibility, convolution theorem, causality, time invariance, consistency across block sizes), on **automatically generated signals** from [Hypothesis](https://hypothesis.works/), chosen to trip up DSP code: impulses, off-grid sinusoids, close tones, near-Nyquist tones, extreme amplitudes, lengths 1, 2, prime or 2^k ± 1, empty and one-sample blocks. Tolerances follow an error model of each operation (O(ε log N) error for an FFT) instead of a fixed `atol`, and every failure is reported with a small counterexample.
+DSP code is usually tested by comparing its output with a reference (MATLAB, SciPy) on a few signals, with a hand-picked tolerance. `dsp-props` instead checks **relations that must always hold** (linearity, shift theorem, Parseval, Hermitian symmetry, invertibility, convolution theorem, causality, time invariance, consistency across block sizes), on **automatically generated signals** from [Hypothesis](https://hypothesis.works/), chosen to trip up DSP code: impulses, off-grid sinusoids, close tones, near-Nyquist tones, extreme amplitudes, lengths 1, 2, prime or 2^k ± 1 (about 15 % of the lengths drawn), empty and one-sample blocks. Tolerances scale with the operation instead of a fixed `atol`: c · ε · log N for an FFT, with an engineering constant (c = 20 for transforms, c = 1000 for filters without a declared transfer function, resamplers and streaming), a derived bound for direct-form I recursive filters, and `dp.calibrate` when you need a tight tolerance. Every failure is reported with a small counterexample.
 
 > Status: alpha. The six phases of the [development plan](https://github.com/clement-basdevant/dsp-props/blob/main/docs/schema-directeur.md) (in French) are complete; version 0.1.2 on PyPI.
 
@@ -45,17 +45,20 @@ dp.transform(inverse=np.fft.irfft, kind="rdft", parseval=True)(np.fft.rfft)
 dp.transform(kind="generic", inverse=idct_ortho, parseval=True, parseval_scale=lambda n: 1.0)(dct_ortho)
 
 # LTI filter: linearity, time invariance, causality, frequency response = B(z)/A(z).
-# The tolerance follows the conditioning of the recursion (IIRTolerance).
+# The tolerance follows the conditioning of the recursion (IIRTolerance, derived for direct form I).
 dp.lti_filter(causal=True, transfer=(b, a))(lambda x: scipy.signal.lfilter(b, a, x))
 
-# BIBO stability: no input bounded by 1 may exceed the declared gain (worst-case input is constructed)
+# Bounded gain on N <= max_n: no input bounded by 1, of length up to max_n, may exceed the declared gain
+# (the worst-case input is constructed); this is not a BIBO stability proof
 dp.lti_filter(max_gain=l1_norm_of_h)(my_filter)
 
 # Rational L/M resampler: linearity, a delay of M input samples = a delay of L output samples,
 # length ceil(N L / M), DC gain, and alias rejection when decimating
 dp.resampler(2, 3)(lambda x: scipy.signal.resample_poly(x, 2, 3))
 
-# Block processing: any split into blocks (empty and one-sample blocks included) must give the same output
+# Block processing: splitting the input into blocks must give the same output as one call. The splits drawn
+# are arbitrary cuts (up to max(N, 16) blocks, empty and one-sample blocks included), all blocks of one
+# sample, and blocks of a fixed size
 @dp.streaming()
 class MyFilter:
     def process(self, block): ...
@@ -99,7 +102,7 @@ dp.verify(dp.streaming()(c_block_processor(lib, "biquad", state_size=2)))
 
 ## Calibrated tolerances
 
-A fixed ε · log N bound does not describe every library: over N = 2…1200, the PyTorch FFT (MKL) reaches 195 ε against 4 ε for NumPy, depending on the factorisation of N. `dp.calibrate` measures the actual error against an extended-precision reference and derives the tolerance from it:
+A fixed ε · log N bound does not describe every library: over N = 2…1200, the PyTorch FFT (MKL) reaches 195 ε against 4 ε for NumPy, depending on the factorisation of N. The default constants are wide on purpose, so an FFT a few tens of ε less accurate than NumPy still passes them (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md)). `dp.calibrate` is the recommended path for a tight tolerance: it measures the actual error against an extended-precision reference (long double where it is extended, a double-double DFT elsewhere) and derives the tolerance from it:
 
 ```python
 tol = dp.calibrate(torch_fft, lengths=range(1, 513))   # refuses a wrong operator
@@ -113,7 +116,7 @@ dp.transform(inverse=torch_ifft, parseval=True, tolerance=tol)(torch_fft)
 
 ## Validating the tool: the mutant suite
 
-`mutants/` contains 31 deliberately buggy implementations, in six families:
+`mutants/` contains 31 deliberately buggy implementations, in six families. They were written by hand, by the author of the relations and in their vocabulary (each mutant breaks a structural property a relation states), so the mutation score measures that the relations catch the faults they were designed for, not their power on independent faults:
 
 | Family | Mutants |
 | --- | --- |
@@ -130,7 +133,7 @@ python mutants/run_mutants.py
 Mutation score: 31/31 (100%)
 ```
 
-Counterexamples are tiny: for 27 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response), the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 27 mutants fail within the first 3 generated inputs. The exceptions are expected: 97 samples for a filter that changes after 64, and 192 for the DC-gain and aliasing relations, which need long signals. `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records these measurements.
+Counterexamples are tiny. In a run with every `dp.verify` seeded with 0, for 26 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response) the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 28 of 31 mutants fail within the first 3 generated inputs. The exceptions are expected: 15 samples for `filtfilt` declared causal, which falls back to `lfilter` on short inputs, 34 for a filter that changes after 64 samples (the time-invariance relation delays the input), and 192 for the DC-gain and aliasing relations, which need long signals. `mutants/run_mutants.py` fixes no seed, so these counts vary between runs (the run recorded in `benchmarks/mutant_results.json` gave 27 and 27); `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records a run.
 
 Every report gives the smallest input found and can be exported:
 
@@ -145,8 +148,14 @@ Known blind spot: a filter that is wrong but still linear, time-invariant and ca
 
 ## Bug hunting in real libraries
 
-`benchmarks/campaign.py` applies the relations to SciPy, NumPy, PyTorch, librosa and torchaudio (46 targets).
-It found that `scipy.signal.lfilter` and `sosfilt` fail on an empty block with an initial state, reported in [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406). The `lfilter` part was already known ([scipy/scipy#22571](https://github.com/scipy/scipy/issues/22571), fixed in the development version of SciPy): dsp-props rediscovered it independently. The `sosfilt` part, which fails on any input that is empty along the filtered axis, is new. It also found that `scipy.signal.tf2sos` drops pure delays ([scipy/scipy#26417](https://github.com/scipy/scipy/issues/26417)) and that torchaudio's `deemphasis` clamps its output to [-1, 1] ([pytorch/audio#4238](https://github.com/pytorch/audio/issues/4238)). Detailed results are in `benchmarks/RESULTS-*.md` ([benchmarks/](https://github.com/clement-basdevant/dsp-props/tree/main/benchmarks)).
+`benchmarks/campaign.py` applies the relations to SciPy, NumPy, PyTorch, librosa and torchaudio (46 targets). What it found, at its actual size:
+
+- **`scipy.signal.lfilter` on an empty block with an initial state** returns an uninitialised final state for an IIR filter (and raises for a FIR one), so block processing goes silently wrong after an empty block. This is a **rediscovery**: it was already reported as [scipy/scipy#22571](https://github.com/scipy/scipy/issues/22571) and is fixed in the development version of SciPy. dsp-props found it independently, and the FIR case also affects librosa's streaming pre-emphasis.
+- **`scipy.signal.sosfilt` on an empty block** is new, but it **raises an exception** (`ValueError`) on any input that is empty along the filtered axis; it does not diverge silently. Reported together with the `lfilter` case in [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406).
+- **`scipy.signal.tf2sos` drops pure delays** ([scipy/scipy#26417](https://github.com/scipy/scipy/issues/26417)): a documented behaviour that is surprising, possibly a documentation issue rather than a bug.
+- **torchaudio's `deemphasis` clamps its output to [-1, 1]** ([pytorch/audio#4238](https://github.com/pytorch/audio/issues/4238)): the clamp comes from `lfilter`'s documented default `clamp=True`, in a library now in maintenance mode.
+
+None of these reports had been confirmed by a maintainer when this was written (October 2026). Detailed results are in `benchmarks/RESULTS-*.md` ([benchmarks/](https://github.com/clement-basdevant/dsp-props/tree/main/benchmarks)).
 
 ## Installation
 
@@ -183,8 +192,8 @@ python -m pytest
 
 1. **Foundations**: generators, basic relations, tests on `numpy.fft` *(done)*
 2. **Tolerance engine**: error models per operator class, calibration against extended precision *(done)*
-3. **Advanced relations**: causality, stability, block streaming, multirate *(done)*
-4. **Mutant suite**: about forty mutants, trial on `scipy.signal` *(31 mutants, campaign on 46 real targets; to be extended)*
+3. **Advanced relations**: causality, bounded gain, block streaming, multirate *(done)*
+4. **Mutant suite**: 31 hand-written mutants in six families, campaign on 46 real targets *(done; to be extended)*
 5. **Shrinking and reporting**: small counterexamples, HTML report *(done)*
 6. **Auto-discovery and C adapter** *(done: `dsp-props check`, `dsp_props.adapters`)*
 

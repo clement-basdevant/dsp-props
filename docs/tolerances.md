@@ -2,10 +2,15 @@
 
 Floating-point results can only be compared within a tolerance. A fixed `rtol`
 is either too loose to catch a single-precision intermediate or too tight for a
-large transform or an ill-conditioned recursion. dsp-props derives the
-tolerance from an **error model** of the operation instead, and lets you
-**calibrate** it against an extended-precision reference when the analytic
-model does not describe a library.
+large transform or an ill-conditioned recursion. dsp-props scales the
+tolerance with the operation instead, and lets you **calibrate** it against an
+extended-precision reference. Only one model is derived from an error
+analysis, the one for recursive filters (`IIRTolerance`, for the direct form I
+recursion). The others have the shape of a known bound (ε log N for an FFT)
+with an engineering constant chosen to avoid false alarms, not derived from
+the analysis: `c = 20` for transforms and `c = 1000` for the operators without
+a dedicated model. **Calibration is the recommended path when you need a
+tight tolerance.**
 
 !!! warning "Project rule: never widen a tolerance to make a test pass"
     When a relation fails, either the operator has a bug, or the error model is
@@ -51,15 +56,21 @@ would be zero.
 
 ## FFT and transforms: `FFTTolerance`
 
-For transforms, the model follows the O(ε log N) forward error bound of the
-FFT (Schatzman 1996; Higham 2002, Thm. 24.2):
+For transforms, the model has the shape of the worst-case O(ε log N) normwise
+forward error bound of the FFT (Higham 2002, Thm. 24.2; Schatzman 1996 shows
+that the root-mean-square error grows only as O(ε √log N)):
 
 $$
 \|\hat y - y\|_2 \le c\,\varepsilon\,\max(\log_2 N, 1)\,\|y\|_2 + N\,\mathrm{tiny}
 $$
 
-The constant `c` absorbs the constants of the analysis and the few chained
-operations in a relation (for example `inverse(f(x))`).
+The constant `c` is not the constant of the theorem, which depends on how the
+implementation computes its twiddle factors and is not known for a given
+library. It is an engineering choice, large enough for correct implementations
+not to raise false alarms and to cover the few chained operations in a
+relation (for example `inverse(f(x))`). The consequence is a blind spot: an FFT
+whose error is a few tens of ε above a good one still passes (see
+[What the relations don't see](blind-spots.md#an-accuracy-gap-between-the-default-tolerance-and-calibration)).
 
 | Where it is used | Default |
 | --- | --- |
@@ -69,12 +80,18 @@ operations in a relation (for example `inverse(f(x))`).
 | `dp.streaming()`, `dp.stateful(...)` | `FFTTolerance(c=1000.0)` |
 
 Operators without a dedicated model get the same formula with a larger
-constant. When the coefficients of a recursive filter are known, the model
-below follows its conditioning instead.
+constant, `c = 1000`, which is not derived from any analysis of a filter, a
+resampler or a streaming processor either: it is wide enough for their
+correct implementations (in `benchmarks/validation.json`, 2000 runs of correct
+implementations raised no false alarm, a measurement made before the latest
+changes to the relations) and still far below the error of a structural bug.
+When the coefficients of a recursive filter are known, the model below follows
+its conditioning instead.
 
 ## Recursive filters: `IIRTolerance`
 
-For a filter y = (B/A) x computed by a direct-form recursion, the rounding
+For a filter y = (B/A) x computed by the direct form I recursion
+y[n] = Σ b_k x[n−k] − Σ a_k y[n−k], the rounding
 errors injected at each step are themselves filtered by 1/A(z), so they are
 amplified by the gain of the recursion. The repository derives (and checks in
 Coq, `proofs/IIRBound.v`) the first-order bound
@@ -90,7 +107,12 @@ in the style of Higham (2002), where
   ℓ1 norms grow as poles approach the unit circle;
 - a_{1:} are the feedback coefficients (b and a are normalised by a_0);
 - k = len(a) + len(b) − 1 grows with the order of the filter;
-- c = 4 by default.
+- c = 4 by default, a margin on top of the first-order bound.
+
+The derivation covers the direct form I only. `scipy.signal.lfilter` computes a
+transposed direct form II, whose rounding errors enter differently; that the
+bound also holds for it is checked by the tests (`tests/test_iir.py`, against
+`longdouble_lfilter`), not proved.
 
 The second term in the parenthesis matters: with clustered poles near the unit
 circle, the state grows far larger than the input and dominates the rounding.
@@ -145,8 +167,10 @@ also the tightest gain bound to declare with `max_gain=` (see the
     against an infinite tolerance. Declare unstable recursions with an explicit
     `tolerance=` and without `transfer`.
 
-`dsp_props.core.longdouble_lfilter(b, a, x)` is a slow reference recursion in
-extended precision, used by the tests to check that the bound holds.
+`dsp_props.core.longdouble_lfilter(b, a, x)` is a slow direct form I reference
+recursion in `long double`, used by the tests to check that the bound holds.
+It is extended precision only where `long double` is (Linux x86-64), and,
+unlike the DFT reference below, has no double-double fallback.
 
 ## Calibration: `dp.calibrate`
 
@@ -167,14 +191,14 @@ extended-precision reference, length by length, and turns it into a tolerance
 model:
 
 ```text
-dp.calibrate(op, reference=longdouble_dft, lengths=range(1, 257), trials=6, *,
+dp.calibrate(op, reference=extended_dft, lengths=range(1, 257), trials=6, *,
              margin=8.0, max_plausible=1e6, seed=0) -> CalibratedTolerance
 ```
 
 | Argument | Meaning |
 | --- | --- |
 | `op` | the operator to measure, `y = op(x)` |
-| `reference` | extended-precision reference with the same output shape; default `longdouble_dft`, a DFT computed by NumPy in `long double` |
+| `reference` | extended-precision reference with the same output shape; default `extended_dft`: NumPy's FFT in `long double` where that is really extended (`longdouble_fft_is_extended()`), otherwise `doubledouble_dft`, an O(N²) DFT in double-double arithmetic |
 | `lengths` | the lengths N to measure |
 | `trials` | number of Gaussian-noise signals per length; each length also gets an impulse at a random position, a cosine of random frequency and phase, and a near-Nyquist alternating signal with a 1e-6 noise detail |
 | `margin` | safety factor applied to the measured error (8 by default) |
@@ -256,12 +280,17 @@ not compute what the reference computes.
 
 ### Caveats
 
-- **The reference must be more precise than the operator.** `longdouble_dft`
-  and `longdouble_lfilter` use NumPy's `long double`, which is 80-bit extended
-  precision on x86-64 Linux, but is the same as `double` on some platforms
-  (for example Windows and Apple silicon). There, the reference is no more
-  accurate than a float64 operator, and the measured ratios understate its
-  error. Check `np.finfo(np.longdouble).eps` before trusting a calibration.
+- **The reference must be more precise than the operator.** NumPy's
+  `long double` is 80-bit extended precision on Linux x86-64, but the same as
+  `double` under MSVC and on macOS arm64, and NumPy 1.x computes the FFT of a
+  `clongdouble` array in complex128. The default DFT reference, `extended_dft`,
+  checks this (`longdouble_fft_is_extended()`) and falls back to
+  `doubledouble_dft` (relative error below 1e-30, checked against mpmath in
+  `tests/test_calibration.py`) where `long double` is not extended; pass
+  `reference=doubledouble_dft` to use it everywhere. The fallback is O(N²), so
+  calibrating long lengths is slower there. `longdouble_lfilter`
+  has no such fallback: where `long double` is float64 it is no more accurate
+  than the filter it checks.
 - **ε is that of the input's dtype.** The probe signals are float64, so an
   implementation that computes in float32 is measured against the float64 ε,
   whether it returns float64 or complex64: its error (of order 1e8 ε for an FFT)

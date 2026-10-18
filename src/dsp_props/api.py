@@ -131,9 +131,10 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     Checks linearity, time invariance and (if ``causal``) causality. With
     ``transfer=(b, a)`` it also checks the measured frequency response against
     B(z)/A(z), and the tolerance defaults to ``IIRTolerance(b, a)``, which
-    follows the conditioning of the recursion. With ``max_gain`` it checks
-    that no input bounded by 1 gives an output above ``max_gain`` (BIBO
-    stability with a declared bound, e.g. the l1 norm of the impulse response).
+    follows the conditioning of a direct-form I recursion. With ``max_gain`` it checks
+    that no input bounded by 1 gives an output above ``max_gain`` (a bounded
+    gain on N <= ``max_n``, e.g. the l1 norm of the impulse response; not BIBO
+    stability, since longer inputs are not tried).
     An unstable ``transfer`` (a pole on or outside the unit circle) raises
     ``ValueError``: no relation could fail against it.
 
@@ -227,8 +228,10 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
 def streaming(*, tolerance=None, max_n=512, precision=np.float64):
     """Declare a block processor: a class (or factory) whose instances have ``process(block)``.
 
-    ``dp.verify`` then checks that any split into blocks, including empty
-    blocks and single samples, gives the same output as one call.
+    ``dp.verify`` then checks that a split into blocks gives the same output
+    as one call. The splits drawn mix arbitrary cut points (up to
+    ``max(N, 16)`` blocks, empty and one-sample blocks included), blocks of
+    one sample, and blocks of a fixed size (see ``generators.block_splits``).
     ``precision`` as for ``lti_filter``.
     """
     precision = _precision(precision)

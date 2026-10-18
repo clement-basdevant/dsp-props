@@ -13,11 +13,12 @@ streaming processor to the way its input is cut into blocks.
 The relations are checked on **automatically generated signals** from
 [Hypothesis](https://hypothesis.works/), chosen to trip up DSP code: impulses,
 constants, off-grid sinusoids, close tones, near-Nyquist tones, extreme
-amplitudes (1e-100 to 1e100), lengths 1, 2, prime or 2^k ± 1, and empty and
-one-sample blocks. Tolerances follow an **error model** of each operation
-(O(ε log N) for an FFT, a conditioning-aware bound for recursive filters)
-instead of a fixed `atol`, and every failure is reported with a **small
-counterexample**.
+amplitudes (1e-100 to 1e100), lengths 1, 2, prime or 2^k ± 1 (about 15 % of
+the lengths drawn), and empty and one-sample blocks. Tolerances **scale with
+the operation** instead of a fixed `atol`: c · ε · log N for an FFT, with an
+engineering constant chosen to avoid false alarms, a derived bound for
+direct-form I recursive filters, and `dp.calibrate` when you need a tight
+tolerance. Every failure is reported with a **small counterexample**.
 
 !!! note "Status"
     Alpha. Version 0.1.2 is on [PyPI](https://pypi.org/project/dsp-props/). DOI: [10.5281/zenodo.23437840](https://doi.org/10.5281/zenodo.23437840).
