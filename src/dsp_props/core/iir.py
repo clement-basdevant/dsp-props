@@ -71,6 +71,69 @@ def recursion_gain(a, b=(1.0,), tol=1e-12, max_len=1_000_000):
     return float(np.sum(np.abs(lfilter(b, a, impulse))))
 
 
+def tail_l1_bound(b, a, n):
+    """Upper bound on sum_{k >= n} |h[k]| for h the impulse response of B(z)/A(z).
+
+    For k >= len(b) the response follows the recursion alone: with the state
+    s_k = (h[k-1], ..., h[k-p]) and F the companion matrix of A,
+    s_{k+1} = F s_k and h[k] = c^T s_k with c = -a[1:] / a[0]. For any rho
+    with r < rho < 1 (r the largest pole modulus), the Lyapunov equation
+    F^T P F - rho^2 P = -I has a positive definite solution P, so that
+    ||F s||_P^2 = rho^2 ||s||_P^2 - ||s||^2 <= rho^2 ||s||_P^2. Hence
+    |h[k]| <= ||c||_{P^-1} ||s_k||_P <= ||c||_{P^-1} rho^(k-n) ||s_n||_P and
+
+        sum_{k >= n} |h[k]| <= ||c||_{P^-1} ||s_n||_P / (1 - rho).
+
+    P absorbs the polynomial growth of repeated poles, so no constant has to
+    be guessed. Each rho gives a valid bound; the smallest over a few is kept.
+    """
+    import warnings
+
+    from scipy.linalg import LinAlgError, LinAlgWarning, cholesky, solve_discrete_lyapunov
+    from scipy.signal import lfilter
+
+    b = np.atleast_1d(np.asarray(b, dtype=float))
+    a = np.atleast_1d(np.asarray(a, dtype=float))
+    b, a = b / a[0], a / a[0]
+    p = len(a) - 1
+    if n < len(b) + p:
+        raise ValueError(f"tail_l1_bound needs n >= len(b) + len(a) - 1 = {len(b) + p}, got {n}")
+    if p == 0:
+        return 0.0  # FIR: h[k] = 0 for k >= len(b)
+    impulse = np.zeros(n)
+    impulse[0] = 1.0
+    s = lfilter(b, a, impulse)[n - p:][::-1]  # (h[n-1], ..., h[n-p])
+    scale = float(np.max(np.abs(s)))
+    if scale == 0.0:
+        return 0.0
+    s = s / scale  # the response may be ~1e-200 by then: keep s^T P s from underflowing
+    c = -a[1:]
+    F = np.zeros((p, p))
+    F[0] = c
+    F[1:, :-1] = np.eye(p - 1)
+    r = pole_radius(a)
+    best = np.inf
+    for t in (0.01, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9):
+        rho = r + t * (1 - r)
+        if rho <= 0:
+            continue
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", LinAlgWarning)
+                P = solve_discrete_lyapunov(F.T / rho, np.eye(p) / rho**2)
+                P = (P + P.T) / 2
+                Rt = cholesky(P)  # P = Rt^T Rt; fails if P is not positive definite
+        except (LinAlgError, LinAlgWarning, ValueError):
+            continue  # too ill-conditioned for this rho to give a trustworthy P
+        norm_c = np.linalg.norm(np.linalg.solve(Rt.T, c))  # ||c||_{P^-1}
+        norm_s = np.linalg.norm(Rt @ s)  # ||s_n||_P
+        best = min(best, norm_c * norm_s / (1 - rho))
+    if not np.isfinite(best):
+        # returning inf would make the transfer-function check pass whatever the filter does
+        raise ValueError(f"tail_l1_bound: no trustworthy Lyapunov solution for poles of radius {r:.6g}")
+    return float(best * scale)
+
+
 @dataclass
 class IIRTolerance(ToleranceModel):
     """Tolerance for lfilter-like recursions; see module docstring.
