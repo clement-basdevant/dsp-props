@@ -19,8 +19,21 @@ from .relations import LTI_RELATIONS, MULTIRATE_RELATIONS, STREAMING_RELATIONS, 
 KINDS = ("dft", "rdft", "generic")
 
 
+def _precision(dtype):
+    """Validate a declared ``precision`` and return it as a real floating dtype."""
+    dt = np.dtype(dtype)
+    if dt.kind not in "fc":
+        raise ValueError(f"precision must be a floating dtype such as np.float32 or np.float64, got {dt}")
+    return np.finfo(np.result_type(dt, np.float32)).dtype  # float16 is checked as float32, like the bounds
+
+
 def hermitian_extend(half, n):
-    """Full length-``n`` DFT from the ``n // 2 + 1`` bins of a real-input DFT."""
+    """Full length-``n`` DFT from the ``n // 2 + 1`` bins of a real-input DFT.
+
+    The result is the complex dtype of ``half``'s precision (complex128 for
+    float64 or complex128 bins, complex64 for single precision): the
+    extension never lowers the precision the relations then check.
+    """
     half = np.asarray(half)
     full = np.empty(n, dtype=np.result_type(half.dtype, np.complex64))
     m = n // 2 + 1
@@ -49,6 +62,7 @@ class TransformSpec:
     inverse_takes_length: bool = False
     tolerance: ToleranceModel = field(default_factory=FFTTolerance)
     max_n: int = 512
+    precision: np.dtype = np.dtype(np.float64)
 
     @property
     def relations(self):
@@ -83,6 +97,7 @@ class StreamingSpec:
     make: Callable
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
+    precision: np.dtype = np.dtype(np.float64)
 
     @property
     def relations(self):
@@ -102,13 +117,15 @@ class LTISpec:
     max_gain: Optional[float] = None
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
+    precision: np.dtype = np.dtype(np.float64)
 
     @property
     def relations(self):
         return [r for r in LTI_RELATIONS if r.applies(self)]
 
 
-def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max_n=512):
+def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max_n=512,
+               precision=np.float64):
     """Declare a linear time-invariant filter applied with zero initial state.
 
     Checks linearity, time invariance and (if ``causal``) causality. With
@@ -119,7 +136,14 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     stability with a declared bound, e.g. the l1 norm of the impulse response).
     An unstable ``transfer`` (a pole on or outside the unit circle) raises
     ``ValueError``: no relation could fail against it.
+
+    ``precision`` (every declaration takes it) is the dtype of the generated
+    inputs, ``np.float64`` by default. The tolerance uses its epsilon, and an
+    output less precise than it (float32 out of float64 in) is a failure.
+    Declare ``precision=np.float32`` for an operator meant to run in single
+    precision: it then gets float32 inputs within float32 range.
     """
+    precision = _precision(precision)
     if transfer is not None:
         from .core.iir import check_stable
 
@@ -134,7 +158,7 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
 
     def decorate(func):
         func.__dsp_props__ = LTISpec(func=func, causal=causal, transfer=transfer, max_gain=max_gain,
-                                     tolerance=tolerance, max_n=max_n)
+                                     tolerance=tolerance, max_n=max_n, precision=precision)
         return func
 
     return decorate
@@ -158,6 +182,7 @@ class MultirateSpec:
     stopband: Optional[float] = 0.1
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
+    precision: np.dtype = np.dtype(np.float64)
 
     @property
     def relations(self):
@@ -168,7 +193,7 @@ class MultirateSpec:
 
 
 def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=1e-2,
-              stopband=0.1, tolerance=None, max_n=512):
+              stopband=0.1, tolerance=None, max_n=512, precision=np.float64):
     """Declare a rational resampler (up by ``up``, down by ``down``), like ``resample_poly``.
 
     Checks linearity and periodic time invariance (an input delay of
@@ -176,8 +201,10 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
     disabled with ``None``: the output length (``"ceil"``: ceil(N up / down),
     ``"floor"``, or a callable), the DC gain within ``ripple`` away from the
     edges, and, when decimating, that a tone above the output Nyquist
-    frequency comes out below ``stopband`` (relative amplitude).
+    frequency comes out below ``stopband`` (relative amplitude). ``precision``
+    as for ``lti_filter``.
     """
+    precision = _precision(precision)
     if up < 1 or down < 1:
         raise ValueError("up and down must be positive integers")
     rules = {
@@ -190,22 +217,25 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
     def decorate(func):
         func.__dsp_props__ = MultirateSpec(func=func, up=up, down=down, causal=causal, length=rule,
                                            dc_gain=dc_gain, ripple=ripple, stopband=stopband,
-                                           tolerance=tolerance or FFTTolerance(c=1000.0), max_n=max_n)
+                                           tolerance=tolerance or FFTTolerance(c=1000.0), max_n=max_n,
+                                           precision=precision)
         return func
 
     return decorate
 
 
-def streaming(*, tolerance=None, max_n=512):
+def streaming(*, tolerance=None, max_n=512, precision=np.float64):
     """Declare a block processor: a class (or factory) whose instances have ``process(block)``.
 
     ``dp.verify`` then checks that any split into blocks, including empty
     blocks and single samples, gives the same output as one call.
+    ``precision`` as for ``lti_filter``.
     """
+    precision = _precision(precision)
 
     def decorate(make):
         make.__dsp_props__ = StreamingSpec(make=make, tolerance=tolerance or FFTTolerance(c=1000.0),
-                                           max_n=max_n)
+                                           max_n=max_n, precision=precision)
         return make
 
     return decorate
@@ -228,7 +258,7 @@ def stateful(func, init_state, **kwargs):
 
 def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval_scale=None,
               real_input_hermitian=False, real_input_only=None, inverse_takes_length=None,
-              tolerance=None, max_n=512):
+              tolerance=None, max_n=512, precision=np.float64):
     """Declare a function as a transform; ``dp.verify`` then checks it.
 
     ``kind="dft"``: complex DFT (shift and convolution theorems apply).
@@ -236,7 +266,9 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
     ``numpy.fft.rfft``; its inverse is called as ``inverse(X, N)``.
     ``kind="generic"``: any linear transform (DCT, wavelets, STFT...): only
     linearity, Parseval and inversibility are checked.
+    ``precision`` as for ``lti_filter``.
     """
+    precision = _precision(precision)
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}, got {kind!r}")
     if real_input_only is None:
@@ -257,6 +289,7 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
             inverse_takes_length=inverse_takes_length,
             tolerance=tolerance or FFTTolerance(),
             max_n=max_n,
+            precision=precision,
         )
         return func
 

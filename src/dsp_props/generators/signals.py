@@ -23,15 +23,35 @@ def lengths(max_n: int = 512) -> st.SearchStrategy[int]:
     return st.one_of(st.sampled_from(patho), st.integers(1, max_n))
 
 
-def _amplitude():
-    return st.sampled_from(AMPLITUDES)
+def amplitudes(dtype=np.float64):
+    """The test amplitudes that ``dtype`` holds with room to spare (all of them in float64).
+
+    A float32 operator cannot be given 1e-100 or 1e100: the cast alone would
+    underflow or overflow, and the failure would say nothing about the operator.
+    """
+    info = np.finfo(dtype)
+    return [a for a in AMPLITUDES if float(info.tiny) * 1e6 < a < float(info.max) / 1e6]
 
 
-def impulse(n: int):
+def _amplitude(dtype=np.float64):
+    return st.sampled_from(amplitudes(dtype))
+
+
+def _cast(dtype, strategy):
+    """``strategy`` with its signals cast to ``dtype`` (complex ones to the matching complex dtype).
+
+    The families build their signals in float64, the default, which is then left untouched.
+    """
+    if np.dtype(dtype) == np.float64:
+        return strategy
+    return strategy.map(lambda x: x.astype(np.result_type(dtype, np.complex64) if np.iscomplexobj(x) else dtype))
+
+
+def impulse(n: int, dtype=np.float64):
     """A single non-zero sample at an arbitrary position, of length ``n``."""
-    return st.builds(
-        lambda k, a: _impulse(n, k, a), st.integers(0, n - 1), _amplitude()
-    )
+    return _cast(dtype, st.builds(
+        lambda k, a: _impulse(n, k, a), st.integers(0, n - 1), _amplitude(dtype)
+    ))
 
 
 def _impulse(n, k, a):
@@ -40,9 +60,9 @@ def _impulse(n, k, a):
     return x
 
 
-def dc(n: int):
+def dc(n: int, dtype=np.float64):
     """A constant signal of length ``n``."""
-    return _amplitude().map(lambda a: np.full(n, a))
+    return _cast(dtype, _amplitude(dtype).map(lambda a: np.full(n, a)))
 
 
 def _sine(n, f, phi, a):
@@ -50,47 +70,47 @@ def _sine(n, f, phi, a):
     return a * np.cos(2 * np.pi * f * t + phi)
 
 
-def offgrid_sine(n: int):
+def offgrid_sine(n: int, dtype=np.float64):
     """Sinusoid whose normalised frequency is not a multiple of 1/N."""
     freq = st.floats(0.0, 0.5, allow_nan=False, exclude_max=False)
     phase = st.floats(-np.pi, np.pi, allow_nan=False)
-    return st.builds(lambda f, p, a: _sine(n, f, p, a), freq, phase, _amplitude())
+    return _cast(dtype, st.builds(lambda f, p, a: _sine(n, f, p, a), freq, phase, _amplitude(dtype)))
 
 
-def near_nyquist_sine(n: int):
+def near_nyquist_sine(n: int, dtype=np.float64):
     """Sinusoid with normalised frequency in [0.45, 0.5], close to Nyquist."""
     freq = st.floats(0.45, 0.5, allow_nan=False)
     phase = st.floats(-np.pi, np.pi, allow_nan=False)
-    return st.builds(lambda f, p, a: _sine(n, f, p, a), freq, phase, _amplitude())
+    return _cast(dtype, st.builds(lambda f, p, a: _sine(n, f, p, a), freq, phase, _amplitude(dtype)))
 
 
-def close_tones(n: int):
+def close_tones(n: int, dtype=np.float64):
     """Two sinusoids separated by less than one frequency bin."""
     f0 = st.floats(0.01, 0.45, allow_nan=False)
     df = st.floats(0.0, 1.0, allow_nan=False)
-    return st.builds(
+    return _cast(dtype, st.builds(
         lambda f, d, a: _sine(n, f, 0.0, a) + _sine(n, f + d / max(n, 1), 0.3, a),
         f0,
         df,
-        _amplitude(),
-    )
+        _amplitude(dtype),
+    ))
 
 
-def white_noise(n: int):
+def white_noise(n: int, dtype=np.float64):
     """Noise with independent samples in [-1, 1], scaled by one of the test amplitudes."""
     elems = st.floats(-1.0, 1.0, allow_nan=False, allow_infinity=False, width=64)
-    return st.builds(
-        lambda x, a: a * x, hnp.arrays(np.float64, n, elements=elems), _amplitude()
-    )
+    return _cast(dtype, st.builds(
+        lambda x, a: a * x, hnp.arrays(np.float64, n, elements=elems), _amplitude(dtype)
+    ))
 
 
-def sparse(n: int):
+def sparse(n: int, dtype=np.float64):
     """A few impulses at arbitrary positions."""
-    return st.builds(
+    return _cast(dtype, st.builds(
         lambda idx, a: _sparse(n, idx, a),
         st.lists(st.integers(0, n - 1), min_size=1, max_size=min(n, 4)),
-        _amplitude(),
-    )
+        _amplitude(dtype),
+    ))
 
 
 def _sparse(n, idx, a):
@@ -103,47 +123,47 @@ def _sparse(n, idx, a):
 SIGNAL_KINDS = [impulse, dc, offgrid_sine, near_nyquist_sine, close_tones, sparse, white_noise]
 
 
-def signals(n: int):
-    """Any of the signal families above, of length ``n``."""
-    return st.one_of([kind(n) for kind in SIGNAL_KINDS])
+def signals(n: int, dtype=np.float64):
+    """Any of the signal families above, of length ``n``, in the real floating dtype ``dtype``."""
+    return st.one_of([kind(n, dtype) for kind in SIGNAL_KINDS])
 
 
-def complex_exponential(n: int):
+def complex_exponential(n: int, dtype=np.float64):
     """exp(i (2 pi f t + phi)) with f in [-0.5, 0.5]: negative frequencies have no real counterpart."""
     freq = st.floats(-0.5, 0.5, allow_nan=False)
     phase = st.floats(-np.pi, np.pi, allow_nan=False)
-    return st.builds(
-        lambda f, p, a: a * np.exp(1j * (2 * np.pi * f * np.arange(n) + p)), freq, phase, _amplitude()
-    )
+    return _cast(dtype, st.builds(
+        lambda f, p, a: a * np.exp(1j * (2 * np.pi * f * np.arange(n) + p)), freq, phase, _amplitude(dtype)
+    ))
 
 
-def complex_noise(n: int):
+def complex_noise(n: int, dtype=np.float64):
     """Noise with independent real and imaginary parts in [-1, 1], scaled by a test amplitude."""
     elems = st.floats(-1.0, 1.0, allow_nan=False, allow_infinity=False, width=64)
     part = hnp.arrays(np.float64, n, elements=elems)
-    return st.builds(lambda re, im, a: a * (re + 1j * im), part, part, _amplitude())
+    return _cast(dtype, st.builds(lambda re, im, a: a * (re + 1j * im), part, part, _amplitude(dtype)))
 
 
-def complex_signals(n: int):
+def complex_signals(n: int, dtype=np.float64):
     """Real signals first (so failures shrink to real input when they can), then complex ones.
 
     Besides the two families above, ``x + i y`` with ``x`` and ``y`` any real
     signals catches code that mixes up or drops the imaginary part of its input.
     """
     return st.one_of(
-        signals(n),
-        complex_exponential(n),
-        st.builds(lambda x, y: x + 1j * y, signals(n), signals(n)),
-        complex_noise(n),
+        signals(n, dtype),
+        complex_exponential(n, dtype),
+        st.builds(lambda x, y: x + 1j * y, signals(n, dtype), signals(n, dtype)),
+        complex_noise(n, dtype),
     )
 
 
 @st.composite
-def signal_pairs(draw, max_n: int = 512, complex: bool = False):
+def signal_pairs(draw, max_n: int = 512, complex: bool = False, dtype=np.float64):
     """Two signals of the same length (drawn from ``lengths(max_n)``), complex ones too if ``complex``."""
     n = draw(lengths(max_n))
     kind = complex_signals if complex else signals
-    return draw(kind(n)), draw(kind(n))
+    return draw(kind(n, dtype)), draw(kind(n, dtype))
 
 
 @st.composite

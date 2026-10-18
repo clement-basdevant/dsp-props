@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 from hypothesis import strategies as st
 
-from ..core.tolerance import assert_close, norm
+from ..core.tolerance import assert_close, check_precision, norm
 from ..generators import lengths, signal_pairs, signals
 from .base import Relation
 
@@ -17,9 +17,9 @@ REAL_COEFFS = [1.0, -1.0, 2.0, 0.5, -0.75, 3.0]
 
 
 @st.composite
-def _signal(draw, max_n):
+def _signal(draw, max_n, dtype=np.float64):
     n = draw(lengths(max_n))
-    return draw(signals(n))
+    return draw(signals(n, dtype))
 
 
 class LTILinearity(Relation):
@@ -29,14 +29,14 @@ class LTILinearity(Relation):
 
     def inputs(self, spec):
         c = st.sampled_from(REAL_COEFFS)
-        return st.tuples(signal_pairs(spec.max_n), c, c)
+        return st.tuples(signal_pairs(spec.max_n, dtype=spec.precision), c, c)
 
     def check(self, spec, inputs):
         (x, y), a, b = inputs
         f = spec.func
         expected = a * np.asarray(f(x)) + b * np.asarray(f(y))
         assert_close(f(a * x + b * y), expected, spec.tolerance,
-                     ref_norm=abs(a) * norm(x) + abs(b) * norm(y), what=self.name)
+                     ref_norm=abs(a) * norm(x) + abs(b) * norm(y), what=self.name, precision=spec.precision)
 
 
 class TimeInvariance(Relation):
@@ -45,17 +45,18 @@ class TimeInvariance(Relation):
     name = "time invariance"
 
     def inputs(self, spec):
-        return st.tuples(_signal(spec.max_n), st.integers(1, 32))
+        return st.tuples(_signal(spec.max_n, spec.precision), st.integers(1, 32))
 
     def check(self, spec, inputs):
         x, s = inputs
         y = np.asarray(spec.func(x))
-        yd = np.asarray(spec.func(np.concatenate([np.zeros(s), x])))
+        yd = np.asarray(spec.func(np.concatenate([np.zeros(s, x.dtype), x])))
         if not spec.causal:
             # a non-causal filter may respond before the delayed input starts
             yd = yd[s:]
         expected = np.concatenate([np.zeros(s), y]) if spec.causal else y
-        assert_close(yd, expected, spec.tolerance, ref_norm=norm(x), what=f"{self.name} (delay {s})")
+        assert_close(yd, expected, spec.tolerance, ref_norm=norm(x), what=f"{self.name} (delay {s})",
+                     precision=spec.precision)
 
 
 class Causality(Relation):
@@ -68,15 +69,15 @@ class Causality(Relation):
 
     @staticmethod
     @st.composite
-    def _case(draw, max_n):
+    def _case(draw, max_n, dtype=np.float64):
         n = draw(lengths(max_n).filter(lambda m: m >= 2))
-        x = draw(signals(n))
+        x = draw(signals(n, dtype))
         k = draw(st.integers(1, n - 1))
         bump = draw(st.sampled_from([1.0, -1e3, 1e-3]))
         return x, k, bump
 
     def inputs(self, spec):
-        return self._case(spec.max_n)
+        return self._case(spec.max_n, spec.precision)
 
     def check(self, spec, inputs):
         x, k, bump = inputs
@@ -84,7 +85,8 @@ class Causality(Relation):
         x2[k:] += bump * (1 + np.arange(len(x) - k))
         y1 = np.asarray(spec.func(x))[:k]
         y2 = np.asarray(spec.func(x2))[:k]
-        assert_close(y2, y1, spec.tolerance, ref_norm=norm(x) + norm(x2), what=f"{self.name} (k={k})")
+        assert_close(y2, y1, spec.tolerance, ref_norm=norm(x) + norm(x2), what=f"{self.name} (k={k})",
+                     precision=spec.precision)
 
 
 class TransferConsistency(Relation):
@@ -111,13 +113,15 @@ class TransferConsistency(Relation):
         poles = np.roots(a / a[0]) if len(a) > 1 else np.array([])
         r = float(np.max(np.abs(poles))) if poles.size else 0.0
         L = int(min(1 << 16, (np.log(1e-17) / np.log(r) if r > 0 else 1) * len(a) + len(b) + 16))
-        impulse = np.zeros(L)
+        impulse = np.zeros(L, spec.precision)
         impulse[0] = 1.0
-        measured = np.fft.fft(np.asarray(spec.func(impulse)))
+        h = np.asarray(spec.func(impulse))
+        check_precision(h, spec.precision, self.name)
+        measured = np.fft.fft(h)
         _, declared = freqz(b, a, worN=L, whole=True)
         # Parseval: ||H_meas - H||_2 = sqrt(L) ||h_meas - h||_2 ; the impulse has norm 1.
         tail = 1e-17 * recursion_gain(a, b)
-        tol = np.sqrt(L) * (spec.tolerance.bound(L, np.float64, 1.0) + tail)
+        tol = np.sqrt(L) * (spec.tolerance.bound(L, spec.precision, 1.0) + tail)
         err = norm(measured - declared)
         if not err <= tol:
             worst = int(np.argmax(np.abs(measured - declared)))
@@ -145,15 +149,16 @@ class BoundedGain(Relation):
         return lengths(spec.max_n).filter(lambda m: m >= 1)
 
     def check(self, spec, n):
-        impulse = np.zeros(n)
+        impulse = np.zeros(n, spec.precision)
         impulse[0] = 1.0
         h = np.asarray(spec.func(impulse))[:n]
-        x = np.sign(h[::-1]).astype(float)
+        x = np.sign(h[::-1]).astype(spec.precision)
         y = np.asarray(spec.func(x))
+        check_precision(y, spec.precision, self.name)
         if not np.all(np.isfinite(y)):
             raise AssertionError(f"{self.name}: non-finite output for a bounded input of length {n}")
         peak = float(np.max(np.abs(y))) if len(y) else 0.0
-        limit = spec.max_gain + spec.tolerance.bound(n, np.float64, np.sqrt(n))
+        limit = spec.max_gain + spec.tolerance.bound(n, spec.precision, np.sqrt(n))
         if not peak <= limit:
             raise AssertionError(
                 f"{self.name}: input bounded by 1 (worst case for N = {n}) gave |y| = {peak:.6g} "

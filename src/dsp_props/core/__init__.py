@@ -6,7 +6,7 @@ from .calibration import (
     relative_error,
 )
 from .iir import IIRTolerance, check_stable, longdouble_lfilter, recursion_gain
-from .tolerance import ToleranceModel, FFTTolerance, ToleranceError, assert_close, norm
+from .tolerance import ToleranceModel, FFTTolerance, ToleranceError, assert_close, check_precision, norm, precision_of
 
 __all__ = [
     "IIRTolerance",
@@ -17,4 +17,5 @@ __all__ = [
     "CalibrationError",
     "calibrate",
     "longdouble_dft",
-    "relative_error","ToleranceModel", "FFTTolerance", "ToleranceError", "assert_close", "norm"]
+    "relative_error","ToleranceModel", "FFTTolerance", "ToleranceError", "assert_close", "check_precision",
+    "norm", "precision_of"]

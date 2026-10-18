@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 from hypothesis import strategies as st
 
-from ..core.tolerance import ToleranceError, assert_close, norm
+from ..core.tolerance import ToleranceError, assert_close, check_precision, norm
 from ..generators import complex_signals, lengths, signals, signal_pairs
 from .base import Relation
 
@@ -14,9 +14,9 @@ REAL_COEFFS = [1.0, -1.0, 2.0, 0.5, -0.75, 3.0]
 
 
 @st.composite
-def _signal(draw, max_n, complex=False):
+def _signal(draw, max_n, complex=False, dtype=np.float64):
     n = draw(lengths(max_n))
-    return draw(complex_signals(n) if complex else signals(n))
+    return draw(complex_signals(n, dtype) if complex else signals(n, dtype))
 
 
 def _accepts_complex(spec):
@@ -35,7 +35,7 @@ class Linearity(Relation):
     def inputs(self, spec):
         coeffs = REAL_COEFFS if spec.real_input_only else COEFFS
         c = st.sampled_from(coeffs)
-        return st.tuples(signal_pairs(spec.max_n, complex=_accepts_complex(spec)), c, c)
+        return st.tuples(signal_pairs(spec.max_n, complex=_accepts_complex(spec), dtype=spec.precision), c, c)
 
     def check(self, spec, inputs):
         (x, y), a, b = inputs
@@ -43,7 +43,8 @@ class Linearity(Relation):
         fx, fy = np.asarray(f(x)), np.asarray(f(y))
         expected = a * fx + b * fy
         ref = abs(a) * norm(fx) + abs(b) * norm(fy)
-        assert_close(f(a * x + b * y), expected, spec.tolerance, ref_norm=ref, what=self.name)
+        assert_close(f(a * x + b * y), expected, spec.tolerance, ref_norm=ref, what=self.name,
+                     precision=spec.precision)
 
 
 class CircularShift(Relation):
@@ -55,7 +56,7 @@ class CircularShift(Relation):
         return spec.is_fourier
 
     def inputs(self, spec):
-        return st.tuples(_signal(spec.max_n, _accepts_complex(spec)), st.integers(-1024, 1024))
+        return st.tuples(_signal(spec.max_n, _accepts_complex(spec), spec.precision), st.integers(-1024, 1024))
 
     def check(self, spec, inputs):
         x, s = inputs
@@ -66,7 +67,7 @@ class CircularShift(Relation):
         # [0, 2*pi) and the reference itself is accurate.
         expected = fx * np.exp(-2j * np.pi * ((k * s) % n) / n)
         assert_close(spec.full(np.roll(x, s)), expected, spec.tolerance,
-                     ref_norm=norm(fx), what=f"{self.name} (s={s})")
+                     ref_norm=norm(fx), what=f"{self.name} (s={s})", precision=spec.precision)
 
 
 class Parseval(Relation):
@@ -78,15 +79,16 @@ class Parseval(Relation):
         return spec.parseval
 
     def inputs(self, spec):
-        return _signal(spec.max_n, _accepts_complex(spec))
+        return _signal(spec.max_n, _accepts_complex(spec), spec.precision)
 
     def check(self, spec, x):
         n = len(x)
         scale = spec.parseval_scale(n)
         spectrum = spec.full(x) if spec.is_fourier else np.asarray(spec.func(x))
+        check_precision(spectrum, spec.precision, self.name)
         lhs = norm(spectrum) / np.sqrt(scale)
         rhs = norm(x)
-        tol = spec.tolerance.bound(n, np.asarray(x).dtype, rhs)
+        tol = spec.tolerance.bound(n, spec.precision, rhs)
         if not abs(lhs - rhs) <= tol:
             raise ToleranceError(
                 f"{self.name}: ||f(x)||/sqrt({scale:g}) = {lhs:.6e} but ||x|| = {rhs:.6e} (N={n})"
@@ -102,12 +104,12 @@ class HermitianSymmetry(Relation):
         return spec.kind == "dft" and spec.real_input_hermitian
 
     def inputs(self, spec):
-        return _signal(spec.max_n)
+        return _signal(spec.max_n, dtype=spec.precision)
 
     def check(self, spec, x):
         fx = np.asarray(spec.func(x))
         mirrored = np.conj(np.roll(fx[::-1], 1))
-        assert_close(fx, mirrored, spec.tolerance, what=self.name)
+        assert_close(fx, mirrored, spec.tolerance, what=self.name, precision=spec.precision)
 
 
 class Inversibility(Relation):
@@ -119,11 +121,11 @@ class Inversibility(Relation):
         return spec.inverse is not None
 
     def inputs(self, spec):
-        return _signal(spec.max_n, _accepts_complex(spec))
+        return _signal(spec.max_n, _accepts_complex(spec), spec.precision)
 
     def check(self, spec, x):
         y = spec.invert(spec.func(x), len(x))
-        assert_close(y, x, spec.tolerance, what=self.name)
+        assert_close(y, x, spec.tolerance, what=self.name, precision=spec.precision)
 
 
 def _pow2_normalise(v):
@@ -142,7 +144,7 @@ class ConvolutionTheorem(Relation):
         return spec.is_fourier and spec.inverse is not None
 
     def inputs(self, spec):
-        return signal_pairs(min(spec.max_n, 256), complex=_accepts_complex(spec))
+        return signal_pairs(min(spec.max_n, 256), complex=_accepts_complex(spec), dtype=spec.precision)
 
     def check(self, spec, inputs):
         x, y = inputs
@@ -155,7 +157,7 @@ class ConvolutionTheorem(Relation):
         fast = spec.invert(np.asarray(spec.func(x)) * np.asarray(spec.func(y)), n)
         # By Cauchy-Schwarz, |c[k]| <= ||x|| ||y||, hence ||c|| <= sqrt(N) ||x|| ||y||.
         ref = np.sqrt(n) * norm(x) * norm(y)
-        assert_close(fast, direct, spec.tolerance, ref_norm=ref, what=self.name)
+        assert_close(fast, direct, spec.tolerance, ref_norm=ref, what=self.name, precision=spec.precision)
 
 
 class RealBins(Relation):
@@ -167,14 +169,15 @@ class RealBins(Relation):
         return spec.kind == "rdft"
 
     def inputs(self, spec):
-        return _signal(spec.max_n)
+        return _signal(spec.max_n, dtype=spec.precision)
 
     def check(self, spec, x):
         n = len(x)
         X = spec.full(x)
+        check_precision(X, spec.precision, self.name)
         idx = [0] + ([n // 2] if n % 2 == 0 else [])
         imag = np.imag(X[idx])
-        tol = spec.tolerance.bound(n, np.asarray(x).dtype, norm(X))
+        tol = spec.tolerance.bound(n, spec.precision, norm(X))
         if not norm(imag) <= tol:
             raise ToleranceError(f"{self.name}: imaginary part {imag} at bins {idx} (N={n})")
 
