@@ -6,6 +6,7 @@ authors:
   - family-names: "Basdevant"
     given-names: "Clément"
     orcid: "https://orcid.org/0009-0004-7496-2365"
+doi: 10.5281/zenodo.23437840
 license: BSD-3-Clause
 repository-code: "https://github.com/clement-basdevant/dsp-props"
 version: 0.1.2

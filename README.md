@@ -1,5 +1,7 @@
 # dsp-props
 
+[![PyPI](https://img.shields.io/pypi/v/dsp-props)](https://pypi.org/project/dsp-props/) [![CI](https://github.com/clement-basdevant/dsp-props/actions/workflows/ci.yml/badge.svg)](https://github.com/clement-basdevant/dsp-props/actions/workflows/ci.yml) [![Documentation](https://readthedocs.org/projects/dsp-props/badge/?version=latest)](https://dsp-props.readthedocs.io/) [![DOI](https://zenodo.org/badge/1418824686.svg)](https://doi.org/10.5281/zenodo.23437840)
+
 **Property-based testing for digital signal processing code**
 
 DSP code is usually tested by comparing its output with a reference (MATLAB, SciPy) on a few signals, with a hand-picked tolerance. `dsp-props` instead checks **relations that must always hold** (linearity, shift theorem, Parseval, Hermitian symmetry, invertibility, convolution theorem, causality, time invariance, consistency across block sizes), on **automatically generated signals** from [Hypothesis](https://hypothesis.works/), chosen to trip up DSP code: impulses, off-grid sinusoids, close tones, near-Nyquist tones, extreme amplitudes, lengths 1, 2, prime or 2^k ± 1, empty and one-sample blocks. Tolerances follow an error model of each operation (O(ε log N) error for an FFT) instead of a fixed `atol`, and every failure is reported with a small counterexample.
@@ -185,6 +187,10 @@ python -m pytest
 4. **Mutant suite**: about forty mutants, trial on `scipy.signal` *(31 mutants, campaign on 46 real targets; to be extended)*
 5. **Shrinking and reporting**: small counterexamples, HTML report *(done)*
 6. **Auto-discovery and C adapter** *(done: `dsp-props check`, `dsp_props.adapters`)*
+
+## Citation
+
+If you use `dsp-props`, please cite it with its DOI, [10.5281/zenodo.23437840](https://doi.org/10.5281/zenodo.23437840) (all versions; each release also has its own DOI on Zenodo), or with the metadata in [`CITATION.cff`](CITATION.cff) (GitHub's *Cite this repository* button).
 
 ## License
 
