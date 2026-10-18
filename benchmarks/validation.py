@@ -98,15 +98,15 @@ _MARGINS = defaultdict(list)
 _CURRENT = {"rel": None}
 
 
-def _instrumented_assert_close(actual, expected, model, *, ref_norm=None, what=""):
+def _instrumented_assert_close(actual, expected, model, *, ref_norm=None, what="", precision=None):
     actual_a, expected_a = np.asarray(actual), np.asarray(expected)
     if actual_a.shape == expected_a.shape and np.all(np.isfinite(actual_a)):
         rn = tolmod.norm(expected_a) if ref_norm is None else ref_norm
         err = tolmod.norm(actual_a - expected_a)
-        tol = model.bound(max(actual_a.size, 1), actual_a.dtype, rn)
+        tol = model.bound(max(actual_a.size, 1), actual_a.dtype if precision is None else precision, rn)
         if tol > 0:
             _MARGINS[_CURRENT["rel"]].append(err / tol)
-    return _ORIGINAL_ASSERT(actual, expected, model, ref_norm=ref_norm, what=what)
+    return _ORIGINAL_ASSERT(actual, expected, model, ref_norm=ref_norm, what=what, precision=precision)
 
 
 _ORIGINAL_ASSERT = tolmod.assert_close

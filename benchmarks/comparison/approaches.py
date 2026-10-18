@@ -52,14 +52,21 @@ def _uniform_lengths(max_n: int = 512):
     return st.integers(1, max_n)
 
 
-def _uniform_signals(n: int):
-    return hnp.arrays(np.float64, n, elements=st.floats(-1.0, 1.0, allow_nan=False, allow_infinity=False))
+def _uniform_signals(n: int, dtype=np.float64):
+    return hnp.arrays(dtype, n, elements=st.floats(-1.0, 1.0, allow_nan=False, allow_infinity=False,
+                                                   width=np.finfo(dtype).bits))
+
+
+def _uniform_complex_signals(n: int, dtype=np.float64):
+    """Real and imaginary parts uniform in [-1, 1] (``dtype`` is the real dtype, as in the generators)."""
+    return st.tuples(_uniform_signals(n, dtype), _uniform_signals(n, dtype)).map(lambda ri: ri[0] + 1j * ri[1])
 
 
 @st.composite
-def _uniform_pairs(draw, max_n: int = 512):
+def _uniform_pairs(draw, max_n: int = 512, complex: bool = False, dtype=np.float64):
     n = draw(_uniform_lengths(max_n))
-    return draw(_uniform_signals(n)), draw(_uniform_signals(n))
+    kind = _uniform_complex_signals if complex else _uniform_signals
+    return draw(kind(n, dtype)), draw(kind(n, dtype))
 
 
 @contextlib.contextmanager
@@ -68,7 +75,7 @@ def uniform_generators():
     patches = [(gen_signals, "lengths", _uniform_lengths), (gen_signals, "signals", _uniform_signals)]
     for mod in (rel_lti, rel_multirate, rel_streaming, rel_transforms):
         for name, new in (("lengths", _uniform_lengths), ("signals", _uniform_signals),
-                          ("signal_pairs", _uniform_pairs)):
+                          ("complex_signals", _uniform_complex_signals), ("signal_pairs", _uniform_pairs)):
             if hasattr(mod, name):
                 patches.append((mod, name, new))
     saved = [(m, n, getattr(m, n)) for m, n, _ in patches]
