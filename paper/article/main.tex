@@ -52,9 +52,10 @@ calibration against extended precision. We evaluate it with a protocol
 that measures its power and its soundness. On \nFunctional{} functional faults
 injected by mutation, it detects \killFuncDsp{} and the ported test suites of
 NumPy and SciPy \killFuncSop{}; the two detect different faults and together
-detect all of them. Ablations on hand-written faults show that the domain
-generators and error models make failures appear sooner, with smaller
-counterexamples and no false alarm. On correct code the method raised no false
+detect all of them. Ablations show that the domain generators and error
+models make failures appear sooner, with smaller counterexamples, that uniform
+inputs miss some faults in some seeds, and that without the error models a
+subnormal input raises a false alarm. On correct code the method raised no false
 alarm in \fpRuns{} runs. Applied to SciPy, it found faults on empty blocks that
 we reported with a fix.
 \end{abstract}

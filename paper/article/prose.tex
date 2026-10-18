@@ -1,7 +1,8 @@
 % Analysis of the results. The numbers are macros from numbers.tex (make_numbers.py).
 \newcommand{\rqOneText}{dsp-props detects \killFuncDsp{} of the \nFunctional{}
-functional mutants and the ported suites \killFuncSop{}; no approach raises an
-alarm on an equivalent mutant. The two sets of detected faults are not nested:
+functional mutants and the ported suites \killFuncSop{}; neither raises an
+alarm on an equivalent mutant, and of the ablations only generic PBT does
+(Section~\ref{sec:rq2}). The two sets of detected faults are not nested:
 \killSopOnly{} mutants are detected only by the suites, \killDspOnly{} only by
 dsp-props, and together they detect \killUnion{} of them.
 
@@ -27,8 +28,16 @@ are a matter of declarations rather than of relations: declaring a first-order
 filter would have caught the \code{lfilter} survivors.}
 
 \newcommand{\rqTwoText}{On the generated mutants the four randomised variants
-detect the same faults, up to one FFT mutant that the variants with uniform
-inputs miss in some seeds (Table~\ref{tab:comparison}). These mutants change the output by orders of magnitude, and almost any input
+detect almost the same faults (Table~\ref{tab:comparison}). The exceptions are
+three FFT mutants that the variants with uniform inputs miss in some seeds,
+while dsp-props detects them in every seed; two of them are the twiddle-factor
+mutants that the ported suites miss. Generic PBT also raised a false alarm in
+one of its \nSeeds{} seeds, on the correct FFT and on every FFT mutant
+equivalent to it: Hypothesis drew a subnormal input of norm $10^{-323}$, for
+which a purely relative tolerance is zero and a rounding error of one subnormal
+fails Parseval's identity. The error model of dsp-props includes an absolute
+floor, and neither dsp-props nor its other ablations raised an alarm. The
+other mutants change the output by orders of magnitude, and almost any input
 reveals them:
 the median number of inputs before the first failure is \firstMedDsp{} for
 dsp-props and \firstMedUni{} for uniform inputs, and the median counterexample
@@ -39,17 +48,14 @@ not change what is detected here, and the generators cost time, with a median of
 
 The hand-written faults, which include the accuracy faults, separate the
 variants (Table~\ref{tab:hand}). Every variant detects every fault in every seed,
-but not equally fast. With the domain generators, the median failure appears at
+except the fixed tolerance, which misses one resampler fault in one seed, but
+not equally fast. With the domain generators, the median failure appears at
 input \handDspFirstMed{} (90th percentile \handDspFirstPnn{}); with uniform inputs
 at input \handUniFirstMed{} (\handUniFirstPnn{}), and with generic PBT at input
 \handGenFirstMed{} (\handGenFirstPnn{}). Counterexamples are smaller too: the 90th percentile of their length is
 \handDspCexPnn{} samples for dsp-props, \handUniCexPnn{} with uniform inputs, and
-\handFixCexPnn{} with a fixed tolerance. Finally, generic PBT raised a false alarm on the correct real FFT, in
-\handGenFalseAlarms{} of its \nSeeds{} runs: Hypothesis drew a
-subnormal input of norm $10^{-323}$, for which a purely relative tolerance is
-zero and a rounding error of one subnormal fails the test. The error model of
-dsp-props includes an absolute floor, and it raised no false alarm.
-With 200 inputs per relation, these differences do not change the detection
+\handFixCexPnn{} with a fixed tolerance. No variant raised a false alarm on
+the correct references of this table. With 200 inputs per relation, these differences do not change the detection
 rate. We expect them to matter with a smaller budget or on faults that need a
 specific input, but we did not measure this. One hand-written fault, a filter
 whose gain is wrong by 1\,\%, is detected only because its transfer function is
