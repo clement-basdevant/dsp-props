@@ -98,15 +98,15 @@ _MARGINS = defaultdict(list)
 _CURRENT = {"rel": None}
 
 
-def _instrumented_assert_close(actual, expected, model, *, ref_norm=None, what=""):
+def _instrumented_assert_close(actual, expected, model, *, ref_norm=None, what="", precision=None):
     actual_a, expected_a = np.asarray(actual), np.asarray(expected)
     if actual_a.shape == expected_a.shape and np.all(np.isfinite(actual_a)):
         rn = tolmod.norm(expected_a) if ref_norm is None else ref_norm
         err = tolmod.norm(actual_a - expected_a)
-        tol = model.bound(max(actual_a.size, 1), actual_a.dtype, rn)
+        tol = model.bound(max(actual_a.size, 1), actual_a.dtype if precision is None else precision, rn)
         if tol > 0:
             _MARGINS[_CURRENT["rel"]].append(err / tol)
-    return _ORIGINAL_ASSERT(actual, expected, model, ref_norm=ref_norm, what=what)
+    return _ORIGINAL_ASSERT(actual, expected, model, ref_norm=ref_norm, what=what, precision=precision)
 
 
 _ORIGINAL_ASSERT = tolmod.assert_close
@@ -237,6 +237,23 @@ def check_generators(n_draws=4000, seed=0):
                         "pathological_values_missed": sorted(patho - set(int(v) for v in d)),
                         "fraction_prime": float(np.mean([_is_prime(int(v)) for v in d])),
                         "fraction_power_of_two": float(np.mean([(v & (v - 1)) == 0 for v in d]))}
+
+    # The run above asks for many draws and Hypothesis then explores the uniform branch at length;
+    # a relation draws 200 examples, the default, so measure the same fraction in runs of that size.
+    per_run = []
+    for s in range(20):
+        run = []
+
+        @hseed(s)
+        @settings(max_examples=200, database=None, deadline=None, suppress_health_check=list(HealthCheck))
+        @given(gen.lengths(512))
+        def collect_run(n):
+            run.append(n)
+
+        collect_run()
+        per_run.append(float(np.mean([v in patho for v in run])))
+    stats["lengths"]["runs_of_200"] = {"runs": len(per_run), "mean_fraction_pathological": float(np.mean(per_run)),
+                                       "min": min(per_run), "max": max(per_run)}
 
     # signal families, through the public signals(n) strategy (as the relations use it)
     per_kind = defaultdict(list)

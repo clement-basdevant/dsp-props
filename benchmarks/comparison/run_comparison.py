@@ -264,7 +264,7 @@ def main(argv=None):
     p.add_argument("--subjects", nargs="+", default=SUBJECT_NAMES, choices=SUBJECT_NAMES)
     p.add_argument("--approaches", nargs="+", choices=approaches.APPROACHES)
     p.add_argument("--seeds", type=int, default=5)
-    p.add_argument("--timeout", type=int, default=45, help="seconds per approach run (a full run on a correct subject takes at most about 25 s)")
+    p.add_argument("--timeout", type=int, default=90, help="seconds per approach run (a full run on the correct FFT subject takes about 35 s on an idle core)")
     p.add_argument("--oracle-timeout", type=int, default=120)
     p.add_argument("--workers", type=int, default=os.cpu_count())
     p.add_argument("--mem-gb", type=float, default=3.0, help="address-space limit per worker")

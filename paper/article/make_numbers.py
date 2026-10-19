@@ -33,7 +33,17 @@ SUBJECT_LABELS = {"fft": "FFT", "lfilter": r"\code{lfilter}", "upfirdn": r"\code
 
 # Facts that come from the bug-hunting campaign reports (benchmarks/RESULTS-2026-10-14*.md),
 # which are written by hand from the campaign output, and from the upstream issue trackers.
-CAMPAIGN = {"campaignTargets": "46", "campaignTriaged": "three"}
+CAMPAIGN = {"campaignTargets": "46", "campaignTriaged": "three",
+            "campaignTriagedShare": rf"{100 * 3 / 46:.1f}\,\%"}
+
+# First pass of the comparison, before the oracle was extended (commit e62b0fb, message of aa19a04):
+# it classified 158 mutants as functional and 25 as equivalent. The eight mutants that the extended
+# oracle reclassified as functional are listed here; who detects them is read from the current results.
+# Recompute with: git show e62b0fb:benchmarks/comparison/results.jsonl > old.jsonl and
+# run_comparison.summarise(Path("old.jsonl")).
+ORACLE_FIRST = {"functional": 158, "equivalent": 25}
+RECLASSIFIED = ["lfilter-019", "lfilter-021", "lfilter-040", "lfilter-042",
+                "upfirdn-012", "upfirdn-013", "upfirdn-014", "upfirdn-015"]
 
 
 def pct(x):
@@ -73,24 +83,35 @@ def survey(macros):
     macros["surveyHardcodedAll"] = str(sum(v["tests_hardcoded_expected"] for v in s.values()))
     macros["surveyLibrosaTests"] = str(s["librosa"]["tests"])
     macros["surveyLibrosaCompared"] = str(s["librosa"]["tests_with_comparison"])
-    hist = sorted(((float(k), n) for k, n in sig["tolerance_histogram"].items()), reverse=True)
+    rel, ab = sig["tolerance_by_kind"]["relative"], sig["tolerance_by_kind"]["absolute"]
+    macros["surveyScipyRelCount"] = str(rel["count"])
+    macros["surveyScipyRelDistinct"] = str(rel["distinct"])
+    macros["surveyScipyRelBelowEps"] = str(rel["below_eps"])
+    macros["surveyScipyRelMin"] = sci(rel["min_from_eps"])
+    macros["surveyScipyRelMax"] = f"${rel['max']:g}$"
+    macros["surveyScipyRelDecades"] = str(round(math.log10(rel["max"] / rel["min_from_eps"])))
+    macros["surveyScipyAbsCount"] = str(ab["count"])
+    macros["surveyScipyAbsDistinct"] = str(ab["distinct"])
+    hist = sorted(((float(k), n) for k, n in rel["histogram"].items()), reverse=True)
     top = sorted(hist, key=lambda kv: -kv[1])[:3]
     macros["surveyScipyTopTols"] = ", ".join(f"$10^{{{round(math.log10(k))}}}$ ({n})" for k, n in top)
     lines = ["decade,count"] + [f"{round(math.log10(k))},{n}" for k, n in sorted(hist)]
     (HERE / "tables" / "tolhist.csv").write_text("\n".join(lines) + "\n")
     rows = []
     for name, v in s.items():
+        r = v["tolerance_by_kind"]["relative"]
+        lo, hi = r["min"], r["max"]
+        span = sci(lo) if lo == hi else f"{sci(lo)}--{sci(hi) if hi < 0.01 else ('$%g$' % hi)}"
         rows.append(f"{name.replace('_', r'_')} & {v['tests']} & {v['tests_hypothesis']} & {v['comparisons']} & "
-                    f"{v['explicit_tolerance']} & {v['distinct_tolerance_values']} & "
-                    f"{sci(v['tolerance_min'])}--{sci(v['tolerance_max']) if v['tolerance_max'] < 0.01 else ('$%g$' % v['tolerance_max'])} & {v['tests_empty_input']} & "
+                    f"{v['explicit_tolerance']} & {r['count']} & {r['distinct']} & {span} & {v['tests_empty_input']} & "
                     f"{v['tests_zi_and_empty']} & {v['tests_hardcoded_expected']} \\\\")
     table = r"""\begin{table*}[t]
-\caption{Test suites of five DSP libraries (syntactic counts). Tol.: comparisons with a hand-written tolerance; distinct: number of distinct tolerance values; empty: tests with an empty input; zi+empty: tests that also pass an initial state; hard-coded: tests that compare with an array of at least four typed-in floating-point values}
+\caption{Test suites of five DSP libraries (syntactic counts). Tol.: comparisons with a hand-written tolerance; rel.: hand-written relative tolerances (\code{rtol}, \code{nulp} and similar), their number of distinct values and their range (absolute tolerances, in the units of the data, are not comparable across tests and are left out); empty: tests with an empty input; zi+empty: tests that also pass an initial state; hard-coded: tests that compare with an array of at least four typed-in floating-point values}
 \label{tab:survey}
 \centering\footnotesize
-\begin{tabular}{@{}lrrrrrlrrr@{}}
+\begin{tabular}{@{}lrrrrrrlrrr@{}}
 \toprule
-Suite & Tests & Hypothesis & Comparisons & Tol. & Distinct & Range & Empty & zi+empty & Hard-coded \\
+Suite & Tests & Hypothesis & Comparisons & Tol. & Rel. & Distinct & Rel.\ range & Empty & zi+empty & Hard-coded \\
 \midrule
 """ + "\n".join(rows) + r"""
 \bottomrule
@@ -166,6 +187,47 @@ Subject & Class (mutants) & """ + head + r""" \\
     macros["killUnion"] = pct(len(sop | dsp) / len(func))
     randomised = [a for a in short if a != "sop"]
     macros["ablationDisagree"] = str(sum(len({v[a] >= 0.5 for a in randomised}) > 1 for v in func.values()))
+    # How dsp-props detects (seed 0): a relation violated, or an exception or time-out of the mutant
+    dsp0 = [r for r in rec if r["approach"] == "dsp-props" and r["seed"] == 0 and r["killed"]
+            and not r["mutant"].endswith("-orig")]
+    kinds = [r["failures"][0]["error"] for r in dsp0]
+    violated = {"ToleranceError", "AssertionError"}
+    macros["dspKillsSeedZero"] = str(len(dsp0))
+    macros["dspKillTolerance"] = str(kinds.count("ToleranceError"))
+    macros["dspKillAssert"] = str(kinds.count("AssertionError"))
+    macros["dspKillRelation"] = str(sum(k in violated for k in kinds))
+    macros["dspKillOther"] = str(sum(k not in violated for k in kinds))
+    macros["dspKillTimeout"] = str(kinds.count("Timeout"))
+    macros["dspKillGroup"] = str(kinds.count("ExceptionGroup"))
+    per_seed = {s: sum(r["failures"][0]["error"] in violated for r in rec if r["approach"] == "dsp-props"
+                       and r["seed"] == s and r["killed"] and not r["mutant"].endswith("-orig"))
+                for s in range(seeds)}
+    macros["dspKillRelationStable"] = "in every seed" if len(set(per_seed.values())) == 1 else \
+        f"between {min(per_seed.values())} and {max(per_seed.values())} across seeds"
+    # Functional mutants that run on the oracle's inputs without raising or hanging
+    oracle = {r["mutant"]: r for r in rec if r["approach"] == "oracle"}
+    quiet = [m for m in func if not (oracle[m].get("crashed") or oracle[m].get("timeout"))]
+    macros["nFuncQuiet"] = str(len(quiet))
+    macros["nFuncLoud"] = str(len(func) - len(quiet))
+    for a, akey in short.items():
+        rates = [np.mean([r["killed"] for r in rec if r["approach"] == a and r["seed"] == s and r["mutant"] in quiet])
+                 for s in range(seeds if a != "sop" else 1)]
+        lo, hi = min(rates), max(rates)
+        macros[f"killQuiet{akey}"] = pct(np.mean(rates)) if hi - lo < 1e-9 else \
+            rf"{100 * np.mean(rates):.0f}\,\% ({100 * lo:.0f}--{100 * hi:.0f})"
+    # The oracle's first pass and the mutants it reclassified
+    macros["oracleFirstFunctional"] = str(ORACLE_FIRST["functional"])
+    macros["oracleFirstEquivalent"] = str(ORACLE_FIRST["equivalent"])
+    macros["nReclassified"] = str(len(RECLASSIFIED))
+    assert all(summ["per_mutant"][m]["class"] == "functional" for m in RECLASSIFIED)
+    recl_sop = [m for m in RECLASSIFIED if summ["per_mutant"][m]["sop"] >= 0.5]
+    recl_dsp = [m for m in RECLASSIFIED if summ["per_mutant"][m]["dsp-props"] >= 0.5]
+    macros["reclSopOnly"] = str(len(set(recl_sop) - set(recl_dsp)))
+    macros["reclDspOnly"] = str(len(set(recl_dsp) - set(recl_sop)))
+    macros["reclSopOnlySubject"] = ", ".join(sorted({m.split("-")[0] for m in set(recl_sop) - set(recl_dsp)}))
+    macros["reclDspOnlySubject"] = ", ".join(sorted({m.split("-")[0] for m in set(recl_dsp) - set(recl_sop)}))
+    macros["reclDspAllVariants"] = "every" if all(
+        summ["per_mutant"][m][a] == 1.0 for m in recl_dsp for a in short if a != "sop") else "not every"
     ff, cl, sec = summ["first_failure"], summ["counterexample_length"], summ["seconds"]
     for a, akey in short.items():
         if a in ff:
@@ -266,6 +328,13 @@ def validation(macros):
     macros["refLfilterMax"] = f"${tex_float(ref['lfilter_max_in_eps64'])}$"
     g = v["generators"]
     macros["genPathoCount"] = str(len(g["lengths"]["pathological_values_hit"]))
+    runs = g["lengths"]["runs_of_200"]
+    macros["genPathoShare"] = pct(runs["mean_fraction_pathological"])
+    macros["genPathoShareMin"] = pct(runs["min"])
+    macros["genPathoShareMax"] = pct(runs["max"])
+    macros["genPathoRuns"] = str(runs["runs"])
+    macros["genPathoLongDraws"] = str(g["lengths"]["draws"])
+    macros["genPathoLong"] = pct(g["lengths"]["fraction_pathological"])
     macros["genEmptyBlock"] = pct(g["block_splits"]["fraction_with_empty_block"])
     macros["genOneBlock"] = pct(g["block_splits"]["fraction_with_one_sample_block"])
     macros["genCloseBelowOne"] = pct(g["signals"]["close_tones"]["fraction_below_one_bin"])

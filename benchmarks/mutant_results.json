@@ -4,7 +4,7 @@
     {
       "mutant": "fft_ifft_missing_1_over_n",
       "killed": true,
-      "seconds": 7.9,
+      "seconds": 15.19,
       "relations": [
         "inversibility",
         "convolution theorem"
@@ -15,7 +15,7 @@
     {
       "mutant": "fft_ifft_missing_conj",
       "killed": true,
-      "seconds": 9.91,
+      "seconds": 14.96,
       "relations": [
         "inversibility",
         "convolution theorem"
@@ -26,7 +26,7 @@
     {
       "mutant": "fft_circular_off_by_one",
       "killed": true,
-      "seconds": 7.27,
+      "seconds": 11.92,
       "relations": [
         "circular shift",
         "hermitian symmetry",
@@ -39,7 +39,7 @@
     {
       "mutant": "fft_wrong_normalisation",
       "killed": true,
-      "seconds": 7.97,
+      "seconds": 11.94,
       "relations": [
         "parseval",
         "inversibility",
@@ -51,7 +51,7 @@
     {
       "mutant": "fft_float32_internal",
       "killed": true,
-      "seconds": 5.6,
+      "seconds": 12.1,
       "relations": [
         "linearity",
         "circular shift",
@@ -66,7 +66,7 @@
     {
       "mutant": "fft_wrong_twiddle_sign",
       "killed": true,
-      "seconds": 13.36,
+      "seconds": 15.93,
       "relations": [
         "circular shift",
         "hermitian symmetry",
@@ -79,7 +79,7 @@
     {
       "mutant": "fft_last_sample_dropped",
       "killed": true,
-      "seconds": 6.53,
+      "seconds": 9.73,
       "relations": [
         "circular shift",
         "parseval",
@@ -92,7 +92,7 @@
     {
       "mutant": "fft_dc_offset",
       "killed": true,
-      "seconds": 6.11,
+      "seconds": 8.25,
       "relations": [
         "linearity",
         "circular shift",
@@ -106,8 +106,9 @@
     {
       "mutant": "rfft_half_bins_off_by_one",
       "killed": true,
-      "seconds": 8.71,
+      "seconds": 7.75,
       "relations": [
+        "linearity",
         "circular shift",
         "parseval",
         "inversibility",
@@ -120,7 +121,7 @@
     {
       "mutant": "rfft_inverse_ignores_length",
       "killed": true,
-      "seconds": 11.2,
+      "seconds": 9.14,
       "relations": [
         "inversibility",
         "convolution theorem"
@@ -131,7 +132,7 @@
     {
       "mutant": "rfft_nyquist_halved",
       "killed": true,
-      "seconds": 7.56,
+      "seconds": 6.22,
       "relations": [
         "parseval",
         "inversibility",
@@ -143,7 +144,7 @@
     {
       "mutant": "rfft_conjugated",
       "killed": true,
-      "seconds": 8.52,
+      "seconds": 5.81,
       "relations": [
         "circular shift",
         "inversibility",
@@ -155,7 +156,7 @@
     {
       "mutant": "rfft_inverse_without_symmetry",
       "killed": true,
-      "seconds": 9.82,
+      "seconds": 7.46,
       "relations": [
         "inversibility",
         "convolution theorem"
@@ -166,7 +167,7 @@
     {
       "mutant": "dct_missing_dc_weight",
       "killed": true,
-      "seconds": 2.64,
+      "seconds": 2.29,
       "relations": [
         "parseval",
         "inversibility"
@@ -177,7 +178,7 @@
     {
       "mutant": "dct_inverse_wrong_type",
       "killed": true,
-      "seconds": 4.53,
+      "seconds": 3.53,
       "relations": [
         "inversibility"
       ],
@@ -187,7 +188,7 @@
     {
       "mutant": "dct_float32_internal",
       "killed": true,
-      "seconds": 4.14,
+      "seconds": 3.09,
       "relations": [
         "linearity",
         "parseval",
@@ -199,7 +200,7 @@
     {
       "mutant": "iir_float32_recursion",
       "killed": true,
-      "seconds": 5.16,
+      "seconds": 3.63,
       "relations": [
         "linearity",
         "time invariance",
@@ -212,42 +213,42 @@
     {
       "mutant": "iir_zero_phase_declared_causal",
       "killed": true,
-      "seconds": 4.85,
+      "seconds": 4.51,
       "relations": [
         "time invariance",
         "causality",
+        "transfer function"
+      ],
+      "min_counterexample_length": 15,
+      "inputs_before_first_failure": 1
+    },
+    {
+      "mutant": "iir_coefficients_change",
+      "killed": true,
+      "seconds": 4.03,
+      "relations": [
+        "time invariance",
+        "transfer function"
+      ],
+      "min_counterexample_length": 34,
+      "inputs_before_first_failure": 1
+    },
+    {
+      "mutant": "iir_nonzero_initial_state",
+      "killed": true,
+      "seconds": 2.63,
+      "relations": [
+        "linearity",
+        "time invariance",
         "transfer function"
       ],
       "min_counterexample_length": 1,
       "inputs_before_first_failure": 1
     },
     {
-      "mutant": "iir_coefficients_change",
-      "killed": true,
-      "seconds": 6.39,
-      "relations": [
-        "time invariance",
-        "transfer function"
-      ],
-      "min_counterexample_length": 97,
-      "inputs_before_first_failure": 1
-    },
-    {
-      "mutant": "iir_nonzero_initial_state",
-      "killed": true,
-      "seconds": 4.48,
-      "relations": [
-        "linearity",
-        "time invariance",
-        "transfer function"
-      ],
-      "min_counterexample_length": 3,
-      "inputs_before_first_failure": 1
-    },
-    {
       "mutant": "iir_wrong_gain",
       "killed": true,
-      "seconds": 5.46,
+      "seconds": 4.32,
       "relations": [
         "transfer function"
       ],
@@ -257,7 +258,7 @@
     {
       "mutant": "rate_missing_interpolation_gain",
       "killed": true,
-      "seconds": 5.38,
+      "seconds": 4.17,
       "relations": [
         "DC gain"
       ],
@@ -267,7 +268,7 @@
     {
       "mutant": "rate_weak_antialiasing",
       "killed": true,
-      "seconds": 4.69,
+      "seconds": 3.71,
       "relations": [
         "alias rejection"
       ],
@@ -277,7 +278,7 @@
     {
       "mutant": "rate_floor_length",
       "killed": true,
-      "seconds": 4.91,
+      "seconds": 3.78,
       "relations": [
         "output length"
       ],
@@ -287,7 +288,7 @@
     {
       "mutant": "rate_phase_depends_on_length",
       "killed": true,
-      "seconds": 4.06,
+      "seconds": 2.9,
       "relations": [
         "periodic time invariance"
       ],
@@ -297,38 +298,38 @@
     {
       "mutant": "rate_float32_filter",
       "killed": true,
-      "seconds": 4.82,
+      "seconds": 4.06,
       "relations": [
         "linearity"
       ],
       "min_counterexample_length": 2,
-      "inputs_before_first_failure": 9
+      "inputs_before_first_failure": 25
     },
     {
       "mutant": "rate_state_leak",
       "killed": true,
-      "seconds": 4.65,
+      "seconds": 4.52,
       "relations": [
         "linearity",
         "periodic time invariance"
       ],
-      "min_counterexample_length": 2,
+      "min_counterexample_length": 1,
       "inputs_before_first_failure": 1
     },
     {
       "mutant": "stream_state_reset_every_block",
       "killed": true,
-      "seconds": 1.11,
+      "seconds": 0.22,
       "relations": [
         "block invariance"
       ],
       "min_counterexample_length": 2,
-      "inputs_before_first_failure": 3
+      "inputs_before_first_failure": 4
     },
     {
       "mutant": "stream_history_off_by_one",
       "killed": true,
-      "seconds": 9.65,
+      "seconds": 0.28,
       "relations": [
         "block invariance"
       ],
@@ -338,17 +339,17 @@
     {
       "mutant": "stream_empty_block_resets_state",
       "killed": true,
-      "seconds": 1.54,
+      "seconds": 1.04,
       "relations": [
         "block invariance"
       ],
       "min_counterexample_length": 2,
-      "inputs_before_first_failure": 32
+      "inputs_before_first_failure": 37
     },
     {
       "mutant": "stream_short_block_passthrough",
       "killed": true,
-      "seconds": 0.45,
+      "seconds": 0.36,
       "relations": [
         "block invariance"
       ],

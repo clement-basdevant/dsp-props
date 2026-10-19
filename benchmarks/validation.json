@@ -1,9 +1,9 @@
 {
  "environment": {
   "python": "3.13.16",
-  "numpy": "2.5.4",
+  "numpy": "2.5.3",
   "scipy": "1.18.1",
-  "hypothesis": "6.169.3"
+  "hypothesis": "6.170.2"
  },
  "reference": {
   "dft": [
@@ -113,8 +113,8 @@
   "dft_max_in_eps64": 0.001036269853554197,
   "lfilter_max_in_eps64": 0.00537013957606974,
   "longdouble_eps_in_eps64": 0.00048828125,
-  "mpmath_version": "1.3.0",
-  "seconds": 1.5
+  "mpmath_version": "1.4.1",
+  "seconds": 1.4
  },
  "generators": {
   "lengths": {
@@ -145,7 +145,13 @@
    ],
    "pathological_values_missed": [],
    "fraction_prime": 0.19962335216572505,
-   "fraction_power_of_two": 0.032015065913371
+   "fraction_power_of_two": 0.032015065913371,
+   "runs_of_200": {
+    "runs": 20,
+    "mean_fraction_pathological": 0.149,
+    "min": 0.135,
+    "max": 0.16
+   }
   },
   "signals": {
    "impulse": {
@@ -162,7 +168,7 @@
     "exactly_one_nonzero": 1.0
    },
    "sparse": {
-    "draws": 437,
+    "draws": 457,
     "all_finite": true,
     "length_ok": true,
     "amplitude_decades": [
@@ -178,7 +184,7 @@
     ]
    },
    "white_noise": {
-    "draws": 1203,
+    "draws": 1161,
     "all_finite": true,
     "length_ok": true,
     "amplitude_decades": [
@@ -186,24 +192,25 @@
      -313,
      -309,
      -308,
-     -304,
      -302,
      -300,
-     -299,
      -297,
      -293,
-     -290,
      -289,
      -286,
+     -284,
+     -283,
      -281,
+     -278,
+     -276,
+     -274,
+     -273,
+     -268,
+     -265,
      -263,
-     -252,
      -251,
-     -244,
-     -234,
      -231,
-     -228,
-     -223,
+     -215,
      -213,
      -205,
      -202,
@@ -211,72 +218,77 @@
      -195,
      -193,
      -192,
+     -186,
      -185,
      -183,
      -182,
-     -181,
+     -180,
+     -179,
+     -178,
+     -177,
+     -174,
      -169,
+     -152,
+     -151,
      -150,
-     -144,
+     -148,
      -143,
-     -141,
      -138,
      -137,
+     -136,
      -134,
-     -131,
-     -130,
-     -128,
-     -127,
      -126,
-     -125,
      -123,
-     -122,
      -116,
+     -112,
+     -110,
      -109,
      -106,
+     -105,
+     -104,
      -102,
      -101,
      -100,
-     -96,
+     -98,
+     -97,
      -95,
-     -90,
-     -89,
+     -94,
+     -92,
+     -91,
+     -86,
      -83,
      -80,
-     -78,
      -77,
-     -75,
-     -68,
+     -76,
+     -65,
+     -59,
      -54,
      -53,
      -45,
-     -43,
      -42,
      -41,
      -38,
      -36,
+     -34,
      -26,
-     -22,
+     -24,
      -17,
      -16,
+     -15,
      -14,
-     -12,
      -11,
      -9,
      -8,
-     -6,
      -5,
      -4,
      -3,
      -2,
      -1,
      0,
-     1,
      2,
      3,
-     8,
+     35,
      86,
-     88,
      93,
      98,
      99,
@@ -306,12 +318,12 @@
      0.0,
      0.5
     ],
-    "fraction_on_dft_grid": 0.39385474860335196,
-    "fraction_freq_0_or_nyquist": 0.23044692737430167,
-    "distinct_freqs": 339
+    "fraction_on_dft_grid": 0.41201117318435754,
+    "fraction_freq_0_or_nyquist": 0.22905027932960895,
+    "distinct_freqs": 335
    },
    "close_tones": {
-    "draws": 727,
+    "draws": 755,
     "all_finite": true,
     "length_ok": true,
     "amplitude_decades": [
@@ -323,21 +335,19 @@
     ],
     "separation_in_bins": [
      0.0,
-     0.2595937699323035,
-     1.0
+     0.26461155133568626,
+     1.0000000000000036
     ],
-    "fraction_below_one_bin": 0.9917469050894085,
-    "fraction_identical_tones": 0.1609353507565337
+    "fraction_below_one_bin": 0.9867549668874173,
+    "fraction_identical_tones": 0.1403973509933775
    },
    "near_nyquist_sine": {
-    "draws": 732,
+    "draws": 726,
     "all_finite": true,
     "length_ok": true,
     "amplitude_decades": [
-     -102,
      -101,
      -100,
-     -6,
      -5,
      -4,
      -3,
@@ -353,8 +363,8 @@
      0.45,
      0.5
     ],
-    "fraction_on_dft_grid": 0.04371584699453552,
-    "fraction_freq_0_or_nyquist": 0.09016393442622951,
+    "fraction_on_dft_grid": 0.03305785123966942,
+    "fraction_freq_0_or_nyquist": 0.07162534435261708,
     "distinct_freqs": 297
    },
    "dc": {
@@ -373,11 +383,11 @@
   },
   "block_splits": {
    "draws": 4000,
-   "fraction_with_empty_block": 0.77925,
-   "fraction_with_one_sample_block": 0.373,
+   "fraction_with_empty_block": 0.6585,
+   "fraction_with_one_sample_block": 0.4415,
    "blocks_cover_signal": true
   },
-  "seconds": 16.8
+  "seconds": 22.0
  },
  "known-bug": {
   "scipy": "1.18.1",
@@ -385,7 +395,7 @@
    {
     "seed": 2000,
     "passed": false,
-    "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.618e-13 (N=2, ref norm 7.287e-01)\n       minimal input: ([1, 1], (1, 1))"
+    "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.197e-13 (N=2, ref norm 5.392e-01)\n       minimal input: ([1, 0], (1, 1))"
    },
    {
     "seed": 2001,
@@ -395,12 +405,12 @@
    {
     "seed": 2002,
     "passed": false,
-    "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.618e-13 (N=2, ref norm 7.287e-01)\n       minimal input: ([1, 1], (1, 1))"
+    "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.197e-13 (N=2, ref norm 5.392e-01)\n       minimal input: ([1, 0], (1, 1))"
    },
    {
     "seed": 2003,
     "passed": false,
-    "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.197e-13 (N=2, ref norm 5.392e-01)\n       minimal input: ([1, 0], (1, 1))"
+    "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.618e-13 (N=2, ref norm 7.287e-01)\n       minimal input: ([1, 1], (1, 1))"
    },
    {
     "seed": 2004,
@@ -408,7 +418,7 @@
     "report": "dsp-props report for <lambda>\n  FAIL block invariance\n       block invariance (cuts=[1, 1]): L2 error 5.007e-01 exceeds tolerance 1.618e-13 (N=2, ref norm 7.287e-01)\n       minimal input: ([1, 1], (1, 1))"
    }
   ],
-  "seconds": 4.7
+  "seconds": 5.2
  },
  "false-positives": {
   "rows": [
@@ -420,10 +430,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 1.9812381919594646e-88,
-    "margin_p99": 0.016078624008427612,
-    "margin_max": 0.045772714936993995,
-    "seconds": 42.3
+    "margin_median": 1.3802791213889418e-85,
+    "margin_p99": 0.017973124150710264,
+    "margin_max": 0.049991562091277905,
+    "seconds": 105.1
    },
    {
     "target": "numpy.fft",
@@ -433,10 +443,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.0025888568253602065,
-    "margin_p99": 0.029473886533568434,
-    "margin_max": 0.06851368820243625,
-    "seconds": 25.2
+    "margin_median": 0.0030885554828269856,
+    "margin_p99": 0.03658969644349113,
+    "margin_max": 0.07136334330168874,
+    "seconds": 52.1
    },
    {
     "target": "numpy.fft",
@@ -449,7 +459,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 23.9
+    "seconds": 49.1
    },
    {
     "target": "numpy.fft",
@@ -459,10 +469,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.0032278398660330696,
-    "margin_p99": 0.018912040720259395,
+    "margin_median": 0.0015296431807622153,
+    "margin_p99": 0.01875743171954956,
     "margin_max": 0.02387423948359729,
-    "seconds": 23.9
+    "seconds": 21.6
    },
    {
     "target": "numpy.fft",
@@ -472,10 +482,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.008285012083205527,
-    "margin_p99": 0.024495097166250434,
+    "margin_median": 0.008218772603733882,
+    "margin_p99": 0.024164847287739936,
     "margin_max": 0.04335799208282665,
-    "seconds": 24.2
+    "seconds": 50.4
    },
    {
     "target": "numpy.fft",
@@ -485,10 +495,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.001114326490607469,
-    "margin_p99": 0.02960711781909594,
-    "margin_max": 0.09142205064541702,
-    "seconds": 36.0
+    "margin_median": 0.0012923460360915544,
+    "margin_p99": 0.04021610072126818,
+    "margin_max": 0.11061140922053778,
+    "seconds": 96.2
    },
    {
     "target": "numpy.fft",
@@ -498,10 +508,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 1.6861058084217232e-05,
-    "margin_p99": 0.017504083226204892,
-    "margin_max": 0.05119342711589198,
-    "seconds": 37.7
+    "margin_median": 0.0008931987017895393,
+    "margin_p99": 0.019822289743125013,
+    "margin_max": 0.049991562091277905,
+    "seconds": 92.4
    },
    {
     "target": "numpy.fft",
@@ -514,7 +524,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 24.2
+    "seconds": 50.1
    },
    {
     "target": "numpy.fft",
@@ -524,10 +534,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.008335648783809154,
-    "margin_p99": 0.02556518603043096,
+    "margin_median": 0.008427832227972179,
+    "margin_p99": 0.02477818094536591,
     "margin_max": 0.044480016878815996,
-    "seconds": 23.6
+    "seconds": 52.9
    },
    {
     "target": "numpy.fft.rfft",
@@ -537,10 +547,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 5.2417239319384274e-86,
-    "margin_p99": 0.025606365313903885,
-    "margin_max": 0.07683957403905785,
-    "seconds": 35.2
+    "margin_median": 6.924117435808658e-88,
+    "margin_p99": 0.026809344005002383,
+    "margin_max": 0.05410349052427666,
+    "seconds": 36.4
    },
    {
     "target": "numpy.fft.rfft",
@@ -550,10 +560,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.0024581804517644136,
-    "margin_p99": 0.029299254580053825,
+    "margin_median": 0.0,
+    "margin_p99": 0.03471678382639636,
     "margin_max": 0.06851368820243625,
-    "seconds": 22.1
+    "seconds": 22.0
    },
    {
     "target": "numpy.fft.rfft",
@@ -566,7 +576,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 24.0
+    "seconds": 22.1
    },
    {
     "target": "numpy.fft.rfft",
@@ -576,9 +586,9 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.00768771847569492,
-    "margin_p99": 0.029006297860836038,
-    "margin_max": 0.06612871631487088,
+    "margin_median": 0.007659762077908491,
+    "margin_p99": 0.031091766072532362,
+    "margin_max": 0.057291166472075994,
     "seconds": 23.8
    },
    {
@@ -589,10 +599,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.0009296237674070242,
-    "margin_p99": 0.03040193980759773,
-    "margin_max": 0.10273160720661413,
-    "seconds": 36.2
+    "margin_median": 0.0008934877433676477,
+    "margin_p99": 0.03250546373196,
+    "margin_max": 0.11361185717875248,
+    "seconds": 37.7
    },
    {
     "target": "numpy.fft.rfft",
@@ -605,7 +615,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 23.4
+    "seconds": 22.5
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -615,10 +625,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 2.6857316931346616e-21,
-    "margin_p99": 0.0003587480120781967,
-    "margin_max": 0.000666000666000666,
-    "seconds": 40.2
+    "margin_median": 7.293602843588842e-103,
+    "margin_p99": 0.0003601854666202949,
+    "margin_max": 0.0009236732973559067,
+    "seconds": 38.3
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -631,7 +641,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 6.2
+    "seconds": 5.9
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -644,7 +654,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 23.7
+    "seconds": 23.6
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -657,7 +667,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 5.1
+    "seconds": 5.7
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -670,7 +680,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 6.4
+    "seconds": 6.6
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -680,41 +690,15 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 1.7060650214518752e-05,
-    "margin_p99": 0.00038273594191670266,
+    "margin_median": 1.3721284602014903e-05,
+    "margin_p99": 0.0003691840386612414,
     "margin_max": 0.0007119989592683578,
-    "seconds": 38.7
+    "seconds": 37.7
    },
    {
     "target": "scipy.signal.upfirdn",
     "declaration": "resample_3_1",
     "relation": "output length",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 6.4
-   },
-   {
-    "target": "scipy.signal.upfirdn",
-    "declaration": "resample_3_1",
-    "relation": "periodic time invariance",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.0,
-    "margin_max": 0.0,
-    "seconds": 24.6
-   },
-   {
-    "target": "scipy.signal.upfirdn",
-    "declaration": "resample_3_1",
-    "relation": "DC gain",
     "seeds": 20,
     "failures": 0,
     "failure_details": [],
@@ -726,33 +710,7 @@
    },
    {
     "target": "scipy.signal.upfirdn",
-    "declaration": "resample_1_2",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 1.9408948886931683e-21,
-    "margin_p99": 0.000294965090399127,
-    "margin_max": 0.0008103515889015492,
-    "seconds": 38.5
-   },
-   {
-    "target": "scipy.signal.upfirdn",
-    "declaration": "resample_1_2",
-    "relation": "output length",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 6.1
-   },
-   {
-    "target": "scipy.signal.upfirdn",
-    "declaration": "resample_1_2",
+    "declaration": "resample_3_1",
     "relation": "periodic time invariance",
     "seeds": 20,
     "failures": 0,
@@ -761,12 +719,38 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 25.4
+    "seconds": 24.1
+   },
+   {
+    "target": "scipy.signal.upfirdn",
+    "declaration": "resample_3_1",
+    "relation": "DC gain",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 5.7
    },
    {
     "target": "scipy.signal.upfirdn",
     "declaration": "resample_1_2",
-    "relation": "DC gain",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 1.6727376377677793e-108,
+    "margin_p99": 0.00033209444779099353,
+    "margin_max": 0.0007042249147782457,
+    "seconds": 38.1
+   },
+   {
+    "target": "scipy.signal.upfirdn",
+    "declaration": "resample_1_2",
+    "relation": "output length",
     "seeds": 20,
     "failures": 0,
     "failure_details": [],
@@ -779,6 +763,32 @@
    {
     "target": "scipy.signal.upfirdn",
     "declaration": "resample_1_2",
+    "relation": "periodic time invariance",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.0,
+    "margin_max": 0.0,
+    "seconds": 24.1
+   },
+   {
+    "target": "scipy.signal.upfirdn",
+    "declaration": "resample_1_2",
+    "relation": "DC gain",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 5.9
+   },
+   {
+    "target": "scipy.signal.upfirdn",
+    "declaration": "resample_1_2",
     "relation": "alias rejection",
     "seeds": 20,
     "failures": 0,
@@ -787,7 +797,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 6.4
+    "seconds": 6.2
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -797,10 +807,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 9.257868392593973e-06,
-    "margin_p99": 0.016486785443226407,
-    "margin_max": 0.03144582717286494,
-    "seconds": 36.2
+    "margin_median": 2.7767201094541706e-06,
+    "margin_p99": 0.01620462394603459,
+    "margin_max": 0.033864456735255836,
+    "seconds": 34.1
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -813,7 +823,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 22.9
+    "seconds": 22.0
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -826,7 +836,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 25.2
+    "seconds": 24.0
    },
    {
     "target": "scipy.signal.upfirdn",
@@ -849,118 +859,14 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 4.315328600679846e-06,
-    "margin_p99": 0.0002335603536218245,
-    "margin_max": 0.0007357238121879244,
-    "seconds": 34.4
+    "margin_median": 3.6075501754612054e-06,
+    "margin_p99": 0.00026073073951895294,
+    "margin_max": 0.0006402649617280151,
+    "seconds": 36.7
    },
    {
     "target": "scipy.signal.lfilter",
     "declaration": "lfilter_resonant",
-    "relation": "time invariance",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.0,
-    "margin_max": 0.0,
-    "seconds": 21.6
-   },
-   {
-    "target": "scipy.signal.lfilter",
-    "declaration": "lfilter_resonant",
-    "relation": "causality",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.0,
-    "margin_max": 0.0,
-    "seconds": 24.4
-   },
-   {
-    "target": "scipy.signal.lfilter",
-    "declaration": "lfilter_resonant",
-    "relation": "transfer function",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 0.1
-   },
-   {
-    "target": "scipy.signal.lfilter",
-    "declaration": "lfilter_a0_not_1",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.002142498379834515,
-    "margin_p99": 0.05124127454488243,
-    "margin_max": 0.0911457032250808,
-    "seconds": 34.5
-   },
-   {
-    "target": "scipy.signal.lfilter",
-    "declaration": "lfilter_a0_not_1",
-    "relation": "time invariance",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.0,
-    "margin_max": 0.0,
-    "seconds": 21.0
-   },
-   {
-    "target": "scipy.signal.lfilter",
-    "declaration": "lfilter_a0_not_1",
-    "relation": "causality",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.0,
-    "margin_max": 0.0,
-    "seconds": 24.3
-   },
-   {
-    "target": "scipy.signal.lfilter",
-    "declaration": "lfilter_a0_not_1",
-    "relation": "transfer function",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 0.0
-   },
-   {
-    "target": "scipy.signal.sosfilt",
-    "declaration": "sosfilt_butter4",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 1.0256266451252685e-05,
-    "margin_p99": 0.0006888964201495571,
-    "margin_max": 0.0014946681270490367,
-    "seconds": 37.6
-   },
-   {
-    "target": "scipy.signal.sosfilt",
-    "declaration": "sosfilt_butter4",
     "relation": "time invariance",
     "seeds": 20,
     "failures": 0,
@@ -972,6 +878,110 @@
     "seconds": 21.4
    },
    {
+    "target": "scipy.signal.lfilter",
+    "declaration": "lfilter_resonant",
+    "relation": "causality",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.0,
+    "margin_max": 0.0,
+    "seconds": 23.3
+   },
+   {
+    "target": "scipy.signal.lfilter",
+    "declaration": "lfilter_resonant",
+    "relation": "transfer function",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 0.1
+   },
+   {
+    "target": "scipy.signal.lfilter",
+    "declaration": "lfilter_a0_not_1",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0015430039786028683,
+    "margin_p99": 0.052413353360617705,
+    "margin_max": 0.10585846250843915,
+    "seconds": 33.4
+   },
+   {
+    "target": "scipy.signal.lfilter",
+    "declaration": "lfilter_a0_not_1",
+    "relation": "time invariance",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.0,
+    "margin_max": 0.0,
+    "seconds": 22.0
+   },
+   {
+    "target": "scipy.signal.lfilter",
+    "declaration": "lfilter_a0_not_1",
+    "relation": "causality",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.0,
+    "margin_max": 0.0,
+    "seconds": 24.5
+   },
+   {
+    "target": "scipy.signal.lfilter",
+    "declaration": "lfilter_a0_not_1",
+    "relation": "transfer function",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 0.1
+   },
+   {
+    "target": "scipy.signal.sosfilt",
+    "declaration": "sosfilt_butter4",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 8.674228270257069e-06,
+    "margin_p99": 0.000659645652270549,
+    "margin_max": 0.0017332296090856775,
+    "seconds": 35.3
+   },
+   {
+    "target": "scipy.signal.sosfilt",
+    "declaration": "sosfilt_butter4",
+    "relation": "time invariance",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.0,
+    "margin_max": 0.0,
+    "seconds": 20.7
+   },
+   {
     "target": "scipy.signal.sosfilt",
     "declaration": "sosfilt_butter4",
     "relation": "causality",
@@ -982,7 +992,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 24.7
+    "seconds": 23.5
    },
    {
     "target": "scipy.signal.sosfilt",
@@ -1005,10 +1015,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 2.6857316931346616e-21,
-    "margin_p99": 0.0003587480120781967,
-    "margin_max": 0.000666000666000666,
-    "seconds": 37.5
+    "margin_median": 7.293602843588842e-103,
+    "margin_p99": 0.0003601854666202949,
+    "margin_max": 0.0009236732973559067,
+    "seconds": 37.0
    },
    {
     "target": "scipy.signal.resample_poly",
@@ -1021,7 +1031,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 5.9
+    "seconds": 5.8
    },
    {
     "target": "scipy.signal.resample_poly",
@@ -1034,7 +1044,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 24.4
+    "seconds": 22.5
    },
    {
     "target": "scipy.signal.resample_poly",
@@ -1047,12 +1057,90 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 5.7
+    "seconds": 5.5
    },
    {
     "target": "scipy.signal.resample_poly",
     "declaration": "resample_poly_2_3",
     "relation": "alias rejection",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 6.8
+   },
+   {
+    "target": "scipy.signal.resample_poly",
+    "declaration": "resample_poly_3_1",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 1.3721284602014903e-05,
+    "margin_p99": 0.0003691840386612414,
+    "margin_max": 0.0007119989592683578,
+    "seconds": 36.4
+   },
+   {
+    "target": "scipy.signal.resample_poly",
+    "declaration": "resample_poly_3_1",
+    "relation": "output length",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 5.9
+   },
+   {
+    "target": "scipy.signal.resample_poly",
+    "declaration": "resample_poly_3_1",
+    "relation": "periodic time invariance",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.0,
+    "margin_max": 0.0,
+    "seconds": 22.8
+   },
+   {
+    "target": "scipy.signal.resample_poly",
+    "declaration": "resample_poly_3_1",
+    "relation": "DC gain",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 5.9
+   },
+   {
+    "target": "scipy.signal.resample_poly",
+    "declaration": "resample_poly_1_2",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 1.6727376377677793e-108,
+    "margin_p99": 0.00033209444779099353,
+    "margin_max": 0.0007042249147782457,
+    "seconds": 36.7
+   },
+   {
+    "target": "scipy.signal.resample_poly",
+    "declaration": "resample_poly_1_2",
+    "relation": "output length",
     "seeds": 20,
     "failures": 0,
     "failure_details": [],
@@ -1064,84 +1152,6 @@
    },
    {
     "target": "scipy.signal.resample_poly",
-    "declaration": "resample_poly_3_1",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 1.7060650214518752e-05,
-    "margin_p99": 0.00038273594191670266,
-    "margin_max": 0.0007119989592683578,
-    "seconds": 38.8
-   },
-   {
-    "target": "scipy.signal.resample_poly",
-    "declaration": "resample_poly_3_1",
-    "relation": "output length",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 6.1
-   },
-   {
-    "target": "scipy.signal.resample_poly",
-    "declaration": "resample_poly_3_1",
-    "relation": "periodic time invariance",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.0,
-    "margin_max": 0.0,
-    "seconds": 23.7
-   },
-   {
-    "target": "scipy.signal.resample_poly",
-    "declaration": "resample_poly_3_1",
-    "relation": "DC gain",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 5.6
-   },
-   {
-    "target": "scipy.signal.resample_poly",
-    "declaration": "resample_poly_1_2",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 1.9408948886931683e-21,
-    "margin_p99": 0.000294965090399127,
-    "margin_max": 0.0008103515889015492,
-    "seconds": 38.8
-   },
-   {
-    "target": "scipy.signal.resample_poly",
-    "declaration": "resample_poly_1_2",
-    "relation": "output length",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 5.9
-   },
-   {
-    "target": "scipy.signal.resample_poly",
     "declaration": "resample_poly_1_2",
     "relation": "periodic time invariance",
     "seeds": 20,
@@ -1151,7 +1161,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 22.7
+    "seconds": 22.8
    },
    {
     "target": "scipy.signal.resample_poly",
@@ -1164,7 +1174,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 5.7
+    "seconds": 5.1
    },
    {
     "target": "scipy.signal.resample_poly",
@@ -1187,10 +1197,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.005591706893610717,
-    "margin_p99": 0.021546220609212737,
-    "margin_max": 0.045772714936993995,
-    "seconds": 38.0
+    "margin_median": 0.005530630570481894,
+    "margin_p99": 0.02388735637238626,
+    "margin_max": 0.05258372906372219,
+    "seconds": 89.3
    },
    {
     "target": "subject:fft",
@@ -1200,10 +1210,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.00823051982015498,
-    "margin_p99": 0.07289637050392855,
-    "margin_max": 0.15272670709632827,
-    "seconds": 24.6
+    "margin_median": 0.008637506482544462,
+    "margin_p99": 0.0731746119208854,
+    "margin_max": 0.12307291759278,
+    "seconds": 48.5
    },
    {
     "target": "subject:fft",
@@ -1216,7 +1226,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 22.8
+    "seconds": 46.2
    },
    {
     "target": "subject:fft",
@@ -1226,10 +1236,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.030877389775955773,
-    "margin_p99": 0.10856489130893533,
-    "margin_max": 0.20451757693395117,
-    "seconds": 24.9
+    "margin_median": 0.030787066510490277,
+    "margin_p99": 0.12312574029463641,
+    "margin_max": 0.2105319459931417,
+    "seconds": 22.4
    },
    {
     "target": "subject:fft",
@@ -1239,10 +1249,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.02256722294683366,
-    "margin_p99": 0.05352560845862533,
+    "margin_median": 0.022837806352345558,
+    "margin_p99": 0.05070747440220715,
     "margin_max": 0.07726254451924841,
-    "seconds": 25.7
+    "seconds": 48.9
    },
    {
     "target": "subject:fft",
@@ -1252,10 +1262,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.0034132998082405863,
-    "margin_p99": 0.05280014943931338,
-    "margin_max": 0.12986604007937486,
-    "seconds": 39.1
+    "margin_median": 0.0037759172581028075,
+    "margin_p99": 0.06132717916019603,
+    "margin_max": 0.10997113376954044,
+    "seconds": 82.7
    },
    {
     "target": "subject:fft",
@@ -1265,10 +1275,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.00576809119221662,
-    "margin_p99": 0.02186324062295951,
-    "margin_max": 0.045772714936993995,
-    "seconds": 38.4
+    "margin_median": 0.005595102296768807,
+    "margin_p99": 0.024641920629833957,
+    "margin_max": 0.049991562091277905,
+    "seconds": 84.3
    },
    {
     "target": "subject:fft",
@@ -1281,7 +1291,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 23.8
+    "seconds": 47.5
    },
    {
     "target": "subject:fft",
@@ -1291,10 +1301,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.02257114757749942,
-    "margin_p99": 0.05435803098053079,
-    "margin_max": 0.07430300878303832,
-    "seconds": 26.6
+    "margin_median": 0.022893364165316316,
+    "margin_p99": 0.050370162456559425,
+    "margin_max": 0.07593517742784779,
+    "seconds": 49.4
    },
    {
     "target": "subject:lfilter",
@@ -1304,10 +1314,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 4.315328600679846e-06,
-    "margin_p99": 0.0002335603536218245,
-    "margin_max": 0.0007357238121879244,
-    "seconds": 35.0
+    "margin_median": 3.6075501754612054e-06,
+    "margin_p99": 0.00026073073951895294,
+    "margin_max": 0.0006402649617280151,
+    "seconds": 34.1
    },
    {
     "target": "subject:lfilter",
@@ -1320,7 +1330,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 22.5
+    "seconds": 21.3
    },
    {
     "target": "subject:lfilter",
@@ -1333,7 +1343,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 24.2
+    "seconds": 23.0
    },
    {
     "target": "subject:lfilter",
@@ -1356,10 +1366,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 0.002142498379834515,
-    "margin_p99": 0.05124127454488243,
-    "margin_max": 0.0911457032250808,
-    "seconds": 34.9
+    "margin_median": 0.0015430039786028683,
+    "margin_p99": 0.052413353360617705,
+    "margin_max": 0.10585846250843915,
+    "seconds": 33.3
    },
    {
     "target": "subject:lfilter",
@@ -1372,7 +1382,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 22.2
+    "seconds": 21.2
    },
    {
     "target": "subject:lfilter",
@@ -1385,7 +1395,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 25.1
+    "seconds": 23.0
    },
    {
     "target": "subject:lfilter",
@@ -1411,7 +1421,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 24.7
+    "seconds": 24.5
    },
    {
     "target": "subject:upfirdn",
@@ -1421,131 +1431,14 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 2.5115155248209474e-21,
-    "margin_p99": 0.0003408426660695363,
-    "margin_max": 0.0006734985571939605,
-    "seconds": 46.5
+    "margin_median": 1.0318136403503326e-100,
+    "margin_p99": 0.00034106242852089064,
+    "margin_max": 0.000666000666000666,
+    "seconds": 39.9
    },
    {
     "target": "subject:upfirdn",
     "declaration": "resample_2_3",
-    "relation": "output length",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 10.2
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_2_3",
-    "relation": "periodic time invariance",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.00019563365217801996,
-    "margin_max": 0.0005470987833142603,
-    "seconds": 29.5
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_2_3",
-    "relation": "DC gain",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 10.8
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_2_3",
-    "relation": "alias rejection",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 12.0
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_3_1",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 1.8209744102486233e-05,
-    "margin_p99": 0.00037282944326295643,
-    "margin_max": 0.0006500224928335934,
-    "seconds": 67.8
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_3_1",
-    "relation": "output length",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 19.8
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_3_1",
-    "relation": "periodic time invariance",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 0.0,
-    "margin_p99": 0.00015116038344711925,
-    "margin_max": 0.0002788851625808911,
-    "seconds": 41.8
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_3_1",
-    "relation": "DC gain",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 0,
-    "margin_median": null,
-    "margin_p99": null,
-    "margin_max": null,
-    "seconds": 31.0
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_1_2",
-    "relation": "linearity",
-    "seeds": 20,
-    "failures": 0,
-    "failure_details": [],
-    "comparisons": 4000,
-    "margin_median": 5.013687773710607e-22,
-    "margin_p99": 0.0002907879827474184,
-    "margin_max": 0.0005650570771704627,
-    "seconds": 43.5
-   },
-   {
-    "target": "subject:upfirdn",
-    "declaration": "resample_1_2",
     "relation": "output length",
     "seeds": 20,
     "failures": 0,
@@ -1558,6 +1451,123 @@
    },
    {
     "target": "subject:upfirdn",
+    "declaration": "resample_2_3",
+    "relation": "periodic time invariance",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.00021341395386356783,
+    "margin_max": 0.0005470987833142603,
+    "seconds": 24.9
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_2_3",
+    "relation": "DC gain",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 10.2
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_2_3",
+    "relation": "alias rejection",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 11.0
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_3_1",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 1.3534277018958644e-05,
+    "margin_p99": 0.0003523481063968456,
+    "margin_max": 0.0006500224928335934,
+    "seconds": 61.2
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_3_1",
+    "relation": "output length",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 17.6
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_3_1",
+    "relation": "periodic time invariance",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 0.0,
+    "margin_p99": 0.00015179891499382303,
+    "margin_max": 0.00026073561760166583,
+    "seconds": 36.3
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_3_1",
+    "relation": "DC gain",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 26.8
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_1_2",
+    "relation": "linearity",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 4000,
+    "margin_median": 4.989313573865128e-205,
+    "margin_p99": 0.0002916334299710682,
+    "margin_max": 0.0005519990839452553,
+    "seconds": 38.3
+   },
+   {
+    "target": "subject:upfirdn",
+    "declaration": "resample_1_2",
+    "relation": "output length",
+    "seeds": 20,
+    "failures": 0,
+    "failure_details": [],
+    "comparisons": 0,
+    "margin_median": null,
+    "margin_p99": null,
+    "margin_max": null,
+    "seconds": 8.7
+   },
+   {
+    "target": "subject:upfirdn",
     "declaration": "resample_1_2",
     "relation": "periodic time invariance",
     "seeds": 20,
@@ -1565,9 +1575,9 @@
     "failure_details": [],
     "comparisons": 4000,
     "margin_median": 0.0,
-    "margin_p99": 0.00014390788464855496,
+    "margin_p99": 0.00014724896545800334,
     "margin_max": 0.00035353191511399465,
-    "seconds": 26.4
+    "seconds": 25.7
    },
    {
     "target": "subject:upfirdn",
@@ -1580,7 +1590,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 9.5
+    "seconds": 7.9
    },
    {
     "target": "subject:upfirdn",
@@ -1593,7 +1603,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 9.3
+    "seconds": 9.1
    },
    {
     "target": "subject:upfirdn",
@@ -1603,10 +1613,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 1.249953658046847e-05,
-    "margin_p99": 0.012523856321416801,
+    "margin_median": 9.450243723038072e-06,
+    "margin_p99": 0.01324834780007294,
     "margin_max": 0.03156380519286965,
-    "seconds": 44.4
+    "seconds": 42.1
    },
    {
     "target": "subject:upfirdn",
@@ -1619,7 +1629,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 27.7
+    "seconds": 25.8
    },
    {
     "target": "subject:upfirdn",
@@ -1632,7 +1642,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 30.8
+    "seconds": 27.9
    },
    {
     "target": "subject:upfirdn",
@@ -1645,7 +1655,7 @@
     "margin_median": null,
     "margin_p99": null,
     "margin_max": null,
-    "seconds": 0.0
+    "seconds": 0.1
    },
    {
     "target": "subject:ola",
@@ -1656,9 +1666,9 @@
     "failure_details": [],
     "comparisons": 4000,
     "margin_median": 0.0,
-    "margin_p99": 0.00032848218641932415,
-    "margin_max": 0.0015531680939228402,
-    "seconds": 26.2
+    "margin_p99": 0.00033258967367166614,
+    "margin_max": 0.0028259088595526216,
+    "seconds": 24.5
    },
    {
     "target": "subject:ola",
@@ -1668,10 +1678,10 @@
     "failures": 0,
     "failure_details": [],
     "comparisons": 4000,
-    "margin_median": 9.262644823674722e-06,
-    "margin_p99": 0.01916261630083974,
-    "margin_max": 0.03744957584612986,
-    "seconds": 38.7
+    "margin_median": 5.22747159794436e-99,
+    "margin_p99": 0.018722265392081106,
+    "margin_max": 0.03717764452418155,
+    "seconds": 35.3
    },
    {
     "target": "subject:ola",
@@ -1684,7 +1694,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 24.2
+    "seconds": 21.9
    },
    {
     "target": "subject:ola",
@@ -1697,7 +1707,7 @@
     "margin_median": 0.0,
     "margin_p99": 0.0,
     "margin_max": 0.0,
-    "seconds": 25.8
+    "seconds": 24.8
    },
    {
     "target": "subject:ola",
@@ -1718,133 +1728,142 @@
   "comparisons": 248000,
   "margin_quantiles": {
    "50": 0.0,
-   "90": 0.010792300672415368,
-   "99": 0.0375723032183213,
-   "99.9": 0.06955485003307349,
-   "100": 0.20451757693395117
+   "90": 0.010819911076371116,
+   "99": 0.03754748553924791,
+   "99.9": 0.07357788233278316,
+   "100": 0.2105319459931417
   },
   "margin_histogram_log10": {
-   "-3": 27979,
-   "-2": 26635,
-   "-4": 13832,
-   "-92": 23,
-   "-102": 70,
-   "-90": 74,
-   "-99": 47,
-   "-87": 97,
-   "-186": 21,
-   "-104": 111,
-   "-89": 47,
-   "-103": 102,
-   "-187": 14,
-   "-188": 15,
-   "-20": 60,
-   "-88": 66,
-   "-84": 67,
-   "-86": 39,
-   "-91": 47,
-   "-83": 21,
-   "-81": 4,
-   "-11": 37,
-   "-105": 69,
-   "-97": 5,
-   "-5": 17918,
-   "-190": 4,
-   "-204": 42,
-   "-202": 19,
-   "-93": 13,
-   "-107": 41,
-   "-100": 82,
-   "-180": 2,
-   "-106": 86,
-   "-85": 31,
-   "-193": 4,
-   "-194": 2,
-   "-7": 294,
-   "-19": 56,
-   "-101": 116,
-   "-232": 2,
-   "-13": 3,
-   "-17": 27,
-   "-16": 9,
-   "-12": 8,
-   "-18": 8,
-   "-9": 28,
-   "-15": 4,
-   "-10": 21,
+   "-3": 27819,
+   "-2": 26638,
+   "-188": 6,
+   "-4": 13508,
+   "-101": 97,
+   "-87": 88,
+   "-84": 60,
+   "-91": 62,
+   "-86": 64,
+   "-85": 40,
+   "-100": 61,
+   "-88": 59,
+   "-102": 81,
+   "-90": 69,
+   "-103": 144,
+   "-187": 20,
+   "-92": 21,
+   "-7": 287,
+   "-6": 3042,
+   "-104": 84,
+   "-9": 34,
+   "-106": 71,
+   "-120": 4,
+   "-191": 2,
+   "-89": 40,
+   "-99": 44,
+   "-20": 53,
+   "-105": 57,
+   "-206": 14,
+   "-17": 34,
+   "-16": 11,
+   "-83": 16,
+   "-5": 17345,
+   "-97": 4,
+   "-24": 9,
+   "-109": 14,
+   "-205": 16,
+   "-203": 20,
+   "-19": 53,
+   "-40": 2,
+   "-13": 6,
+   "-26": 3,
+   "-23": 3,
+   "-79": 1,
+   "-11": 50,
+   "-18": 26,
+   "-34": 3,
+   "-10": 50,
    "-50": 2,
-   "-8": 39,
-   "-155": 10,
-   "-34": 6,
-   "-66": 2,
-   "-65": 3,
-   "-207": 2,
-   "-37": 2,
-   "-36": 20,
-   "-35": 14,
-   "-21": 368,
-   "-43": 6,
-   "-169": 8,
-   "-159": 3,
-   "-6": 3002,
-   "-108": 31,
-   "-191": 3,
-   "-31": 1,
-   "-82": 2,
-   "-281": 1,
-   "-189": 5,
-   "-203": 23,
-   "-237": 1,
-   "-1": 68,
-   "-23": 4,
-   "-22": 75,
-   "-206": 13,
-   "-222": 6,
-   "-109": 11,
-   "-125": 3,
-   "-124": 10,
-   "-205": 20,
-   "-96": 9,
-   "-95": 9,
-   "-312": 6,
-   "-117": 3,
-   "-94": 8,
+   "-153": 1,
+   "-14": 4,
+   "-30": 9,
+   "-126": 4,
+   "-144": 4,
+   "-194": 1,
+   "-8": 59,
+   "-287": 2,
+   "-312": 2,
+   "-183": 4,
+   "-143": 1,
+   "-46": 4,
+   "-244": 4,
+   "-271": 1,
+   "-254": 7,
+   "-27": 6,
+   "-302": 2,
+   "-197": 2,
+   "-36": 16,
+   "-35": 9,
+   "-21": 304,
+   "-1": 90,
+   "-37": 6,
+   "-52": 1,
+   "-226": 1,
+   "-190": 2,
+   "-293": 2,
+   "-310": 2,
+   "-272": 1,
+   "-177": 2,
+   "-130": 1,
+   "-213": 2,
+   "-32": 6,
+   "-189": 6,
+   "-12": 7,
+   "-186": 6,
+   "-53": 1,
+   "-202": 11,
+   "-193": 2,
+   "-15": 3,
+   "-155": 2,
+   "-146": 2,
+   "-154": 2,
+   "-48": 4,
+   "-66": 1,
+   "-65": 1,
+   "-159": 1,
+   "-117": 4,
+   "-22": 74,
+   "-33": 15,
+   "-108": 27,
+   "-25": 3,
+   "-204": 27,
+   "-107": 22,
+   "-124": 5,
    "-123": 2,
-   "-98": 28,
-   "-111": 2,
+   "-43": 5,
+   "-93": 2,
+   "-98": 16,
+   "-95": 2,
    "-39": 2,
-   "-209": 4,
-   "-57": 2,
+   "-94": 2,
+   "-96": 2,
    "-200": 2,
-   "-201": 5,
-   "-242": 2,
-   "-14": 2,
-   "-32": 1,
-   "-166": 3,
+   "-201": 4,
+   "-211": 1,
+   "-212": 2,
+   "-78": 1,
+   "-286": 2,
+   "-38": 3,
    "-235": 4,
-   "-54": 6,
-   "-196": 2,
-   "-272": 2,
-   "-49": 6,
-   "-131": 3,
+   "-304": 9,
+   "-169": 3,
+   "-208": 6,
+   "-80": 3,
+   "-192": 1,
    "-297": 2,
-   "-246": 2,
-   "-197": 1,
-   "-305": 1,
-   "-165": 1,
-   "-296": 6,
-   "-132": 4,
-   "-48": 1,
-   "-213": 1,
-   "-214": 3,
-   "-147": 1,
-   "-168": 1,
-   "-208": 3,
-   "-63": 2,
-   "-67": 1,
-   "-42": 1
+   "-306": 1,
+   "-42": 5
   },
-  "exact_comparisons": 155790,
-  "seconds": 2264.4
+  "exact_comparisons": 156893,
+  "seconds": 2743.2
  }
 }

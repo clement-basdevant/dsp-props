@@ -133,7 +133,7 @@ python mutants/run_mutants.py
 Mutation score: 31/31 (100%)
 ```
 
-Counterexamples are tiny. In a run with every `dp.verify` seeded with 0, for 26 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response) the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 28 of 31 mutants fail within the first 3 generated inputs. The exceptions are expected: 15 samples for `filtfilt` declared causal, which falls back to `lfilter` on short inputs, 34 for a filter that changes after 64 samples (the time-invariance relation delays the input), and 192 for the DC-gain and aliasing relations, which need long signals. `mutants/run_mutants.py` fixes no seed, so these counts vary between runs (the run recorded in `benchmarks/mutant_results.json` gave 27 and 27); `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records a run.
+Counterexamples are tiny. In a run with every `dp.verify` seeded with 0, for 26 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response) the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 28 of 31 mutants fail within the first 3 generated inputs. The exceptions are expected: 15 samples for `filtfilt` declared causal, which falls back to `lfilter` on short inputs, 34 for a filter that changes after 64 samples (the time-invariance relation delays the input), and 192 for the DC-gain and aliasing relations, which need long signals. `mutants/run_mutants.py` fixes no seed, so these counts vary between runs (the run recorded in `benchmarks/mutant_results.json` gave 26 and 26); `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records a run.
 
 Every report gives the smallest input found and can be exported:
 
