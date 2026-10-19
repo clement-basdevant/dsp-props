@@ -18,6 +18,33 @@
       "1e-6": 56,
       "1e-12": 2,
       "1e-14": 2
+    },
+    "tolerance_by_kind": {
+      "relative": {
+        "count": 2,
+        "distinct": 1,
+        "min": 1e-14,
+        "max": 1e-14,
+        "decades": 0.0,
+        "below_eps": 0,
+        "min_from_eps": 1e-14,
+        "histogram": {
+          "1e-14": 2
+        }
+      },
+      "absolute": {
+        "count": 58,
+        "distinct": 2,
+        "min": 1e-12,
+        "max": 1e-06,
+        "decades": 6.0,
+        "below_eps": 0,
+        "min_from_eps": 1e-12,
+        "histogram": {
+          "1e-6": 56,
+          "1e-12": 2
+        }
+      }
     }
   },
   "SciPy (scipy.fft)": {
@@ -39,6 +66,34 @@
       "1e-6": 10,
       "1e-7": 4,
       "1e-10": 2
+    },
+    "tolerance_by_kind": {
+      "relative": {
+        "count": 9,
+        "distinct": 4,
+        "min": 1e-07,
+        "max": 3e-06,
+        "decades": 1.4771212547196626,
+        "below_eps": 0,
+        "min_from_eps": 1e-07,
+        "histogram": {
+          "1e-6": 5,
+          "1e-7": 4
+        }
+      },
+      "absolute": {
+        "count": 7,
+        "distinct": 3,
+        "min": 1e-10,
+        "max": 3e-06,
+        "decades": 4.477121254719663,
+        "below_eps": 0,
+        "min_from_eps": 1e-10,
+        "histogram": {
+          "1e-6": 5,
+          "1e-10": 2
+        }
+      }
     }
   },
   "SciPy (scipy.signal)": {
@@ -77,6 +132,64 @@
       "1e-31": 4,
       "1e-16": 3,
       "1e-27": 1
+    },
+    "tolerance_by_kind": {
+      "relative": {
+        "count": 240,
+        "distinct": 26,
+        "min": 1e-31,
+        "max": 0.1,
+        "decades": 30.0,
+        "below_eps": 9,
+        "min_from_eps": 1e-15,
+        "histogram": {
+          "1e-13": 66,
+          "1e-7": 31,
+          "1e-15": 30,
+          "1e-4": 18,
+          "1e-11": 16,
+          "1e-6": 15,
+          "1e-10": 15,
+          "1e-14": 9,
+          "1e-5": 8,
+          "1e-3": 5,
+          "1e-30": 5,
+          "1e-1": 5,
+          "1e-12": 4,
+          "1e-8": 4,
+          "1e-2": 4,
+          "1e-31": 4,
+          "1e-9": 1
+        }
+      },
+      "absolute": {
+        "count": 323,
+        "distinct": 37,
+        "min": 1e-27,
+        "max": 3.01,
+        "decades": 27.478566495593842,
+        "below_eps": 4,
+        "min_from_eps": 5e-16,
+        "histogram": {
+          "1e-4": 55,
+          "1e-15": 47,
+          "1e-6": 32,
+          "1e-7": 32,
+          "1e-12": 24,
+          "1e-14": 22,
+          "1e-5": 20,
+          "1e-10": 20,
+          "1e-13": 19,
+          "1e0": 12,
+          "1e-3": 8,
+          "1e-1": 8,
+          "1e-9": 7,
+          "1e-8": 7,
+          "1e-2": 6,
+          "1e-16": 3,
+          "1e-27": 1
+        }
+      }
     }
   },
   "librosa": {
@@ -104,6 +217,45 @@
       "1e-4": 3,
       "1e-7": 3,
       "1e-12": 2
+    },
+    "tolerance_by_kind": {
+      "relative": {
+        "count": 19,
+        "distinct": 6,
+        "min": 1e-12,
+        "max": 0.01,
+        "decades": 10.0,
+        "below_eps": 0,
+        "min_from_eps": 1e-12,
+        "histogram": {
+          "1e-6": 8,
+          "1e-2": 5,
+          "1e-5": 2,
+          "1e-3": 2,
+          "1e-7": 1,
+          "1e-12": 1
+        }
+      },
+      "absolute": {
+        "count": 55,
+        "distinct": 14,
+        "min": 1e-12,
+        "max": 3.0,
+        "decades": 12.477121254719663,
+        "below_eps": 0,
+        "min_from_eps": 1e-12,
+        "histogram": {
+          "1e-6": 13,
+          "1e-2": 12,
+          "1e-3": 11,
+          "1e0": 5,
+          "1e-1": 5,
+          "1e-4": 3,
+          "1e-5": 3,
+          "1e-7": 2,
+          "1e-12": 1
+        }
+      }
     }
   },
   "torchaudio (functional)": {
@@ -128,6 +280,39 @@
       "1e-6": 5,
       "1e-1": 1,
       "1e-7": 1
+    },
+    "tolerance_by_kind": {
+      "relative": {
+        "count": 12,
+        "distinct": 6,
+        "min": 1e-07,
+        "max": 0.001,
+        "decades": 4.0,
+        "below_eps": 0,
+        "min_from_eps": 1e-07,
+        "histogram": {
+          "1e-6": 5,
+          "1e-5": 4,
+          "1e-3": 1,
+          "1e-4": 1,
+          "1e-7": 1
+        }
+      },
+      "absolute": {
+        "count": 12,
+        "distinct": 6,
+        "min": 1e-05,
+        "max": 0.1,
+        "decades": 4.0,
+        "below_eps": 0,
+        "min_from_eps": 1e-05,
+        "histogram": {
+          "1e-3": 5,
+          "1e-4": 4,
+          "1e-5": 2,
+          "1e-1": 1
+        }
+      }
     }
   }
 }

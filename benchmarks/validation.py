@@ -238,6 +238,23 @@ def check_generators(n_draws=4000, seed=0):
                         "fraction_prime": float(np.mean([_is_prime(int(v)) for v in d])),
                         "fraction_power_of_two": float(np.mean([(v & (v - 1)) == 0 for v in d]))}
 
+    # The run above asks for many draws and Hypothesis then explores the uniform branch at length;
+    # a relation draws 200 examples, the default, so measure the same fraction in runs of that size.
+    per_run = []
+    for s in range(20):
+        run = []
+
+        @hseed(s)
+        @settings(max_examples=200, database=None, deadline=None, suppress_health_check=list(HealthCheck))
+        @given(gen.lengths(512))
+        def collect_run(n):
+            run.append(n)
+
+        collect_run()
+        per_run.append(float(np.mean([v in patho for v in run])))
+    stats["lengths"]["runs_of_200"] = {"runs": len(per_run), "mean_fraction_pathological": float(np.mean(per_run)),
+                                       "min": min(per_run), "max": max(per_run)}
+
     # signal families, through the public signals(n) strategy (as the relations use it)
     per_kind = defaultdict(list)
     freqs = defaultdict(list)  # frequencies actually drawn, recorded at the source
