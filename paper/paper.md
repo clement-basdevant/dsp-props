@@ -100,6 +100,8 @@ who need executable specifications of DSP operators.
   operators and exits non-zero on failure, for continuous integration.
 - A mutation suite [@jia2011mutation] that measures how well the relations
   catch realistic bugs.
+- Coq proofs of the relations in exact arithmetic (`proofs/`), and
+  documentation at <https://dsp-props.readthedocs.io/>.
 
 # Evaluation
 
@@ -117,12 +119,14 @@ Applied to 46 targets in SciPy, NumPy, PyTorch, librosa [@mcfee2015librosa]
 and torchaudio, the relations found that, given an empty block and an initial state,
 `scipy.signal.lfilter` returns a wrong final state (recursive filters) or
 raises (FIR filters, which breaks librosa's streaming pre-emphasis), and
-`sosfilt` raises (scipy/scipy#26406, not yet confirmed by a maintainer). The
+`sosfilt` raises (scipy/scipy#26406, not yet confirmed by a maintainer; proposed
+fix scipy/scipy#26415). The
 `lfilter` part rediscovers scipy/scipy#22571, already fixed in the
 development version after SciPy 1.18.1; the `sosfilt` part is new, but is an
 exception rather than a silent divergence. They also flagged two documented
-behaviours: `tf2sos` drops pure delays, and torchaudio's `deemphasis` clips
-to [-1, 1] by default, so it does not invert `preemphasis`. An error profile
+behaviours: `tf2sos` drops pure delays (scipy/scipy#26417), and torchaudio's
+`deemphasis` clips to [-1, 1] by default, so it does not invert `preemphasis`
+(pytorch/audio#4238). An error profile
 over lengths 2 to 1200 shows PyTorch's CPU FFT reaching about 200 ε at some
 lengths with a large prime factor (195 ε at N = 596 in the committed profile,
 214 ε at N = 1048 on another x86-64 machine), against at most about 4 ε for
