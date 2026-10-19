@@ -938,7 +938,8 @@ Signal processing code is hard to test because the correct output is unknown,
 the inputs that break it are specific, and floating-point results can only be
 compared within a tolerance that nobody derives: in the libraries we surveyed,
 tests compare with typed-in values, never generate their inputs, and use
-tolerances spread over \surveyScipyTolDecades{} orders of magnitude.
+tolerances chosen test by test, with \surveyScipyRelDistinct{} distinct relative
+tolerances in \code{scipy.signal} alone.
 
 We proposed a method that answers each problem from a single statement of what
 an operator is: metamorphic relations proved for four classes of DSP operators
