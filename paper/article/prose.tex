@@ -1,75 +1,107 @@
-% Analysis of the results. The numbers are macros from numbers.tex (make_numbers.py).
+% Analysis of the results, written by hand. The numbers are macros from
+% numbers.tex (make_numbers.py); the sentences must stay consistent with them.
 \newcommand{\rqOneText}{dsp-props detects \killFuncDsp{} of the \nFunctional{}
-functional mutants and the ported suites \killFuncSop{}; neither raises an
-alarm on an equivalent mutant, and of the ablations only generic PBT does
+functional mutants and the ported suites \killFuncSop{}. Neither raises an
+alarm on an equivalent mutant; among the ablations, only generic PBT does
 (Section~\ref{sec:rq2}). The two sets of detected faults are not nested:
 \killSopOnly{} mutants are detected only by the suites, \killDspOnly{} only by
 dsp-props, and together they detect \killUnion{} of them.
 
-Every miss of dsp-props has the same cause: the fault shows only for operator
-parameters that no declaration uses. A declaration fixes the coefficients of a
-filter or the rates of a resampler, and dsp-props then varies the input signal.
-Seven \code{lfilter} mutants break filters of order 0 or 1, or filters whose
-numerator is shorter than the denominator, and the declared filters have orders
-4 and 2 with numerators at least as long. The \code{upfirdn} survivors change the
-length of the full output, which the declarations never see since they reach
-\code{upfirdn} through \code{resample\_poly} and through a FIR filter truncated to
-the input length, or ignore the last input sample, which every relation sees
-identically on both of its sides. The suites miss the opposite kind of fault.
-Their only comparisons with expected values on the FFT use length 30, which the
-subject computes with Bluestein's algorithm; on powers of two they only check
-that \code{ifft} inverts \code{fft}, which two mutants of the radix-2 twiddle
-factors still satisfy. They also always pass the rates of \code{upfirdn}
-explicitly, so four mutants of its default arguments survive.
+Many of these detections owe little to the relations. With seed~0, dsp-props
+detects \dspKillsSeedZero{} mutants. In \dspKillRelation{} of them a relation
+is violated: \dspKillTolerance{} comparisons exceed their tolerance and
+\dspKillAssert{} other checks fail, such as the transfer function or the DC
+gain; these counts are the same \dspKillRelationStable. In the other
+\dspKillOther, the mutant raises an exception, exceeds the time limit
+(\dspKillTimeout{} mutants), or makes Hypothesis report several distinct
+failures at once (\dspKillGroup{} mutants, which we count here because we did
+not record what the individual failures were). Any test that calls the mutated
+code on a valid input detects most of these. The classification oracle itself
+raises or times out on \nFuncLoud{} of the \nFunctional{} functional mutants.
+On the remaining \nFuncQuiet, which return a wrong value without raising,
+dsp-props detects \killQuietDsp{} and the suites \killQuietSop.
 
-dsp-props therefore does not detect more of these faults than suites refined
-over many years; it detects other ones, without expected values, and its misses
-are a matter of declarations rather than of relations: declaring a first-order
-filter would have caught the \code{lfilter} survivors.}
+Every miss of dsp-props involves operator parameters that no declaration uses. A
+declaration fixes the coefficients of a filter or the rates of a resampler, and
+dsp-props then varies only the input signal. Seven \code{lfilter} mutants break
+filters of order 0 or 1, or filters whose numerator is shorter than the
+denominator, and the declared filters have orders 4 and 2 with numerators at
+least as long. The \code{upfirdn} survivors change the length of the full
+output, which the declarations never see since they reach \code{upfirdn}
+through \code{resample\_poly} and through a FIR filter truncated to the input
+length, or ignore the last input sample, which every relation sees identically
+on both of its sides. The suites miss other faults. Their only comparisons with
+expected values on the FFT use length 30, which the subject computes with
+Bluestein's algorithm; on powers of two they only check that \code{ifft} inverts
+\code{fft}, which two mutants of the radix-2 twiddle factors still satisfy. They
+also always pass the rates of \code{upfirdn} explicitly, so four mutants of its
+default arguments survive.
 
-\newcommand{\rqTwoText}{On the generated mutants the four randomised variants
-detect almost the same faults (Table~\ref{tab:comparison}). The exceptions are
-three FFT mutants that the variants with uniform inputs miss in some seeds,
-while dsp-props detects them in every seed; two of them are the twiddle-factor
-mutants that the ported suites miss. Generic PBT also raised a false alarm in
-one of its \nSeeds{} seeds, on the correct FFT and on every FFT mutant
-equivalent to it: Hypothesis drew a subnormal input of norm $10^{-323}$, for
-which a purely relative tolerance is zero and a rounding error of one subnormal
-fails Parseval's identity. The error model of dsp-props includes an absolute
-floor, and neither dsp-props nor its other ablations raised an alarm. The
-other mutants change the output by orders of magnitude, and almost any input
-reveals them:
-the median number of inputs before the first failure is \firstMedDsp{} for
-dsp-props and \firstMedUni{} for uniform inputs, and the median counterexample
-has \cexMedDsp{} and \cexMedUni{} samples. The generators and tolerances do
-not change what is detected here, and the generators cost time, with a median of
+On these subjects, dsp-props detects fewer faults than the ported suites. It
+detects some faults that they miss, without expected values. Its misses point
+to the choice of declarations rather than to the relations, but we did not
+test whether additional declarations, such as a first-order filter, would
+detect them.}
+
+\newcommand{\rqTwoText}{On the generated mutants, the four randomised variants
+detect almost the same faults (Table~\ref{tab:comparison}); counting a mutant
+as detected when a majority of seeds detect it, they disagree on
+\ablationDisagree{} functional mutants. The differences are between seeds: three FFT mutants are missed in some seeds by the variants with uniform
+inputs and detected in every seed by dsp-props; two of them are the
+twiddle-factor mutants that the ported suites miss. Generic PBT also raised a
+false alarm in one of its \nSeeds{} seeds, on the correct FFT and on every FFT
+mutant equivalent to it: Hypothesis drew a subnormal input of norm
+$10^{-323}$, for which a purely relative tolerance is zero and a rounding error
+of one subnormal fails Parseval's identity. The error model of dsp-props
+includes an absolute floor, and neither dsp-props nor its other ablations
+raised an alarm. Most generated mutants change the output by orders of
+magnitude, and almost any input reveals them. The domain generators do not make
+detection faster here: the median number of inputs before the first failure is
+\firstMedDsp{} for dsp-props and \firstMedUni{} for uniform inputs (90th
+percentile \firstPnnDsp{} and \firstPnnUni), and the median counterexample has
+\cexMedDsp{} samples in both cases. They cost time, with a median of
 \secMedDsp{}~s per mutant against \secMedUni{}~s for uniform inputs and
 \secMedSop{}~s for a ported suite.
 
-The hand-written faults, which include the accuracy faults, separate the
-variants (Table~\ref{tab:hand}). Every variant detects every fault in every seed,
-except the fixed tolerance, which misses one resampler fault in one seed, but
-not equally fast. With the domain generators, the median failure appears at
-input \handDspFirstMed{} (90th percentile \handDspFirstPnn{}); with uniform inputs
-at input \handUniFirstMed{} (\handUniFirstPnn{}), and with generic PBT at input
-\handGenFirstMed{} (\handGenFirstPnn{}). Counterexamples are smaller too: the 90th percentile of their length is
-\handDspCexPnn{} samples for dsp-props, \handUniCexPnn{} with uniform inputs, and
-\handFixCexPnn{} with a fixed tolerance. No variant raised a false alarm on
-the correct references of this table. With 200 inputs per relation, these differences do not change the detection
-rate. We expect them to matter with a smaller budget or on faults that need a
-specific input, but we did not measure this. One hand-written fault, a filter
-whose gain is wrong by 1\,\%, is detected only because its transfer function is
-declared: it is still linear, time-invariant and causal.}
+On the hand-written faults (Table~\ref{tab:hand}), every variant detects every
+fault in every seed, except the fixed tolerance, which misses one resampler
+fault in one seed. The variants differ in how fast they detect. With the domain
+generators, the median failure appears at input \handDspFirstMed{} (90th
+percentile \handDspFirstPnn{}); with uniform inputs at input \handUniFirstMed{}
+(\handUniFirstPnn{}), and with generic PBT at input \handGenFirstMed{}
+(\handGenFirstPnn{}). The 90th percentile of the counterexample length is
+\handDspCexPnn{} samples for dsp-props, \handUniCexPnn{} with uniform inputs,
+and \handFixCexPnn{} with a fixed tolerance. No variant raised a false alarm
+on the correct references of this table. These faults were written by the
+author of the relations and of the generators, which favours the generators.
 
-\newcommand{\conclusionResult}{On \nFunctional{} generated faults it detects
-\killFuncDsp{}, against \killFuncSop{} for the ported test suites of NumPy and
-SciPy, and the two are complementary: together they detect \killUnion. Its
-misses come from operator parameters that no declaration exercised; the misses
-of the suites, from code paths that their few expected values do not reach.}
+In short, at 200 inputs per relation the generators and the error-model
+tolerances bring no net gain in detection on either set of faults. Their
+measurable effects are fewer inputs before a failure and shorter
+counterexamples on the hand-written faults, a few seed-dependent misses
+avoided on generated ones, and one false alarm avoided. They might matter
+more with a smaller budget or on faults that need a specific input; we did not
+measure this. One hand-written fault, a filter whose gain is wrong by
+1\,\%, is detected only because its transfer function is declared: it is
+still linear, time-invariant and causal.}
 
-\newcommand{\reportedUpstream}{We reported the empty-block faults to
-SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26406}} and
-contributed a fix\footnote{\url{https://github.com/scipy/scipy/pull/26415}},
-the dropped delay of \code{tf2sos} to
-SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26417}}, and the
-clamping to torchaudio\footnote{\url{https://github.com/pytorch/audio/issues/4238}}.}
+\newcommand{\conclusionResult}{On \nFunctional{} faults generated by mutation of
+four small subjects, it detects \killFuncDsp{}, fewer than the \killFuncSop{} of
+the ported test suites of NumPy and SciPy; the two detect partly different
+faults and together detect \killUnion{} of them. More than half of its
+detections come from the mutant raising an exception or hanging rather than
+from a violated relation, and in our ablations neither the domain generators
+nor the error models increased detection; they made failures appear after
+fewer inputs, with smaller counterexamples, on hand-written faults. Its misses
+involve operator parameters that no declaration exercised; the misses of the
+suites, code paths that their few expected values do not reach.}
+
+\newcommand{\reportedUpstream}{The empty-block faults are reported to
+SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26406}}, with a
+proposed fix that has not been reviewed
+yet\footnote{\url{https://github.com/scipy/scipy/pull/26415}}; the dropped
+delay of \code{tf2sos} is reported to
+SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26417}} and the
+clamping to torchaudio\footnote{\url{https://github.com/pytorch/audio/issues/4238}}.
+None of these reports had been confirmed by a maintainer when we wrote this
+article.}

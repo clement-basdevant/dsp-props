@@ -3,7 +3,8 @@
 Usage: python benchmarks/survey_test_suites.py ROOT [--json out.json]
 
 ROOT contains sparse checkouts of the libraries (see SUITES below for the
-paths). The script parses every test file with ``ast`` and counts, per
+paths). benchmarks/survey_results.json was produced from the commits listed
+in SOURCES. The script parses every test file with ``ast`` and counts, per
 library:
 
 * test functions (``def test_*``) and those that use Hypothesis (``@given``);
@@ -39,12 +40,26 @@ SUITES = {
     "torchaudio (functional)": ["torchaudio/test/torchaudio_unittest/functional"],
 }
 
+# The checkouts behind benchmarks/survey_results.json (main branches on 14 October 2026 for SciPy
+# and librosa, release tags otherwise).
+SOURCES = {
+    "numpy": ("https://github.com/numpy/numpy", "v2.5.3"),
+    "scipy": ("https://github.com/scipy/scipy", "19a262b04562aac08b22412fe5c7b7c11ff6085a"),
+    "librosa": ("https://github.com/librosa/librosa", "08e2c0a"),
+    "torchaudio": ("https://github.com/pytorch/audio", "v2.11.0"),
+}
+
 CLOSE_FUNCS = {
     "assert_allclose", "assert_array_almost_equal", "assert_almost_equal",
     "assert_array_almost_equal_nulp", "assert_array_max_ulp", "allclose", "isclose",
     "xp_assert_close", "assert_close", "assert_approx_equal",
 }
 TOL_KEYWORDS = {"rtol", "atol", "decimal", "nulp", "maxulp", "significant", "rel", "abs"}
+# Relative and absolute tolerances do not measure the same thing: an atol is in the units of the
+# signal, so its magnitude depends on the test data. They are reported separately.
+EPS64 = 2.220446049250313e-16
+TOL_KINDS = {"relative": {"rtol", "rel", "nulp", "maxulp", "significant"},
+             "absolute": {"atol", "abs", "decimal"}}
 
 
 def _name(func):
@@ -198,6 +213,20 @@ def survey(root: pathlib.Path):
                 stats["tests_hardcoded_expected"] += a["hardcoded"]
                 tolerances += a["tolerances"]
         mags = [m for _, m in tolerances]
+        by_kind = {}
+        for kind, keys in TOL_KINDS.items():
+            km = [m for k, m in tolerances if k in keys]
+            by_kind[kind] = {
+                "count": len(km),
+                "distinct": len({round(m, 300) for m in km}),
+                "min": min(km) if km else None,
+                "max": max(km) if km else None,
+                "decades": math.log10(max(km) / min(km)) if km else None,
+                # below the double-precision epsilon, a relative tolerance asks for exact equality
+                "below_eps": sum(m < EPS64 for m in km),
+                "min_from_eps": min((m for m in km if m >= EPS64), default=None),
+                "histogram": dict(Counter(f"1e{round(math.log10(m))}" for m in km).most_common()),
+            }
         results[lib] = {
             **stats,
             "distinct_tolerance_values": len({(k, round(m, 300)) for k, m in tolerances}),
@@ -205,6 +234,7 @@ def survey(root: pathlib.Path):
             "tolerance_max": max(mags) if mags else None,
             "tolerance_decades": (math.log10(max(mags) / min(mags)) if mags else None),
             "tolerance_histogram": dict(Counter(f"1e{round(math.log10(m))}" for m in mags).most_common()),
+            "tolerance_by_kind": by_kind,
         }
     return results
 
