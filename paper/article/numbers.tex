@@ -2,6 +2,7 @@
 \newcommand{\ablationDisagree}{0}
 \newcommand{\campaignTargets}{46}
 \newcommand{\campaignTriaged}{three}
+\newcommand{\campaignTriagedShare}{6.5\,\%}
 \newcommand{\cexMedDsp}{3}
 \newcommand{\cexMedFix}{3}
 \newcommand{\cexMedGen}{3}
@@ -10,7 +11,15 @@
 \newcommand{\cexPnnFix}{33}
 \newcommand{\cexPnnGen}{23}
 \newcommand{\cexPnnUni}{17}
-\newcommand{\envDescription}{Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, Hypothesis 6.169.3, on a 4-core Linux x86-64 machine}
+\newcommand{\dspKillAssert}{13}
+\newcommand{\dspKillGroup}{7}
+\newcommand{\dspKillOther}{80}
+\newcommand{\dspKillRelation}{69}
+\newcommand{\dspKillRelationStable}{in every seed}
+\newcommand{\dspKillTimeout}{4}
+\newcommand{\dspKillTolerance}{56}
+\newcommand{\dspKillsSeedZero}{149}
+\newcommand{\envDescription}{Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, Hypothesis 6.170.2, on a 4-core Linux x86-64 machine}
 \newcommand{\firstMedDsp}{3}
 \newcommand{\firstMedFix}{3}
 \newcommand{\firstMedGen}{2}
@@ -28,6 +37,12 @@
 \newcommand{\genOnGrid}{41\,\%}
 \newcommand{\genOneBlock}{44\,\%}
 \newcommand{\genPathoCount}{19}
+\newcommand{\genPathoLong}{7\,\%}
+\newcommand{\genPathoLongDraws}{531}
+\newcommand{\genPathoRuns}{20}
+\newcommand{\genPathoShare}{15\,\%}
+\newcommand{\genPathoShareMax}{16\,\%}
+\newcommand{\genPathoShareMin}{14\,\%}
 \newcommand{\genZeroNyq}{23\,\%}
 \newcommand{\handDspAlways}{31}
 \newcommand{\handDspCexPnn}{19}
@@ -68,6 +83,11 @@
 \newcommand{\killFuncSop}{96\,\%}
 \newcommand{\killFuncUni}{89\,\%}
 \newcommand{\killNeither}{0}
+\newcommand{\killQuietDsp}{87\,\%}
+\newcommand{\killQuietFix}{87\,\%}
+\newcommand{\killQuietGen}{86\,\% (84--87)}
+\newcommand{\killQuietSop}{95\,\%}
+\newcommand{\killQuietUni}{86\,\% (84--87)}
 \newcommand{\killSopOnly}{17}
 \newcommand{\killUnion}{100\,\%}
 \newcommand{\knownBugFlagged}{5}
@@ -78,6 +98,8 @@
 \newcommand{\marginPnn}{$0.038$}
 \newcommand{\nAccuracy}{0}
 \newcommand{\nEquivalent}{17}
+\newcommand{\nFuncLoud}{83}
+\newcommand{\nFuncQuiet}{83}
 \newcommand{\nFunctional}{166}
 \newcommand{\nMutAuto}{183}
 \newcommand{\nMutFft}{76}
@@ -85,8 +107,16 @@
 \newcommand{\nMutLfilter}{55}
 \newcommand{\nMutOla}{16}
 \newcommand{\nMutUpfirdn}{36}
+\newcommand{\nReclassified}{8}
 \newcommand{\nSeeds}{5}
 \newcommand{\numpyMaxEps}{4.1}
+\newcommand{\oracleFirstEquivalent}{25}
+\newcommand{\oracleFirstFunctional}{158}
+\newcommand{\reclDspAllVariants}{every}
+\newcommand{\reclDspOnly}{4}
+\newcommand{\reclDspOnlySubject}{upfirdn}
+\newcommand{\reclSopOnly}{4}
+\newcommand{\reclSopOnlySubject}{lfilter}
 \newcommand{\refDftMax}{$1.0\times10^{-3}$}
 \newcommand{\refLfilterMax}{$5.4\times10^{-3}$}
 \newcommand{\scipyVersion}{1.18.1}
@@ -98,16 +128,24 @@
 \newcommand{\surveyHardcodedAll}{220}
 \newcommand{\surveyLibrosaCompared}{358}
 \newcommand{\surveyLibrosaTests}{916}
+\newcommand{\surveyScipyAbsCount}{323}
+\newcommand{\surveyScipyAbsDistinct}{37}
 \newcommand{\surveyScipyComparisons}{1\,645}
 \newcommand{\surveyScipyDistinctTol}{66}
 \newcommand{\surveyScipyEmpty}{62}
 \newcommand{\surveyScipyExplicit}{584}
 \newcommand{\surveyScipyHardcoded}{169}
+\newcommand{\surveyScipyRelBelowEps}{9}
+\newcommand{\surveyScipyRelCount}{240}
+\newcommand{\surveyScipyRelDecades}{14}
+\newcommand{\surveyScipyRelDistinct}{26}
+\newcommand{\surveyScipyRelMax}{$0.1$}
+\newcommand{\surveyScipyRelMin}{$10^{-15}$}
 \newcommand{\surveyScipyTests}{1\,095}
 \newcommand{\surveyScipyTolDecades}{31}
 \newcommand{\surveyScipyTolMax}{$3.01$}
 \newcommand{\surveyScipyTolMin}{$10^{-31}$}
-\newcommand{\surveyScipyTopTols}{$10^{-13}$ (85), $10^{-15}$ (77), $10^{-4}$ (73)}
+\newcommand{\surveyScipyTopTols}{$10^{-13}$ (66), $10^{-7}$ (31), $10^{-15}$ (30)}
 \newcommand{\surveyScipyZi}{19}
 \newcommand{\surveyTotalTests}{2\,388}
 \newcommand{\surveyZiEmpty}{2}

@@ -344,3 +344,240 @@
   howpublished = {\url{https://github.com/FFTW/fftw3/blob/master/libbench2/verify-lib.c}},
   note         = {Accessed 15 October 2026}
 }
+
+% ---------------------------------------------------------------------
+% Part 3: related work added on 2026-10-19 (A5, A6). Each entry was checked
+% on the page named in its "verified" comment.
+% ---------------------------------------------------------------------
+
+% ===== Testing of numerical / deep learning libraries =====
+
+% verified: https://api.crossref.org/works/10.1109%2FICSE.2019.00107
+@inproceedings{pham2019cradle,
+  author    = {Pham, Hung Viet and Lutellier, Thibaud and Qi, Weizhen and Tan, Lin},
+  title     = {{CRADLE}: Cross-Backend Validation to Detect and Localize Bugs in Deep Learning Libraries},
+  booktitle = {2019 IEEE/ACM 41st International Conference on Software Engineering (ICSE)},
+  publisher = {IEEE},
+  pages     = {1027--1038},
+  year      = {2019},
+  doi       = {10.1109/ICSE.2019.00107}
+}
+
+% verified: https://personal.ntu.edu.sg/yi_li/publication/Guo2020AAT/ (authors, pages) ; https://rankdblp.com/venues/db_conf_kbse_ase2020_html.html (DOI)
+@inproceedings{guo2020audee,
+  author    = {Guo, Qianyu and Xie, Xiaofei and Li, Yi and Zhang, Xiaoyu and Liu, Yang and Li, Xiaohong and Shen, Chao},
+  title     = {{Audee}: Automated Testing for Deep Learning Frameworks},
+  booktitle = {Proceedings of the 35th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  publisher = {ACM},
+  pages     = {486--498},
+  year      = {2020},
+  doi       = {10.1145/3324884.3416571}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3510003.3510041 ; https://par.nsf.gov/servlets/purl/10348153
+@inproceedings{wei2022freefuzz,
+  author    = {Wei, Anjiang and Deng, Yinlin and Yang, Chenyuan and Zhang, Lingming},
+  title     = {Free Lunch for Testing: Fuzzing Deep-Learning Libraries from Open Source},
+  booktitle = {Proceedings of the 44th International Conference on Software Engineering (ICSE)},
+  publisher = {ACM},
+  pages     = {995--1007},
+  year      = {2022},
+  doi       = {10.1145/3510003.3510041}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3540250.3549085 ; https://2022.esec-fse.org/details/fse-2022-research-papers/7/Fuzzing-Deep-Learning-Libraries-via-Automated-Relational-API-Inference
+@inproceedings{deng2022deeprel,
+  author    = {Deng, Yinlin and Yang, Chenyuan and Wei, Anjiang and Zhang, Lingming},
+  title     = {Fuzzing Deep-Learning Libraries via Automated Relational {API} Inference},
+  booktitle = {Proceedings of the 30th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)},
+  publisher = {ACM},
+  pages     = {44--56},
+  year      = {2022},
+  doi       = {10.1145/3540250.3549085}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3533767.3534220
+@inproceedings{xie2022docter,
+  author    = {Xie, Danning and Li, Yitong and Kim, Mijung and Pham, Hung Viet and Tan, Lin and Zhang, Xiangyu and Godfrey, Michael W.},
+  title     = {{DocTer}: Documentation-Guided Fuzzing for Testing Deep Learning {API} Functions},
+  booktitle = {Proceedings of the 31st ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA)},
+  publisher = {ACM},
+  pages     = {176--188},
+  year      = {2022},
+  doi       = {10.1145/3533767.3534220}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3597926.3598067
+@inproceedings{deng2023titanfuzz,
+  author    = {Deng, Yinlin and Xia, Chunqiu Steven and Peng, Haoran and Yang, Chenyuan and Zhang, Lingming},
+  title     = {Large Language Models Are Zero-Shot Fuzzers: Fuzzing Deep-Learning Libraries via Large Language Models},
+  booktitle = {Proceedings of the 32nd ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA)},
+  publisher = {ACM},
+  pages     = {423--435},
+  year      = {2023},
+  doi       = {10.1145/3597926.3598067}
+}
+
+% ===== Assertion tolerances / flaky tests in ML and probabilistic code =====
+
+% verified: https://par.nsf.gov/servlets/purl/10176758 (authors, venue, pages 211-224, DOI; this paper introduces the FLASH technique)
+@inproceedings{dutta2020flaky,
+  author    = {Dutta, Saikat and Shi, August and Choudhary, Rutvik and Zhang, Zhekun and Jain, Aryaman and Misailovic, Sasa},
+  title     = {Detecting Flaky Tests in Probabilistic and Machine Learning Applications},
+  booktitle = {Proceedings of the 29th ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA)},
+  publisher = {ACM},
+  pages     = {211--224},
+  year      = {2020},
+  doi       = {10.1145/3395363.3397366}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3468264.3468615 ; https://par.nsf.gov/servlets/purl/10319477
+@inproceedings{dutta2021flex,
+  author    = {Dutta, Saikat and Shi, August and Misailovic, Sasa},
+  title     = {{FLEX}: Fixing Flaky Tests in Machine Learning Projects by Updating Assertion Bounds},
+  booktitle = {Proceedings of the 29th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)},
+  publisher = {ACM},
+  pages     = {603--614},
+  year      = {2021},
+  doi       = {10.1145/3468264.3468615}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3460319.3464844 ; https://par.nsf.gov/servlets/purl/10319475
+% NOTE: ISSTA 2021 (not 2022).
+@inproceedings{dutta2021tera,
+  author    = {Dutta, Saikat and Selvam, Jeeva and Jain, Aryaman and Misailovic, Sasa},
+  title     = {{TERA}: Optimizing Stochastic Regression Tests in Machine Learning Projects},
+  booktitle = {Proceedings of the 30th ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA)},
+  publisher = {ACM},
+  pages     = {413--426},
+  year      = {2021},
+  doi       = {10.1145/3460319.3464844}
+}
+
+% ===== Floating-point error analysis =====
+
+% verified: https://api.openalex.org/works/doi:10.1145/2737924.2737959 ; https://rankdblp.com/venues/db_conf_pldi_pldi2015_html.html
+@inproceedings{panchekha2015herbie,
+  author    = {Panchekha, Pavel and Sanchez-Stern, Alex and Wilcox, James R. and Tatlock, Zachary},
+  title     = {Automatically Improving Accuracy for Floating Point Expressions},
+  booktitle = {Proceedings of the 36th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI)},
+  publisher = {ACM},
+  pages     = {1--11},
+  year      = {2015},
+  doi       = {10.1145/2737924.2737959}
+}
+
+% verified: https://api.crossref.org/works/10.1145%2F3230733
+@article{solovyev2019fptaylor,
+  author    = {Solovyev, Alexey and Baranowski, Marek S. and Briggs, Ian and Jacobsen, Charles and Rakamari{\'c}, Zvonimir and Gopalakrishnan, Ganesh},
+  title     = {Rigorous Estimation of Floating-Point Round-Off Errors with Symbolic {Taylor} Expansions},
+  journal   = {ACM Transactions on Programming Languages and Systems},
+  publisher = {ACM},
+  volume    = {41},
+  number    = {1},
+  pages     = {1--39},
+  year      = {2019},
+  doi       = {10.1145/3230733}
+}
+
+% verified: https://infoscience.epfl.ch/record/198120?ln=en
+@inproceedings{darulova2014rosa,
+  author    = {Darulova, Eva and Kuncak, Viktor},
+  title     = {Sound Compilation of Reals},
+  booktitle = {Proceedings of the 41st Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL)},
+  publisher = {ACM},
+  pages     = {235--248},
+  year      = {2014},
+  doi       = {10.1145/2535838.2535874}
+}
+
+% verified: https://people.mpi-sws.org/~eva/papers/tacas18_daisy_toolpaper.pdf (title, authors) ; https://link.springer.com/chapter/10.1007/978-3-319-89960-2_15 (DOI resolves to this paper)
+% pages/volume from secondary source: https://ic.unicamp.br/~stolfi/EXPORT/bibliography/split-bib/2018/dar-izy-nas-rit-bec-bas-18-aa-daisy.bib
+@inproceedings{darulova2018daisy,
+  author    = {Darulova, Eva and Izycheva, Anastasiia and Nasir, Fariha and Ritter, Fabian and Becker, Heiko and Bastian, Robert},
+  title     = {{Daisy} -- Framework for Analysis and Optimization of Numerical Programs (Tool Paper)},
+  booktitle = {Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2018), Part I},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {10805},
+  publisher = {Springer},
+  pages     = {270--287},
+  year      = {2018},
+  doi       = {10.1007/978-3-319-89960-2_15}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3371128 ; https://popl20.sigplan.org/details/POPL-2020-Research-Papers/46/Detecting-Floating-Point-Errors-via-Atomic-Conditions ; article number 60 from https://researcher.itu.dk/p/en/research-outputs/detecting-floating-point-errors-via-atomic-conditions
+@article{zou2020atomu,
+  author    = {Zou, Daming and Zeng, Muhan and Xiong, Yingfei and Fu, Zhoulai and Zhang, Lu and Su, Zhendong},
+  title     = {Detecting Floating-Point Errors via Atomic Conditions},
+  journal   = {Proceedings of the ACM on Programming Languages},
+  volume    = {4},
+  number    = {POPL},
+  articleno = {60},
+  numpages  = {27},
+  publisher = {ACM},
+  year      = {2020},
+  doi       = {10.1145/3371128}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1145/3377811.3380359 ; https://rankdblp.com/venues/db_conf_icse_icse2020_html.html
+@inproceedings{guo2020fpgen,
+  author    = {Guo, Hui and Rubio-Gonz{\'a}lez, Cindy},
+  title     = {Efficient Generation of Error-Inducing Floating-Point Inputs via Symbolic Execution},
+  booktitle = {Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering (ICSE)},
+  publisher = {ACM},
+  pages     = {1261--1272},
+  year      = {2020},
+  doi       = {10.1145/3377811.3380359}
+}
+
+% ===== Analysis of digital filters =====
+
+% verified: https://www.di.ens.fr/~feret/publications/esop2004.shtml ; https://link.springer.com/doi/10.1007/978-3-540-24725-8_4
+@inproceedings{feret2004filters,
+  author    = {Feret, J{\'e}r{\^o}me},
+  title     = {Static Analysis of Digital Filters},
+  booktitle = {Programming Languages and Systems: 13th European Symposium on Programming (ESOP 2004)},
+  editor    = {Schmidt, David},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {2986},
+  publisher = {Springer},
+  pages     = {33--48},
+  year      = {2004},
+  doi       = {10.1007/978-3-540-24725-8_4}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1007/11513988_21 ; https://rankdblp.com/venues/db_conf_cav_cav2005_html.html
+@inproceedings{monniaux2005filters,
+  author    = {Monniaux, David},
+  title     = {Compositional Analysis of Floating-Point Linear Numerical Filters},
+  booktitle = {Computer Aided Verification (CAV 2005)},
+  series    = {Lecture Notes in Computer Science},
+  publisher = {Springer},
+  pages     = {199--212},
+  year      = {2005},
+  doi       = {10.1007/11513988_21}
+}
+
+% verified: https://api.openalex.org/works/doi:10.1109/ARITH.2015.14 ; https://rankdblp.com/venues/db_conf_arith_arith2015_html.html
+@inproceedings{volkova2015wcpg,
+  author    = {Volkova, Anastasia and Hilaire, Thibault and Lauter, Christoph},
+  title     = {Reliable Evaluation of the Worst-Case Peak Gain Matrix in Multiple Precision},
+  booktitle = {IEEE Symposium on Computer Arithmetic (ARITH 2015)},
+  publisher = {IEEE},
+  pages     = {96--103},
+  year      = {2015},
+  doi       = {10.1109/ARITH.2015.14}
+}
+
+% verified: https://www.scitepress.org/Papers/2014/47112
+@inproceedings{lopez2014formatting,
+  author    = {Lopez, Benoit and Hilaire, Thibault and Didier, Laurent-St{\'e}phane},
+  title     = {Formatting Bits to Better Implement Signal Processing Algorithms},
+  booktitle = {Proceedings of the 4th International Conference on Pervasive and Embedded Computing and Communication Systems (PECCS)},
+  volume    = {1},
+  pages     = {104--111},
+  year      = {2014},
+  doi       = {10.5220/0004711201040111}
+}
+
+% ===== Testing scientific software =====
