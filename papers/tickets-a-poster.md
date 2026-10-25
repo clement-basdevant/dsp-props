@@ -4,7 +4,7 @@ Brouillons prêts, à poster depuis le compte GitHub du projet. Une fois posté,
 
 | # | Où | Statut |
 | --- | --- | --- |
-| 0 | scipy/scipy : lfilter/sosfilt sur bloc vide | posté : [scipy#26406](https://github.com/scipy/scipy/issues/26406) |
+| 0 | scipy/scipy : lfilter/sosfilt sur bloc vide | posté : [scipy#26406](https://github.com/scipy/scipy/issues/26406), corrigé par [scipy#26415](https://github.com/scipy/scipy/pull/26415) (fusionnée le 23/10/2026, SciPy 2.0.0) |
 | 1 | pytorch/audio : deemphasis écrête à [-1, 1] | posté : [pytorch/audio#4238](https://github.com/pytorch/audio/issues/4238) |
 | 2 | scipy/scipy : tf2sos supprime les retards purs | posté : [scipy#26417](https://github.com/scipy/scipy/issues/26417) |
 | 3 | commentaire sur scipy#26406 : impact librosa | posté le 15/10/2026 sur [scipy#26406](https://github.com/scipy/scipy/issues/26406) |

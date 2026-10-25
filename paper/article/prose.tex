@@ -97,11 +97,10 @@ involve operator parameters that no declaration exercised; the misses of the
 suites, code paths that their few expected values do not reach.}
 
 \newcommand{\reportedUpstream}{The empty-block faults are reported to
-SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26406}}, with a
-proposed fix that has not been reviewed
-yet\footnote{\url{https://github.com/scipy/scipy/pull/26415}}; the dropped
-delay of \code{tf2sos} is reported to
+SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26406}}; our
+fix\footnote{\url{https://github.com/scipy/scipy/pull/26415}} was reviewed
+and merged by a SciPy maintainer and is scheduled for SciPy~2.0.0. The
+dropped delay of \code{tf2sos} is reported to
 SciPy\footnote{\url{https://github.com/scipy/scipy/issues/26417}} and the
-clamping to torchaudio\footnote{\url{https://github.com/pytorch/audio/issues/4238}}.
-None of these reports had been confirmed by a maintainer when we wrote this
-article.}
+clamping to torchaudio\footnote{\url{https://github.com/pytorch/audio/issues/4238}};
+neither had been confirmed by a maintainer when we wrote this article.}

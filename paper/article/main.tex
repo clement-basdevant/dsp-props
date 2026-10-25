@@ -62,7 +62,7 @@ counterexamples on hand-written faults. On the correct implementations and
 declarations we tested, the method raised no false alarm in \fpRuns{} runs.
 Applied to SciPy, it rediscovered a known, already fixed fault (issue 22571)
 and found one new edge-case exception, \code{sosfilt} on an empty input (issue
-26406, not yet confirmed by the maintainers).
+26406); our fix for both was merged into SciPy.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -781,7 +781,8 @@ librosa and torchaudio. The campaign produced the following findings.
 \code{lfilter} part is an independent rediscovery of issue 22571, fixed in the
 development version after SciPy~1.18.1; the \code{sosfilt} part, which fails on
 any input that is empty along the filtered axis, was new. The same fault makes
-librosa's streaming pre-emphasis fail on an empty block.
+librosa's streaming pre-emphasis fail on an empty block. Our fix for both parts
+was merged into SciPy and is scheduled for SciPy~2.0.0.
 \item \code{scipy.signal.tf2sos} drops pure delays: for $y[n]=x[n-2]$ it
 returns an identity section, so \code{sosfilt(tf2sos(b, a), x)} differs from
 \code{lfilter(b, a, x)}.

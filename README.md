@@ -151,11 +151,11 @@ Known blind spot: a filter that is wrong but still linear, time-invariant and ca
 `benchmarks/campaign.py` applies the relations to SciPy, NumPy, PyTorch, librosa and torchaudio (46 targets). What it found, at its actual size:
 
 - **`scipy.signal.lfilter` on an empty block with an initial state** returns an uninitialised final state for an IIR filter (and raises for a FIR one), so block processing goes silently wrong after an empty block. This is a **rediscovery**: it was already reported as [scipy/scipy#22571](https://github.com/scipy/scipy/issues/22571) and is fixed in the development version of SciPy. dsp-props found it independently, and the FIR case also affects librosa's streaming pre-emphasis.
-- **`scipy.signal.sosfilt` on an empty block** is new, but it **raises an exception** (`ValueError`) on any input that is empty along the filtered axis; it does not diverge silently. Reported together with the `lfilter` case in [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406).
+- **`scipy.signal.sosfilt` on an empty block** is new, but it **raises an exception** (`ValueError`) on any input that is empty along the filtered axis; it does not diverge silently. Reported together with the `lfilter` case in [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406), and **fixed**: our fix for both cases ([scipy/scipy#26415](https://github.com/scipy/scipy/pull/26415)) was merged on October 23, 2026 and is scheduled for SciPy 2.0.0.
 - **`scipy.signal.tf2sos` drops pure delays** ([scipy/scipy#26417](https://github.com/scipy/scipy/issues/26417)): a documented behaviour that is surprising, possibly a documentation issue rather than a bug.
 - **torchaudio's `deemphasis` clamps its output to [-1, 1]** ([pytorch/audio#4238](https://github.com/pytorch/audio/issues/4238)): the clamp comes from `lfilter`'s documented default `clamp=True`, in a library now in maintenance mode.
 
-None of these reports had been confirmed by a maintainer when this was written (October 2026). Detailed results are in `benchmarks/RESULTS-*.md` ([benchmarks/](https://github.com/clement-basdevant/dsp-props/tree/main/benchmarks)).
+The `tf2sos` and `deemphasis` reports had not been confirmed by a maintainer when this was written (October 2026). Detailed results are in `benchmarks/RESULTS-*.md` ([benchmarks/](https://github.com/clement-basdevant/dsp-props/tree/main/benchmarks)).
 
 ## Installation
 
