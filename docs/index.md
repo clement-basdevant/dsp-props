@@ -21,7 +21,7 @@ direct-form I recursive filters, and `dp.calibrate` when you need a tight
 tolerance. Every failure is reported with a **small counterexample**.
 
 !!! note "Status"
-    Alpha. Version 0.1.2 is on [PyPI](https://pypi.org/project/dsp-props/). DOI: [10.5281/zenodo.23437840](https://doi.org/10.5281/zenodo.23437840).
+    Alpha. Version 0.1.3 is on [PyPI](https://pypi.org/project/dsp-props/). DOI: [10.5281/zenodo.23437840](https://doi.org/10.5281/zenodo.23437840).
 
 ## Install
 

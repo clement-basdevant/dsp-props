@@ -6,7 +6,7 @@ doivent tenir pour toute implémentation correcte, avec une tolérance dérivée
 d'erreur, et on rapporte le plus petit contre-exemple.
 
 Auteur : Clément Basdevant (Nicolas Boganski, retiré des auteurs pour l'instant, est cité dans les remerciements). Papier JOSS en préparation (`paper/paper.md`, `paper/paper.bib`).
-Version 0.1.2 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développement :
+Version 0.1.3 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développement :
 `docs/schema-directeur.md`. Tickets de bugs à poster en amont : `papers/tickets-a-poster.md`.
 
 ## Les trois briques

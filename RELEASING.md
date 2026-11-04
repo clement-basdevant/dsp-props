@@ -1,6 +1,6 @@
 # Publier une version sur PyPI
 
-Le paquet est prêt (version dans `src/dsp_props/__init__.py`, actuellement 0.1.2).
+Le paquet est prêt (version dans `src/dsp_props/__init__.py`, actuellement 0.1.3).
 `python -m build && python -m twine check dist/*` passe. La publication est déclenchée par un tag ;
 rien n'est publié tant qu'aucun tag `v*` n'est poussé.
 
