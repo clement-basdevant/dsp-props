@@ -6,7 +6,7 @@
 
 DSP code is usually tested by comparing its output with a reference (MATLAB, SciPy) on a few signals, with a hand-picked tolerance. `dsp-props` instead checks **relations that must always hold** (linearity, shift theorem, Parseval, Hermitian symmetry, invertibility, convolution theorem, causality, time invariance, consistency across block sizes), on **automatically generated signals** from [Hypothesis](https://hypothesis.works/), chosen to trip up DSP code: impulses, off-grid sinusoids, close tones, near-Nyquist tones, extreme amplitudes, lengths 1, 2, prime or 2^k ± 1 (about 15 % of the lengths drawn), empty and one-sample blocks. Tolerances scale with the operation instead of a fixed `atol`: c · ε · log N for an FFT, with an engineering constant (c = 20 for transforms, c = 1000 for filters without a declared transfer function, resamplers and streaming), a derived bound for direct-form I recursive filters, and `dp.calibrate` when you need a tight tolerance. Every failure is reported with a small counterexample.
 
-> Status: alpha. The six phases of the [development plan](https://github.com/clement-basdevant/dsp-props/blob/main/docs/schema-directeur.md) (in French) are complete; version 0.1.2 on PyPI.
+> Status: alpha. The six phases of the [development plan](https://github.com/clement-basdevant/dsp-props/blob/main/docs/schema-directeur.md) (in French) are complete; version 0.1.3 on PyPI.
 
 **Documentation:** [dsp-props.readthedocs.io](https://dsp-props.readthedocs.io/) (tutorial, tolerance models, known blind spots, API reference).
 
