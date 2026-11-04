@@ -154,8 +154,9 @@ Known blind spot: a filter that is wrong but still linear, time-invariant and ca
 - **`scipy.signal.sosfilt` on an empty block** is new, but it **raises an exception** (`ValueError`) on any input that is empty along the filtered axis; it does not diverge silently. Reported together with the `lfilter` case in [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406), and **fixed**: our fix for both cases ([scipy/scipy#26415](https://github.com/scipy/scipy/pull/26415)) was merged on October 23, 2026 and is scheduled for SciPy 2.0.0.
 - **`scipy.signal.tf2sos` drops pure delays** ([scipy/scipy#26417](https://github.com/scipy/scipy/issues/26417)): a documented behaviour that is surprising, possibly a documentation issue rather than a bug.
 - **torchaudio's `deemphasis` clamps its output to [-1, 1]** ([pytorch/audio#4238](https://github.com/pytorch/audio/issues/4238)): the clamp comes from `lfilter`'s documented default `clamp=True`, in a library now in maintenance mode.
+- **`scipy.signal.filtfilt(method="gust")` depends on how the filter is written** ([scipy/scipy#26610](https://github.com/scipy/scipy/issues/26610)): trailing zeros in `a` or `b` change the output at both ends of the signal, by up to 0.54 on a unit-variance example. Found because the campaign's random filters sometimes have poles at zero.
 
-The `tf2sos` and `deemphasis` reports had not been confirmed by a maintainer when this was written (October 2026). Detailed results are in `benchmarks/RESULTS-*.md` ([benchmarks/](https://github.com/clement-basdevant/dsp-props/tree/main/benchmarks)).
+The `tf2sos`, `deemphasis` and `filtfilt` reports had not been confirmed by a maintainer when this was written (October 2026). Detailed results are in `benchmarks/RESULTS-*.md` ([benchmarks/](https://github.com/clement-basdevant/dsp-props/tree/main/benchmarks)).
 
 ## Installation
 

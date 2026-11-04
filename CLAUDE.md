@@ -106,11 +106,14 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
     exception levée sur une entrée vide, pas une divergence silencieuse. Corrigé (avec le
     cas `lfilter`) par notre PR scipy/scipy#26415, fusionnée le 23/10/2026 par un
     mainteneur, prévue pour SciPy 2.0.0.
-  - Pas encore de confirmation d'un mainteneur pour les deux points suivants.
+  - Pas encore de confirmation d'un mainteneur pour les trois points suivants.
   - `tf2sos` qui supprime les retards purs (scipy/scipy#26417) : comportement documenté,
     peut-être un problème de documentation.
   - `deemphasis` de torchaudio (pytorch/audio#4238) : écrêtage par défaut (`clamp=True`)
     documenté, bibliothèque en maintenance.
+  - `filtfilt(method="gust")` dépend de l'écriture du filtre (scipy/scipy#26610) : des
+    zéros en fin de `a` ou `b` gonflent l'ordre, ajoutent une impulsion aux bords (0,54 sur
+    un exemple) et rendent le système des moindres carrés singulier. Reproduit de 1.15 à 1.18.1.
   - SciPy applique une politique IA : tickets et PR rédigés par l'auteur, pas par une IA.
 - FFT CPU de PyTorch : jusqu'à 195 ε pour certaines longueurs à grands facteurs premiers
   (N = 596), contre environ 4 ε pour NumPy/SciPy.
