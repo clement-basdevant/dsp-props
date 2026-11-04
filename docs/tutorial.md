@@ -249,7 +249,9 @@ with SciPy 1.18.1, `lfilter` returns an uninitialised final state when given an
 empty block with an initial state (reported by dsp-props as
 [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406); the `lfilter`
 part is the known [scipy/scipy#22571](https://github.com/scipy/scipy/issues/22571),
-fixed in SciPy's development version). The workaround is to skip empty blocks:
+fixed in SciPy's development version; the fix for both `lfilter` and `sosfilt`,
+[scipy/scipy#26415](https://github.com/scipy/scipy/pull/26415), is scheduled for
+SciPy 2.0.0). Until then, the workaround is to skip empty blocks:
 
 ```python
 @dp.streaming()

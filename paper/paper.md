@@ -119,11 +119,11 @@ Applied to 46 targets in SciPy, NumPy, PyTorch, librosa [@mcfee2015librosa]
 and torchaudio, the relations found that, given an empty block and an initial state,
 `scipy.signal.lfilter` returns a wrong final state (recursive filters) or
 raises (FIR filters, which breaks librosa's streaming pre-emphasis), and
-`sosfilt` raises (scipy/scipy#26406, not yet confirmed by a maintainer; proposed
-fix scipy/scipy#26415). The
-`lfilter` part rediscovers scipy/scipy#22571, already fixed in the
-development version after SciPy 1.18.1; the `sosfilt` part is new, but is an
-exception rather than a silent divergence. They also flagged two documented
+`sosfilt` raises (scipy/scipy#26406). The `lfilter` part rediscovers
+scipy/scipy#22571, already fixed in the development version after SciPy
+1.18.1; the `sosfilt` part is new, but is an exception rather than a silent
+divergence. Our fix for both (scipy/scipy#26415) was reviewed and merged by a
+SciPy maintainer and is scheduled for SciPy 2.0.0. They also flagged two documented
 behaviours: `tf2sos` drops pure delays (scipy/scipy#26417), and torchaudio's
 `deemphasis` clips to [-1, 1] by default, so it does not invert `preemphasis`
 (pytorch/audio#4238). An error profile

@@ -6,7 +6,7 @@ doivent tenir pour toute implémentation correcte, avec une tolérance dérivée
 d'erreur, et on rapporte le plus petit contre-exemple.
 
 Auteur : Clément Basdevant (Nicolas Boganski, retiré des auteurs pour l'instant, est cité dans les remerciements). Papier JOSS en préparation (`paper/paper.md`, `paper/paper.bib`).
-Version 0.1.2 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développement :
+Version 0.1.3 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développement :
 `docs/schema-directeur.md`. Tickets de bugs à poster en amont : `papers/tickets-a-poster.md`.
 
 ## Les trois briques
@@ -98,16 +98,22 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
   double-double ; `benchmarks/campaign.py` garde sa propre copie de `block_splits` plafonnée
   à 9 blocs ; écart de précision entre la tolérance par défaut (20 ε log2 N) et le refus de
   `dp.calibrate` (1e6 ε), où une FFT à facteurs de rotation récursifs (38 ε) passe.
-- Résultats en amont, à leur juste taille (aucune confirmation d'un mainteneur à ce jour) :
+- Résultats en amont, à leur juste taille :
   - `lfilter` sur bloc vide avec état initial : redécouverte de scipy/scipy#22571, déjà
     corrigé dans la version de développement ; le cas FIR se propage à la pré-emphase en
     streaming de librosa.
   - `sosfilt` sur bloc vide : nouveau (scipy/scipy#26406, avec `lfilter`), mais c'est une
-    exception levée sur une entrée vide, pas une divergence silencieuse.
+    exception levée sur une entrée vide, pas une divergence silencieuse. Corrigé (avec le
+    cas `lfilter`) par notre PR scipy/scipy#26415, fusionnée le 23/10/2026 par un
+    mainteneur, prévue pour SciPy 2.0.0.
+  - Pas encore de confirmation d'un mainteneur pour les trois points suivants.
   - `tf2sos` qui supprime les retards purs (scipy/scipy#26417) : comportement documenté,
     peut-être un problème de documentation.
   - `deemphasis` de torchaudio (pytorch/audio#4238) : écrêtage par défaut (`clamp=True`)
     documenté, bibliothèque en maintenance.
+  - `filtfilt(method="gust")` dépend de l'écriture du filtre (scipy/scipy#26610) : des
+    zéros en fin de `a` ou `b` gonflent l'ordre, ajoutent une impulsion aux bords (0,54 sur
+    un exemple) et rendent le système des moindres carrés singulier. Reproduit de 1.15 à 1.18.1.
   - SciPy applique une politique IA : tickets et PR rédigés par l'auteur, pas par une IA.
 - FFT CPU de PyTorch : jusqu'à 195 ε pour certaines longueurs à grands facteurs premiers
   (N = 596), contre environ 4 ε pour NumPy/SciPy.

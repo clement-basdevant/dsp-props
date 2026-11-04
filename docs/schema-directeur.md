@@ -15,7 +15,7 @@ Le schéma directeur complet (état de l'art, catalogue de propriétés, feuille
 - [x] Générateurs : impulsion, DC, sinusoïde hors grille, quasi-Nyquist, tons proches, parcimonieux, bruit blanc ; longueurs pathologiques
 - [x] Relations : linéarité, décalage circulaire, Parseval, symétrie hermitienne, inversibilité, théorème de convolution
 - [x] `numpy.fft` passe toutes les relations ; 8 mutants sur 8 détectés
-- [x] Premier bug réel signalé en amont : [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406) (`lfilter`/`sosfilt` sur bloc vide)
+- [x] Premier bug réel signalé en amont : [scipy/scipy#26406](https://github.com/scipy/scipy/issues/26406) (`lfilter`/`sosfilt` sur bloc vide), corrigé par notre PR [scipy/scipy#26415](https://github.com/scipy/scipy/pull/26415), fusionnée le 23/10/2026 (SciPy 2.0.0)
 - [x] Transformées réelles (`kind="rdft"`), transformées génériques (DCT, STFT) et streaming par blocs (`dp.streaming`, `dp.stateful`)
 - [x] 20 mutants en quatre familles, tous détectés
 
