@@ -58,3 +58,13 @@ def test_rounded_state_only_matters_across_blocks():
     proc = pm.moving_sum_with_rounded_state(20)()
     split = np.concatenate([proc.process(b) for b in np.array_split(x, 16)])
     assert 0 < _rel(split, whole) < 1e-9
+
+
+@pytest.mark.parametrize("n", [0, 1, 2, 3, 7, 50, 511])
+def test_long_double_references_match_the_double_implementations(n):
+    x = np.random.default_rng(n).standard_normal(n)
+    resampled = pm.longdouble_resample(x)
+    assert resampled.shape == (-(-n * pm.UP // pm.DOWN),)
+    if n:
+        assert np.max(np.abs(resampled - ss.resample_poly(x, pm.UP, pm.DOWN))) < 1e-14
+    assert np.max(np.abs(pm.longdouble_moving_sum(x) - MovingSum().process(x)), initial=0) < 1e-14

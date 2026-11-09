@@ -29,7 +29,7 @@ Version 0.1.3 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développ
    rééchantillonneurs, streaming) sont des constantes d'ingénierie, pas des bornes dérivées.
    Seul le modèle des filtres récursifs (`core/iir.py`) est dérivé, au premier ordre et pour
    la forme directe I ; il croît avec l'ordre et les normes ℓ1 des réponses impulsionnelles.
-   `dp.calibrate` (chemin recommandé pour une tolérance serrée) mesure une implémentation
+   `dp.calibrate` (chemin recommandé pour une tolérance serrée, avec `base=None`) mesure une implémentation
    longueur par longueur contre `extended_dft` : FFT `long double` là où elle est étendue,
    DFT double-double sinon.
 
@@ -53,10 +53,12 @@ ctypes.
 
 ```bash
 python -m pip install -e ".[dev]"      # installation de développement
-python -m pytest -q                    # suite de tests interne (133 tests, ~5 min)
+python -m pytest -q                    # suite de tests interne (142 tests, ~5 min)
 dsp-props check module_or_file.py      # découvre les opérateurs déclarés, code de sortie ≠ 0 si échec
 python mutants/run_mutants.py          # suite de mutation (31 mutants, 6 familles)
 python benchmarks/precision_mutants.py # mutants de précision : plus petite perte détectée (~10 min)
+python benchmarks/precision_oracles.py # mêmes mutants contre 4 oracles (A9, ~1 h)
+python benchmarks/calibrated_tolerance.py # tolérance calibrée : fausses alarmes, 5 filtres, 4 rapports (~1 h)
 python benchmarks/campaign.py          # campagne sur 46 cibles réelles
 python benchmarks/error_profile.py     # profil d'erreur FFT, N = 2..1200
 ```
@@ -90,6 +92,17 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
   à partir de 7e3 ε, rééchantillonneur (arithmétique) de 1e5 ε, IIR de 7e5 ε (coefficients) à
   3e6 ε (arithmétique). Coefficients arrondis d'un rééchantillonneur : jamais attrapés.
   Détail dans `docs/blind-spots.md`.
+- A9 (`benchmarks/precision_oracles.py`) : tolérance fixe 1e-7 ne détecte aucun de ces
+  mutants ; tolérance calibrée sur l'implémentation de confiance, sans plancher analytique
+  (`CalibratedTolerance(..., base=FFTTolerance(c=0))`) : FFT dès 21 ε, streaming 28 ε, filtres
+  430 à 3e3 ε, sans fausse alarme (3 graines). `dp.calibrate` garde par défaut le plancher
+  20 ε log2 N (il élargit seulement) ; `base=None` le retire. `assert_allclose` différentiel :
+  inégal. `benchmarks/calibrated_tolerance.py` : tolérance calibrée sans plancher sur
+  l'implémentation de confiance, aucune fausse alarme sur 12 autres implémentations correctes
+  (scipy.fft, radix-2, DFT directe, sosfilt sur 5 filtres, polyphase sur 4 rapports, convolve) ;
+  seule la FFT PyTorch (156 ε contre 2,7 ε pour NumPy) est signalée. Sur 5 filtres et 4
+  rapports, calibré 7 à 3400 fois plus fin que le défaut : le modèle IIR dérivé est pessimiste.
+  La calibration suppose une implémentation de confiance et une référence étendue.
 - Changements récents (PR #7 à #10, fusionnées) :
   - #8 : la relation « transfer function » borne la queue tronquée de la réponse
     impulsionnelle (`tail_l1_bound`, solution de Lyapunov) au lieu de supposer 1e-17 ·
