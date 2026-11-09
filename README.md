@@ -110,6 +110,15 @@ print(tol.summary())
 dp.transform(inverse=torch_ifft, parseval=True, tolerance=tol)(torch_fft)
 ```
 
+By default the calibrated tolerance never goes below the default model: calibration widens it where an implementation measures worse. To tighten it, calibrate a trusted implementation without analytic floor and check the operator under test with the result:
+
+```python
+tight = dp.calibrate(np.fft.fft, lengths=range(1, 513), base=None)
+dp.transform(inverse=np.fft.ifft, parseval=True, tolerance=tight)(my_fft)
+```
+
+On the precision mutants, this catches an FFT from 21 ε of error instead of 90 ε, and filters and resamplers 7 to 3400 times earlier than the default models, with no false alarm on twelve other correct implementations (`benchmarks/calibrated_tolerance.py`). It is an accuracy requirement: the PyTorch FFT, correct but up to 156 ε where NumPy stays under 2.7 ε, does not meet one calibrated on NumPy.
+
 `python benchmarks/error_profile.py` produces the full error profile (`benchmarks/error_profile.csv`), and `python benchmarks/plot_error_profile.py` the figure below.
 
 ![Relative FFT error as a function of N, NumPy against PyTorch](https://raw.githubusercontent.com/clement-basdevant/dsp-props/main/docs/figures/error_profile.png)
@@ -133,7 +142,7 @@ python mutants/run_mutants.py
 Mutation score: 31/31 (100%)
 ```
 
-These mutants break properties. Precision mutants, which keep every property and lose accuracy (rounded twiddles, coefficients, arithmetic or state), are measured separately by `python benchmarks/precision_mutants.py`: with the default tolerances, an FFT is caught from about 90 ε of error, a streaming processor from about 7e3 ε, an IIR filter or a resampler from 1e5 to 3e6 ε, and a fault confined to undeclared filter coefficients is never caught (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md#how-large-an-accuracy-loss-the-relations-detect)). `python benchmarks/precision_oracles.py` compares with other oracles: a fixed relative tolerance of 1e-7 catches none of these faults, and a tolerance calibrated on a trusted implementation, without analytic floor, lowers the thresholds to 21 ε (FFT), 28 ε (streaming) and 430 to 3e3 ε (filters), with no false alarm on the correct implementations.
+These mutants break properties. Precision mutants, which keep every property and lose accuracy (rounded twiddles, coefficients, arithmetic or state), are measured separately by `python benchmarks/precision_mutants.py`: with the default tolerances, an FFT is caught from about 90 ε of error, a streaming processor from about 7e3 ε, an IIR filter or a resampler from 1e5 to 3e6 ε, and a fault confined to undeclared filter coefficients is never caught (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md#how-large-an-accuracy-loss-the-relations-detect)). `python benchmarks/precision_oracles.py` compares with other oracles: a fixed relative tolerance of 1e-7 catches none of these faults, and a tolerance calibrated on a trusted implementation (`dp.calibrate(..., base=None)`) lowers the thresholds to 21 ε (FFT), 28 ε (streaming) and 430 to 3e3 ε (filters).
 
 Counterexamples are tiny. In a run with every `dp.verify` seeded with 0, for 26 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response) the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 28 of 31 mutants fail within the first 3 generated inputs. The exceptions are expected: 15 samples for `filtfilt` declared causal, which falls back to `lfilter` on short inputs, 34 for a filter that changes after 64 samples (the time-invariance relation delays the input), and 192 for the DC-gain and aliasing relations, which need long signals. `mutants/run_mutants.py` fixes no seed, so these counts vary between runs (the run recorded in `benchmarks/mutant_results.json` gave 26 and 26); `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records a run.
 

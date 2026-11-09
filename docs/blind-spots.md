@@ -328,11 +328,74 @@ What this says:
   1 and 2 seeds out of 3 over a wide range of levels). It is the only oracle
   that sees rounded resampler taps, because it compares with the very filter
   the mutant was meant to implement.
-- `dp.calibrate` as such keeps the default model as a floor
+- By default `dp.calibrate` keeps the default model as a floor
   (`base=FFTTolerance()`, 20 ε log2 N): it widens a tolerance where the
-  implementation measures worse, it never tightens it. The calibrated column
-  replaces that floor by `FFTTolerance(c=0)`; `dp.calibrate` has no option for
-  that yet.
+  implementation measures worse and never tightens it. The calibrated column
+  uses `dp.calibrate(..., base=None)`, which keeps no analytic floor.
+- What the calibrated column assumes: a trusted implementation of the same
+  operator and an extended-precision reference to measure it, the same
+  ingredients as a differential test. Its advantage over `assert_allclose`
+  is a threshold that follows the size of the loss and does not depend on the
+  probe signals, not the absence of a reference.
+- The derived IIR model is pessimistic: on the five filters below it is 7 to
+  3000 times looser than a calibrated tolerance (first-order worst case,
+  growing with the ℓ1 norms of the impulse responses).
+
+### Does a calibrated tolerance hold for other implementations?
+
+`python benchmarks/calibrated_tolerance.py` calibrates, without analytic
+floor, a trusted implementation against long double, then checks other
+correct implementations of the same operator with that tolerance (200 inputs
+per relation, 3 seeds; `benchmarks/calibrated_tolerance.json`). Worst errors
+are measured against long double over N = 1…512 for the FFTs, over 100
+lengths up to 512 otherwise.
+
+| Trusted (calibrated on) | Other implementation | Its worst error | Seeds failing |
+| --- | --- | --- | --- |
+| `numpy.fft.fft` (2.2 ε) | `scipy.fft.fft` | 2.0 ε | 0/3 |
+| | radix-2, accurate twiddles | 4.8 ε | 0/3 |
+| | direct DFT, accurate twiddles | 4.5 ε | 0/3 |
+| | `torch.fft.fft` (CPU, torch 2.15) | 156 ε | 3/3 |
+| `lfilter`, five filters (27 to 275 ε) | `sosfilt(tf2sos(b, a))` | 47 to 631 ε | 0/3 each |
+| `resample_poly`, 2/3, 3/2, 5/4, 1/4 (1.2 to 57 ε) | direct polyphase convolution | 0.9 to 94 ε | 0/3 each |
+| moving sum (2.0 ε) | `np.convolve` with carried history | 1.5 ε | 0/3 |
+
+The filters are the resonant fourth-order filter of the mutants,
+`butter(4, 0.2)`, `cheby1(6, 1, 0.3)`, `ellip(4, 0.5, 40, 0.25)` and
+`butter(2, 0.01)`. `sosfilt` measures up to 2.7 times worse than `lfilter` on
+the same filter and still passes: the calibrated bound carries a margin of
+16 (8, times 2 for chained operations).
+
+The PyTorch FFT is the only one flagged. It is correct, but up to 156 ε where
+NumPy stays under 2.7 ε (N = 412; 82 ε against 1.1 ε at N = 354): a tolerance
+calibrated on NumPy is an accuracy requirement, and PyTorch does not meet it.
+Calibrate PyTorch on itself to test it for correctness rather than accuracy.
+
+A first version of the `np.convolve` moving sum used `mode="valid"`. It failed
+block invariance on every seed: NumPy swaps the arguments when the signal is
+shorter than the kernel, so an empty block returned two samples. That was a
+real bug, and the table shows the fixed version.
+
+Detection thresholds on the same filters and ratios (graded mutants, 0 to 24
+bits in steps of 4, smallest loss caught on every seed from there on; no false
+alarm at 0 bits):
+
+| Setting | Fault | Default | Calibrated |
+| --- | --- | --- | --- |
+| resonant order 4 | coefficients / arithmetic | 6.6e5 / 9.8e6 ε | 2.5e3 / 2.9e3 ε |
+| `butter(4, 0.2)` | coefficients / arithmetic | 2.3e4 / 1.9e6 ε | 3.3e3 / 1.3e5 ε |
+| `cheby1(6, 1, 0.3)` | coefficients / arithmetic | 6.1e6 / 2.6e7 ε | 4.3e4 / 1.1e5 ε |
+| `ellip(4, 0.5, 40, 0.25)` | coefficients / arithmetic | 1.2e6 / 7.5e5 ε | 2.9e3 / 3.0e3 ε |
+| `butter(2, 0.01)` | coefficients / arithmetic | 1.4e7 / 3.3e7 ε | 2.5e5 / 1.7e6 ε |
+| resampler 2/3 | arithmetic | 4.6e5 ε | 1.7e3 ε |
+| resampler 3/2 | arithmetic | 2.6e3 ε | 130 ε |
+| resampler 5/4 | arithmetic | 2.2e3 ε | 180 ε |
+| resampler 1/4 | arithmetic | 1.4e6 ε | 5.5e3 ε |
+
+Steps of 4 bits make these thresholds coarser (a factor 16) than the 2-bit
+steps of the previous tables. The gain of calibration varies from 7 to 3400
+with the filter: it is largest where the derived model is most pessimistic
+(poles close to the unit circle, high order).
 
 ## Hidden state
 

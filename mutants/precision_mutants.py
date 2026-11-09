@@ -149,9 +149,10 @@ FFT_REFERENCES = {"numpy_fft": np.fft.fft, "radix2_accurate_twiddles": radix2_re
 B, A = iir_mutants.B, iir_mutants.A
 
 
-def lfilter_with_rounded_coefficients(bits):
+def lfilter_with_rounded_coefficients(bits, b=None, a=None):
     """``lfilter`` on coefficients that keep 53 - bits bits (the declared ones are exact)."""
-    b, a = round_bits(B, bits), round_bits(A, bits)
+    b = round_bits(B if b is None else np.asarray(b, float), bits)
+    a = round_bits(A if a is None else np.asarray(a, float), bits)
 
     def filt(x):
         return ss.lfilter(b, a, x)
@@ -160,11 +161,12 @@ def lfilter_with_rounded_coefficients(bits):
     return filt
 
 
-def lfilter_in_narrow_format(bits):
+def lfilter_in_narrow_format(bits, b=None, a=None):
     """``lfilter`` on an input rounded to 53 - bits bits, output rounded likewise."""
+    b, a = (B, A) if b is None else (b, a)
 
     def filt(x):
-        return round_bits(ss.lfilter(B, A, round_bits(x, bits)), bits)
+        return round_bits(ss.lfilter(b, a, round_bits(x, bits)), bits)
 
     filt.__name__ = f"lfilter_arithmetic_minus_{bits}_bits"
     return filt
@@ -175,8 +177,9 @@ def lfilter_single_coefficients(x):
     return ss.lfilter(B.astype(np.float32).astype(float), A.astype(np.float32).astype(float), x)
 
 
-def declare_iir(func, tolerance=None):
-    return dp.lti_filter(causal=True, transfer=(B, A), tolerance=tolerance)(func)
+def declare_iir(func, tolerance=None, b=None, a=None):
+    transfer = (B, A) if b is None else (b, a)
+    return dp.lti_filter(causal=True, transfer=transfer, tolerance=tolerance)(func)
 
 
 # --- resampler -------------------------------------------------------------
@@ -195,18 +198,18 @@ def resample_with_rounded_taps(bits):
     return resample
 
 
-def resample_in_narrow_format(bits):
+def resample_in_narrow_format(bits, up=UP, down=DOWN):
     """``resample_poly`` on an input rounded to 53 - bits bits, output rounded likewise."""
 
     def resample(x):
-        return round_bits(ss.resample_poly(round_bits(x, bits), UP, DOWN), bits)
+        return round_bits(ss.resample_poly(round_bits(x, bits), up, down), bits)
 
     resample.__name__ = f"resample_arithmetic_minus_{bits}_bits"
     return resample
 
 
-def declare_resampler(func, tolerance=None):
-    return dp.resampler(UP, DOWN, tolerance=tolerance)(func)
+def declare_resampler(func, tolerance=None, up=UP, down=DOWN):
+    return dp.resampler(up, down, tolerance=tolerance)(func)
 
 
 # --- streaming -------------------------------------------------------------
@@ -255,18 +258,52 @@ REALISTIC = {
 # --- extended-precision references (long double), for calibration -------------
 
 
-def longdouble_resample(x):
-    """``resample_poly(x, UP, DOWN)`` computed in long double (same filter, same alignment)."""
+def resample_poly_taps(up, down):
+    """The filter ``resample_poly(x, up, down)`` applies by default, gain ``up`` included."""
+    g = np.gcd(up, down)
+    up, down = up // g, down // g
+    max_rate = max(up, down)
+    return up * ss.firwin(2 * 10 * max_rate + 1, 1.0 / max_rate, window=("kaiser", 5.0))
+
+
+def polyphase_resample(x, up=UP, down=DOWN, dtype=np.float64):
+    """``resample_poly(x, up, down)`` by zero insertion and direct convolution, in ``dtype``.
+
+    Same filter and alignment as SciPy, another summation order: in float64 it
+    is a second correct implementation, in long double a reference.
+    """
     x = np.asarray(x)
-    n_out = -(-len(x) * UP // DOWN)
+    g = np.gcd(up, down)
+    up, down = up // g, down // g
+    n_out = -(-len(x) * up // down)
     if len(x) == 0:
         return np.zeros(0)
-    h = (_TAPS * UP).astype(np.longdouble)
-    xu = np.zeros(len(x) * UP, np.longdouble)
-    xu[::UP] = x
-    full = np.concatenate([np.convolve(xu, h), np.zeros(len(h) + DOWN, np.longdouble)])
-    half_len = (len(_TAPS) - 1) // 2
-    return full[half_len::DOWN][:n_out]
+    h = resample_poly_taps(up, down).astype(dtype)
+    xu = np.zeros(len(x) * up, dtype)
+    xu[::up] = x
+    full = np.concatenate([np.convolve(xu, h), np.zeros(len(h) + down, dtype)])
+    half_len = (len(h) - 1) // 2
+    return full[half_len::down][:n_out]
+
+
+def longdouble_resample(x, up=UP, down=DOWN):
+    """``resample_poly(x, up, down)`` computed in long double (same filter, same alignment)."""
+    return polyphase_resample(x, up, down, np.longdouble)
+
+
+class ConvolveMovingSum:
+    """A second correct moving sum: ``np.convolve`` on the block with the carried history."""
+
+    def __init__(self):
+        self.hist = np.zeros(2)
+
+    def process(self, block):
+        buf = np.concatenate([self.hist, np.asarray(block, float)])
+        # not mode="valid": NumPy swaps the arguments when buf is shorter than
+        # the kernel, and an empty block would then return two samples
+        out = np.convolve(buf, np.ones(3))[2:len(buf)]
+        self.hist = buf[-2:]
+        return out
 
 
 def longdouble_moving_sum(x):
