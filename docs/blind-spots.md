@@ -234,6 +234,50 @@ compare its worst ratio (`tol.worst`, `tol.summary()`) with a trusted library
 calibrated on the same lengths, or lower `max_plausible` to the accuracy you
 require, so that calibration refuses anything worse.
 
+### How large an accuracy loss the relations detect
+
+`python benchmarks/precision_mutants.py` measures it with precision mutants
+(`mutants/precision_mutants.py`): operators that compute the right thing with
+fewer significand bits in one place, from 0 to 24 bits dropped (1 to about
+1e7 ε). The loss is measured against an accurate reference, as the worst
+relative error over N = 1…512 in units of ε; detection is `dp.verify` with
+the default tolerance, 200 inputs per relation, 3 seeds
+(`benchmarks/precision_mutants.json`). A family is caught "from" a loss when
+that level and every larger one fail on all 3 seeds.
+
+| Class and fault | Not caught up to | Caught from | By |
+| --- | --- | --- | --- |
+| FFT, twiddle table rounded | 21 ε | 90 ε | circular shift, inversibility, Parseval, convolution |
+| IIR (order 4, poles at 0.95), coefficients rounded | 1.9e5 ε | 7.1e5 ε | transfer function |
+| IIR, input and output rounded | 6.9e5 ε | 3.0e6 ε | linearity |
+| 2/3 resampler, filter taps rounded | 6.2e7 ε (24 bits) | never | — |
+| 2/3 resampler, input and output rounded | 6.7e3 ε | 1.1e5 ε | linearity |
+| Streaming moving sum, state rounded between blocks | 750 ε | 7.1e3 ε | block invariance |
+
+Realistic precision faults in an FFT, same protocol:
+
+| FFT mutant | Loss | Caught (seeds) |
+| --- | --- | --- |
+| radix-2, twiddles by the recurrence w^k = w^(k−1) · w | 19 ε | 0/3 |
+| direct DFT with exp(−2iπkn/N), argument not reduced mod N | 805 ε | 3/3 |
+| one Goertzel recursion per bin | 1.4e4 ε | 3/3 |
+| radix-2, twiddle table in single precision | 2.5e8 ε | 3/3 |
+
+NumPy's FFT and the accurate versions of these mutants measure 2 to 3.5 ε and
+pass. Single-precision IIR coefficients (7e9 ε) are caught by the transfer
+function relation.
+
+What this says: for transforms, the relations tell an FFT a few tens of ε
+worse than NumPy from a correct one only from about 100 ε, the scale of the
+default tolerance. For the other classes the detectable loss is three to
+five orders of magnitude larger: the IIR bound is derived but grows with the
+order and the ℓ1 norms of the impulse responses (poles at 0.95 make it large),
+and filters without a dedicated model, resamplers and streaming processors use
+c = 1000. A fault confined to the coefficients of a filter whose response is
+not declared is never caught: the mutant is a different, equally valid,
+operator of the same class (the "wrong operator of the right class" blind
+spot above), whatever the loss.
+
 ## Hidden state
 
 Each relation call builds its inputs and calls the operator several times. An
