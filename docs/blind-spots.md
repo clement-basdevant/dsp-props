@@ -278,6 +278,62 @@ not declared is never caught: the mutant is a different, equally valid,
 operator of the same class (the "wrong operator of the right class" blind
 spot above), whatever the loss.
 
+### The same faults against other oracles
+
+`python benchmarks/precision_oracles.py` runs the precision mutants against
+four oracles, same levels and seeds (`benchmarks/precision_oracles.json`):
+
+- **default**: the relations with the default tolerances (the table above);
+- **fixed 1e-7**: the same relations with a relative tolerance of 1e-7 on
+  the L2 error, the default `rtol` of `numpy.testing.assert_allclose`;
+- **calibrated**: the same relations with a tolerance calibrated on the
+  trusted implementation of the class (`numpy.fft.fft`, `lfilter`,
+  `resample_poly`, the moving sum) against a long double reference, without
+  analytic floor: `CalibratedTolerance(ratios, base=FFTTolerance(c=0))`;
+- **differential**: `numpy.testing.assert_allclose(mutant(x), trusted(x))`
+  with its defaults (elementwise, `rtol = 1e-7`, `atol = 0`) on the
+  calibration probe signals at 18 lengths. Unlike the three others, it needs
+  a trusted implementation to compare with.
+
+Smallest loss caught on all 3 seeds, with every larger level also caught:
+
+| Family | Default | Fixed 1e-7 | Calibrated | Differential |
+| --- | --- | --- | --- | --- |
+| FFT, twiddles rounded | 90 ε | never | 21 ε | 240 ε |
+| IIR, coefficients rounded | 7.1e5 ε | never | 1.7e3 ε | 7.1e5 ε |
+| IIR, input and output rounded | 3.0e6 ε | never | 2.9e3 ε | 190 ε |
+| Resampler, taps rounded | never | never | never | 1.5e7 ε |
+| Resampler, input and output rounded | 1.1e5 ε | never | 430 ε | 100 ε |
+| Streaming, state rounded | 7.1e3 ε | never | 28 ε | 750 ε |
+
+No oracle raised a false alarm on the correct implementations (level 0: the
+trusted implementations, and for the FFT a direct DFT with accurate twiddles,
+3.5 ε against 2.2 ε for NumPy), over 3 seeds. The calibrated ratios of the
+trusted implementations are 2.2 ε (FFT), 27 ε (IIR), 17 ε (resampler) and
+2.0 ε (moving sum).
+
+What this says:
+
+- A fixed relative tolerance of 1e-7 (4.5e8 ε) catches none of these faults,
+  up to 24 bits dropped.
+- With a tolerance calibrated on a trusted implementation, the relations catch
+  losses two to four orders of magnitude smaller than with the default models,
+  without a false alarm here: 21 ε for the FFT, 28 ε for the streaming
+  processor, 430 ε to 3e3 ε for the filters. The error model, not the
+  relations, sets what is detectable.
+- The differential `assert_allclose` is uneven: elementwise, it is strict on
+  the samples close to zero, so it catches some faults earlier than the
+  calibrated relations (IIR and resampler arithmetic) and others much later
+  (IIR coefficients), with results that depend on the probe signals (between
+  1 and 2 seeds out of 3 over a wide range of levels). It is the only oracle
+  that sees rounded resampler taps, because it compares with the very filter
+  the mutant was meant to implement.
+- `dp.calibrate` as such keeps the default model as a floor
+  (`base=FFTTolerance()`, 20 ε log2 N): it widens a tolerance where the
+  implementation measures worse, it never tightens it. The calibrated column
+  replaces that floor by `FFTTolerance(c=0)`; `dp.calibrate` has no option for
+  that yet.
+
 ## Hidden state
 
 Each relation call builds its inputs and calls the operator several times. An

@@ -130,8 +130,8 @@ def goertzel(x):
     return (s1 - np.exp(-1j * omega) * s2) * np.exp(-1j * omega * (n - 1))
 
 
-def declare_fft(func):
-    return dp.transform(inverse=np.fft.ifft, parseval=True, real_input_hermitian=True)(func)
+def declare_fft(func, tolerance=None):
+    return dp.transform(inverse=np.fft.ifft, parseval=True, real_input_hermitian=True, tolerance=tolerance)(func)
 
 
 FFT_REALISTIC = {
@@ -175,8 +175,8 @@ def lfilter_single_coefficients(x):
     return ss.lfilter(B.astype(np.float32).astype(float), A.astype(np.float32).astype(float), x)
 
 
-def declare_iir(func):
-    return dp.lti_filter(causal=True, transfer=(B, A))(func)
+def declare_iir(func, tolerance=None):
+    return dp.lti_filter(causal=True, transfer=(B, A), tolerance=tolerance)(func)
 
 
 # --- resampler -------------------------------------------------------------
@@ -205,8 +205,8 @@ def resample_in_narrow_format(bits):
     return resample
 
 
-def declare_resampler(func):
-    return dp.resampler(UP, DOWN)(func)
+def declare_resampler(func, tolerance=None):
+    return dp.resampler(UP, DOWN, tolerance=tolerance)(func)
 
 
 # --- streaming -------------------------------------------------------------
@@ -225,22 +225,51 @@ def moving_sum_with_rounded_state(bits):
     return RoundedStateMovingSum
 
 
-def declare_streaming(cls):
-    return dp.streaming()(cls)
+def declare_streaming(cls, tolerance=None):
+    return dp.streaming(tolerance=tolerance)(cls)
 
 
 # --- graded families, by operator class --------------------------------------
 
-GRADED = {
-    "fft_twiddles": lambda bits: declare_fft(dft_with_rounded_twiddles(bits)),
-    "iir_coefficients": lambda bits: declare_iir(lfilter_with_rounded_coefficients(bits)),
-    "iir_arithmetic": lambda bits: declare_iir(lfilter_in_narrow_format(bits)),
-    "resampler_taps": lambda bits: declare_resampler(resample_with_rounded_taps(bits)),
-    "resampler_arithmetic": lambda bits: declare_resampler(resample_in_narrow_format(bits)),
-    "streaming_state": lambda bits: declare_streaming(moving_sum_with_rounded_state(bits)),
+# Each family: bits -> the undeclared mutant, and the declaration of its class
+# (which takes an optional tolerance model). At 0 bits the mutant is the
+# trusted implementation (numpy.fft.fft, lfilter, resample_poly, the moving sum).
+FAMILIES = {
+    "fft_twiddles": (dft_with_rounded_twiddles, declare_fft),
+    "iir_coefficients": (lfilter_with_rounded_coefficients, declare_iir),
+    "iir_arithmetic": (lfilter_in_narrow_format, declare_iir),
+    "resampler_taps": (resample_with_rounded_taps, declare_resampler),
+    "resampler_arithmetic": (resample_in_narrow_format, declare_resampler),
+    "streaming_state": (moving_sum_with_rounded_state, declare_streaming),
 }
+
+GRADED = {name: (lambda make, declare: lambda bits, tolerance=None: declare(make(bits), tolerance))(make, declare)
+          for name, (make, declare) in FAMILIES.items()}
 
 REALISTIC = {
     **{name: declare_fft(f) for name, f in FFT_REALISTIC.items()},
     "iir_single_coefficients": declare_iir(lfilter_single_coefficients),
 }
+
+
+# --- extended-precision references (long double), for calibration -------------
+
+
+def longdouble_resample(x):
+    """``resample_poly(x, UP, DOWN)`` computed in long double (same filter, same alignment)."""
+    x = np.asarray(x)
+    n_out = -(-len(x) * UP // DOWN)
+    if len(x) == 0:
+        return np.zeros(0)
+    h = (_TAPS * UP).astype(np.longdouble)
+    xu = np.zeros(len(x) * UP, np.longdouble)
+    xu[::UP] = x
+    full = np.concatenate([np.convolve(xu, h), np.zeros(len(h) + DOWN, np.longdouble)])
+    half_len = (len(_TAPS) - 1) // 2
+    return full[half_len::DOWN][:n_out]
+
+
+def longdouble_moving_sum(x):
+    """The moving sum of streaming_mutants.MovingSum, in long double."""
+    buf = np.concatenate([np.zeros(2, np.longdouble), np.asarray(x, np.longdouble)])
+    return buf[2:] + buf[1:-1] + buf[:-2]

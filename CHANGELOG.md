@@ -5,6 +5,8 @@
 - Precision mutants (`mutants/precision_mutants.py`, `benchmarks/precision_mutants.py`): operators
   that keep every property but lose accuracy, graded from 0 to 24 dropped significand bits, and the
   smallest loss the relations detect for each operator class (`docs/blind-spots.md`).
+- `benchmarks/precision_oracles.py` compares the relations with default, fixed (1e-7) and calibrated
+  tolerances, and a differential `assert_allclose`, on the same precision mutants.
 
 ## 0.1.3 (2026-11-04)
 

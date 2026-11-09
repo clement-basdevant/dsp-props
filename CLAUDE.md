@@ -53,10 +53,11 @@ ctypes.
 
 ```bash
 python -m pip install -e ".[dev]"      # installation de développement
-python -m pytest -q                    # suite de tests interne (133 tests, ~5 min)
+python -m pytest -q                    # suite de tests interne (140 tests, ~5 min)
 dsp-props check module_or_file.py      # découvre les opérateurs déclarés, code de sortie ≠ 0 si échec
 python mutants/run_mutants.py          # suite de mutation (31 mutants, 6 familles)
 python benchmarks/precision_mutants.py # mutants de précision : plus petite perte détectée (~10 min)
+python benchmarks/precision_oracles.py # mêmes mutants contre 4 oracles (A9, ~1 h)
 python benchmarks/campaign.py          # campagne sur 46 cibles réelles
 python benchmarks/error_profile.py     # profil d'erreur FFT, N = 2..1200
 ```
@@ -90,6 +91,11 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
   à partir de 7e3 ε, rééchantillonneur (arithmétique) de 1e5 ε, IIR de 7e5 ε (coefficients) à
   3e6 ε (arithmétique). Coefficients arrondis d'un rééchantillonneur : jamais attrapés.
   Détail dans `docs/blind-spots.md`.
+- A9 (`benchmarks/precision_oracles.py`) : tolérance fixe 1e-7 ne détecte aucun de ces
+  mutants ; tolérance calibrée sur l'implémentation de confiance, sans plancher analytique
+  (`CalibratedTolerance(..., base=FFTTolerance(c=0))`) : FFT dès 21 ε, streaming 28 ε, filtres
+  430 à 3e3 ε, sans fausse alarme (3 graines). `dp.calibrate` seul garde le plancher
+  20 ε log2 N : il élargit, ne resserre jamais. `assert_allclose` différentiel : inégal.
 - Changements récents (PR #7 à #10, fusionnées) :
   - #8 : la relation « transfer function » borne la queue tronquée de la réponse
     impulsionnelle (`tail_l1_bound`, solution de Lyapunov) au lieu de supposer 1e-17 ·
