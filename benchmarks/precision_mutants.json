@@ -1,0 +1,683 @@
+{
+  "examples": 200,
+  "seeds": 3,
+  "graded": {
+    "fft_twiddles": [
+      {
+        "bits": 0,
+        "loss_eps": 3.506706298919597,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 3.5981437473321036,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 4.554352685787681,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 21.173501830325275,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 90.38758807645186,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 10,
+        "loss_eps": 236.34599729073497,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 12,
+        "loss_eps": 938.4765731830414,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "hermitian symmetry",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 14,
+        "loss_eps": 4121.635146682638,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "hermitian symmetry",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 13780.7338727,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "hermitian symmetry",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 56051.88898431645,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 314572.75421024463,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 1125449.6493020474,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 5173307.368631041,
+        "seeds_failing": 3,
+        "relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      }
+    ],
+    "iir_coefficients": [
+      {
+        "bits": 0,
+        "loss_eps": 26.91641375768032,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 121.65357587930306,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 421.5124000337188,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 1685.664339499298,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 2528.085238960135,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 13579.289620379182,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 186854.19515069795,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 14,
+        "loss_eps": 714823.2603319242,
+        "seeds_failing": 3,
+        "relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 658744.7258003936,
+        "seeds_failing": 3,
+        "relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 4147803.819467566,
+        "seeds_failing": 3,
+        "relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 15156146.421810897,
+        "seeds_failing": 3,
+        "relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 95914761.21687745,
+        "seeds_failing": 3,
+        "relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 673729417.9881449,
+        "seeds_failing": 3,
+        "relations": [
+          "transfer function"
+        ]
+      }
+    ],
+    "iir_arithmetic": [
+      {
+        "bits": 0,
+        "loss_eps": 26.91641375768032,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 55.226670388058956,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 188.53432729835095,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 644.4379937803669,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 2879.978804399008,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 10448.522074182,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 37925.27762064394,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 14,
+        "loss_eps": 170071.71541628623,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 16,
+        "loss_eps": 686787.019229453,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 18,
+        "loss_eps": 3042261.3604636528,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 9765597.67316538,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity",
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 46737693.49917973,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity",
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 202957791.8447615,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity",
+          "transfer function"
+        ]
+      }
+    ],
+    "resampler_taps": [
+      {
+        "bits": 0,
+        "loss_eps": 0.0,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 13.372461118054146,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 47.73599385829865,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 109.34450385832653,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 3495.864989728278,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 1659.3858293191186,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 13620.377347479878,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 14,
+        "loss_eps": 45421.236537024524,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 16,
+        "loss_eps": 427057.2680436571,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 18,
+        "loss_eps": 1049323.798442622,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 20,
+        "loss_eps": 5832221.729456868,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 22,
+        "loss_eps": 15316048.97517686,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 24,
+        "loss_eps": 61824957.276190326,
+        "seeds_failing": 0,
+        "relations": []
+      }
+    ],
+    "resampler_arithmetic": [
+      {
+        "bits": 0,
+        "loss_eps": 0.0,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 31.203259928571,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 104.37895140279272,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 428.76539503219567,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 1708.5849118626659,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 6738.570169360649,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 26981.656398515042,
+        "seeds_failing": 2,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 14,
+        "loss_eps": 114668.53958559799,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 464960.324569348,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 1770443.9514724994,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 6788143.5689872345,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 28825622.09370807,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 114514162.06302197,
+        "seeds_failing": 3,
+        "relations": [
+          "linearity"
+        ]
+      }
+    ],
+    "streaming_state": [
+      {
+        "bits": 0,
+        "loss_eps": 0.0,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 1.9999991767371519,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 11.175998020866272,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 27.967665744129867,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 132.72815710409375,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 750.119678534711,
+        "seeds_failing": 0,
+        "relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 1800.6087048573593,
+        "seeds_failing": 2,
+        "relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 14,
+        "loss_eps": 7126.3563617299105,
+        "seeds_failing": 3,
+        "relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 43814.63647436327,
+        "seeds_failing": 3,
+        "relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 113013.17903297777,
+        "seeds_failing": 3,
+        "relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 577199.4149792984,
+        "seeds_failing": 3,
+        "relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 2219655.6087594256,
+        "seeds_failing": 3,
+        "relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 8325366.573016091,
+        "seeds_failing": 3,
+        "relations": [
+          "block invariance"
+        ]
+      }
+    ]
+  },
+  "realistic": {
+    "fft_radix2_recursive_twiddles": {
+      "loss_eps": 18.58460413542759,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    "fft_radix2_single_twiddles": {
+      "loss_eps": 250965899.82357705,
+      "seeds_failing": 3,
+      "relations": [
+        "circular shift",
+        "convolution theorem",
+        "inversibility",
+        "parseval"
+      ]
+    },
+    "fft_naive_dft_unreduced": {
+      "loss_eps": 804.9101897264391,
+      "seeds_failing": 3,
+      "relations": [
+        "circular shift",
+        "convolution theorem",
+        "hermitian symmetry",
+        "inversibility"
+      ]
+    },
+    "fft_goertzel": {
+      "loss_eps": 14016.977801622583,
+      "seeds_failing": 3,
+      "relations": [
+        "circular shift",
+        "convolution theorem",
+        "hermitian symmetry",
+        "inversibility",
+        "linearity",
+        "parseval"
+      ]
+    },
+    "iir_single_coefficients": {
+      "loss_eps": 7129211098.881185,
+      "seeds_failing": 3,
+      "relations": [
+        "transfer function"
+      ]
+    }
+  },
+  "threshold": {
+    "fft_twiddles": {
+      "caught_from_loss_eps": 90.38758807645186,
+      "caught_from_bits": 8,
+      "largest_loss_never_caught_eps": 21.173501830325275,
+      "any_caught": true
+    },
+    "iir_coefficients": {
+      "caught_from_loss_eps": 714823.2603319242,
+      "caught_from_bits": 14,
+      "largest_loss_never_caught_eps": 186854.19515069795,
+      "any_caught": true
+    },
+    "iir_arithmetic": {
+      "caught_from_loss_eps": 3042261.3604636528,
+      "caught_from_bits": 18,
+      "largest_loss_never_caught_eps": 686787.019229453,
+      "any_caught": true
+    },
+    "resampler_taps": {
+      "caught_from_loss_eps": null,
+      "caught_from_bits": null,
+      "largest_loss_never_caught_eps": 61824957.276190326,
+      "any_caught": false
+    },
+    "resampler_arithmetic": {
+      "caught_from_loss_eps": 114668.53958559799,
+      "caught_from_bits": 14,
+      "largest_loss_never_caught_eps": 6738.570169360649,
+      "any_caught": true
+    },
+    "streaming_state": {
+      "caught_from_loss_eps": 7126.3563617299105,
+      "caught_from_bits": 14,
+      "largest_loss_never_caught_eps": 750.119678534711,
+      "any_caught": true
+    }
+  },
+  "references": {
+    "numpy_fft": {
+      "loss_eps": 2.0305710685706915,
+      "seeds_failing": 0
+    },
+    "radix2_accurate_twiddles": {
+      "loss_eps": 2.0305710685706915,
+      "seeds_failing": 0
+    },
+    "dft_accurate_twiddles": {
+      "loss_eps": 3.506706298919597,
+      "seeds_failing": 0
+    }
+  }
+}

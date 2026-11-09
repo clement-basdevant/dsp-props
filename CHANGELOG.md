@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Precision mutants (`mutants/precision_mutants.py`, `benchmarks/precision_mutants.py`): operators
+  that keep every property but lose accuracy, graded from 0 to 24 dropped significand bits, and the
+  smallest loss the relations detect for each operator class (`docs/blind-spots.md`).
+
 ## 0.1.3 (2026-11-04)
 
 Fixes found by the October 2026 reviews of the library and the article.
