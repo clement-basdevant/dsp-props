@@ -1,0 +1,934 @@
+{
+  "examples": 200,
+  "seeds": 3,
+  "calibrated_worst_eps": {
+    "fft": 2.1516818359707384,
+    "iir": 26.90089363077543,
+    "resampler": 17.269669072753775,
+    "streaming": 2.015384290110709
+  },
+  "graded": {
+    "fft_twiddles": [
+      {
+        "bits": 0,
+        "loss_eps": 3.506706298919597,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 3.5981437473321036,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 4.554352685787681,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 21.173501830325275,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 90.38758807645186,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 1,
+        "default_relations": [
+          "circular shift",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 10,
+        "loss_eps": 236.34599729073497,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 12,
+        "loss_eps": 938.4765731830414,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "hermitian symmetry",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 14,
+        "loss_eps": 4121.635146682638,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "hermitian symmetry",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 13780.7338727,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "hermitian symmetry",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 56051.88898431645,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 314572.75421024463,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 1125449.6493020474,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 5173307.368631041,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "circular shift",
+          "convolution theorem",
+          "inversibility",
+          "parseval"
+        ]
+      }
+    ],
+    "iir_coefficients": [
+      {
+        "bits": 0,
+        "loss_eps": 26.91641375768032,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 121.65357587930306,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 421.5124000337188,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 1685.664339499298,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 2528.085238960135,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 13579.289620379182,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 186854.19515069795,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 2,
+        "default_relations": []
+      },
+      {
+        "bits": 14,
+        "loss_eps": 714823.2603319242,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 658744.7258003936,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 4147803.819467566,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 15156146.421810897,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 95914761.21687745,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 673729417.9881449,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "transfer function"
+        ]
+      }
+    ],
+    "iir_arithmetic": [
+      {
+        "bits": 0,
+        "loss_eps": 26.91641375768032,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 55.226670388058956,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 2,
+        "default_relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 188.53432729835095,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 644.4379937803669,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 2879.978804399008,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 10448.522074182,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 37925.27762064394,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 14,
+        "loss_eps": 170071.71541628623,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 16,
+        "loss_eps": 686787.019229453,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 18,
+        "loss_eps": 3042261.3604636528,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 9765597.67316538,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity",
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 46737693.49917973,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity",
+          "transfer function"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 202957791.8447615,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity",
+          "transfer function"
+        ]
+      }
+    ],
+    "resampler_taps": [
+      {
+        "bits": 0,
+        "loss_eps": 0.0,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 13.372461118054146,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 47.73599385829865,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 109.34450385832653,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 3495.864989728278,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 1659.3858293191186,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 13620.377347479878,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 14,
+        "loss_eps": 45421.236537024524,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 16,
+        "loss_eps": 427057.2680436571,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 18,
+        "loss_eps": 1049323.798442622,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 1,
+        "default_relations": []
+      },
+      {
+        "bits": 20,
+        "loss_eps": 5832221.729456868,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 2,
+        "default_relations": []
+      },
+      {
+        "bits": 22,
+        "loss_eps": 15316048.97517686,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 24,
+        "loss_eps": 61824957.276190326,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 3,
+        "default_relations": []
+      }
+    ],
+    "resampler_arithmetic": [
+      {
+        "bits": 0,
+        "loss_eps": 0.0,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 31.203259928571,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 2,
+        "default_relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 104.37895140279272,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 428.76539503219567,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 1708.5849118626659,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 6738.570169360649,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 26981.656398515042,
+        "default": 1,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 14,
+        "loss_eps": 114668.53958559799,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 464960.324569348,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 1770443.9514724994,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 6788143.5689872345,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 28825622.09370807,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 114514162.06302197,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "linearity"
+        ]
+      }
+    ],
+    "streaming_state": [
+      {
+        "bits": 0,
+        "loss_eps": 0.0,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 2,
+        "loss_eps": 1.9999991767371519,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 0,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 4,
+        "loss_eps": 11.175998020866272,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 1,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 6,
+        "loss_eps": 27.967665744129867,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 0,
+        "default_relations": []
+      },
+      {
+        "bits": 8,
+        "loss_eps": 132.72815710409375,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 2,
+        "default_relations": []
+      },
+      {
+        "bits": 10,
+        "loss_eps": 750.119678534711,
+        "default": 0,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": []
+      },
+      {
+        "bits": 12,
+        "loss_eps": 1800.6087048573593,
+        "default": 2,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 14,
+        "loss_eps": 7126.3563617299105,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 16,
+        "loss_eps": 43814.63647436327,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 18,
+        "loss_eps": 113013.17903297777,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 20,
+        "loss_eps": 577199.4149792984,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 22,
+        "loss_eps": 2219655.6087594256,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      },
+      {
+        "bits": 24,
+        "loss_eps": 8325366.573016091,
+        "default": 3,
+        "fixed": 0,
+        "calibrated": 3,
+        "differential": 3,
+        "default_relations": [
+          "block invariance"
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "fft_twiddles": {
+      "default": {
+        "caught_from_loss_eps": 90.38758807645186,
+        "false_alarm_at_0_bits": 0
+      },
+      "fixed": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "calibrated": {
+        "caught_from_loss_eps": 21.173501830325275,
+        "false_alarm_at_0_bits": 0
+      },
+      "differential": {
+        "caught_from_loss_eps": 236.34599729073497,
+        "false_alarm_at_0_bits": 0
+      }
+    },
+    "iir_coefficients": {
+      "default": {
+        "caught_from_loss_eps": 714823.2603319242,
+        "false_alarm_at_0_bits": 0
+      },
+      "fixed": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "calibrated": {
+        "caught_from_loss_eps": 1685.664339499298,
+        "false_alarm_at_0_bits": 0
+      },
+      "differential": {
+        "caught_from_loss_eps": 714823.2603319242,
+        "false_alarm_at_0_bits": 0
+      }
+    },
+    "iir_arithmetic": {
+      "default": {
+        "caught_from_loss_eps": 3042261.3604636528,
+        "false_alarm_at_0_bits": 0
+      },
+      "fixed": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "calibrated": {
+        "caught_from_loss_eps": 2879.978804399008,
+        "false_alarm_at_0_bits": 0
+      },
+      "differential": {
+        "caught_from_loss_eps": 188.53432729835095,
+        "false_alarm_at_0_bits": 0
+      }
+    },
+    "resampler_taps": {
+      "default": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "fixed": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "calibrated": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "differential": {
+        "caught_from_loss_eps": 15316048.97517686,
+        "false_alarm_at_0_bits": 0
+      }
+    },
+    "resampler_arithmetic": {
+      "default": {
+        "caught_from_loss_eps": 114668.53958559799,
+        "false_alarm_at_0_bits": 0
+      },
+      "fixed": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "calibrated": {
+        "caught_from_loss_eps": 428.76539503219567,
+        "false_alarm_at_0_bits": 0
+      },
+      "differential": {
+        "caught_from_loss_eps": 104.37895140279272,
+        "false_alarm_at_0_bits": 0
+      }
+    },
+    "streaming_state": {
+      "default": {
+        "caught_from_loss_eps": 7126.3563617299105,
+        "false_alarm_at_0_bits": 0
+      },
+      "fixed": {
+        "caught_from_loss_eps": null,
+        "false_alarm_at_0_bits": 0
+      },
+      "calibrated": {
+        "caught_from_loss_eps": 27.967665744129867,
+        "false_alarm_at_0_bits": 0
+      },
+      "differential": {
+        "caught_from_loss_eps": 750.119678534711,
+        "false_alarm_at_0_bits": 0
+      }
+    }
+  }
+}

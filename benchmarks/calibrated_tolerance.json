@@ -1,0 +1,980 @@
+{
+  "examples": 200,
+  "seeds": 3,
+  "false_alarms": [
+    {
+      "class": "fft",
+      "setting": "complex DFT",
+      "implementation": "trusted",
+      "worst_eps": 2.7426685812012987,
+      "trusted_worst_eps": 2.1516818359707384,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "fft",
+      "setting": "complex DFT",
+      "implementation": "scipy.fft.fft",
+      "worst_eps": 2.820387657631104,
+      "trusted_worst_eps": 2.1516818359707384,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "fft",
+      "setting": "complex DFT",
+      "implementation": "radix-2, accurate twiddles",
+      "worst_eps": 4.768206050698802,
+      "trusted_worst_eps": 2.1516818359707384,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "fft",
+      "setting": "complex DFT",
+      "implementation": "direct DFT, accurate twiddles",
+      "worst_eps": 4.514292635605297,
+      "trusted_worst_eps": 2.1516818359707384,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "fft",
+      "setting": "complex DFT",
+      "implementation": "torch.fft.fft (CPU)",
+      "worst_eps": 156.3193078183794,
+      "trusted_worst_eps": 2.1516818359707384,
+      "seeds_failing": 3,
+      "relations": [
+        "circular shift",
+        "convolution theorem",
+        "inversibility",
+        "linearity"
+      ]
+    },
+    {
+      "class": "iir",
+      "setting": "resonant order 4 (poles 0.95)",
+      "implementation": "trusted",
+      "worst_eps": 54.71447278704834,
+      "trusted_worst_eps": 26.90089363077543,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "resonant order 4 (poles 0.95)",
+      "implementation": "sosfilt(tf2sos)",
+      "worst_eps": 84.48153598807286,
+      "trusted_worst_eps": 26.90089363077543,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "butter(4, 0.2)",
+      "implementation": "trusted",
+      "worst_eps": 45.18909057667354,
+      "trusted_worst_eps": 50.31527801344174,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "butter(4, 0.2)",
+      "implementation": "sosfilt(tf2sos)",
+      "worst_eps": 54.12528132994727,
+      "trusted_worst_eps": 50.31527801344174,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "cheby1(6, 1, 0.3)",
+      "implementation": "trusted",
+      "worst_eps": 187.7565966587774,
+      "trusted_worst_eps": 180.24957442842683,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "cheby1(6, 1, 0.3)",
+      "implementation": "sosfilt(tf2sos)",
+      "worst_eps": 343.16643037849036,
+      "trusted_worst_eps": 180.24957442842683,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "ellip(4, 0.5, 40, 0.25)",
+      "implementation": "trusted",
+      "worst_eps": 17.959580533056283,
+      "trusted_worst_eps": 26.810853590203216,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "ellip(4, 0.5, 40, 0.25)",
+      "implementation": "sosfilt(tf2sos)",
+      "worst_eps": 46.66104923186052,
+      "trusted_worst_eps": 26.810853590203216,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "butter(2, 0.01)",
+      "implementation": "trusted",
+      "worst_eps": 232.14404468614538,
+      "trusted_worst_eps": 275.1313016001647,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "iir",
+      "setting": "butter(2, 0.01)",
+      "implementation": "sosfilt(tf2sos)",
+      "worst_eps": 630.6773227263413,
+      "trusted_worst_eps": 275.1313016001647,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "2/3",
+      "implementation": "trusted",
+      "worst_eps": 11.543699394017501,
+      "trusted_worst_eps": 17.269669072753775,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "2/3",
+      "implementation": "direct polyphase convolution",
+      "worst_eps": 17.612596142751656,
+      "trusted_worst_eps": 17.269669072753775,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "3/2",
+      "implementation": "trusted",
+      "worst_eps": 0.9542886123658529,
+      "trusted_worst_eps": 1.1923953891447958,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "3/2",
+      "implementation": "direct polyphase convolution",
+      "worst_eps": 0.8969258254483214,
+      "trusted_worst_eps": 1.1923953891447958,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "5/4",
+      "implementation": "trusted",
+      "worst_eps": 0.9956887842965875,
+      "trusted_worst_eps": 1.6420026472589249,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "5/4",
+      "implementation": "direct polyphase convolution",
+      "worst_eps": 0.8563857163587391,
+      "trusted_worst_eps": 1.6420026472589249,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "1/4",
+      "implementation": "trusted",
+      "worst_eps": 31.55706590532929,
+      "trusted_worst_eps": 57.34993489032183,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "resampler",
+      "setting": "1/4",
+      "implementation": "direct polyphase convolution",
+      "worst_eps": 93.53317124843674,
+      "trusted_worst_eps": 57.34993489032183,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "streaming",
+      "setting": "moving sum",
+      "implementation": "trusted",
+      "worst_eps": 1.4656484168966648,
+      "trusted_worst_eps": 2.015384290110709,
+      "seeds_failing": 0,
+      "relations": []
+    },
+    {
+      "class": "streaming",
+      "setting": "moving sum",
+      "implementation": "np.convolve with history",
+      "worst_eps": 1.4675899505902403,
+      "trusted_worst_eps": 2.015384290110709,
+      "seeds_failing": 0,
+      "relations": []
+    }
+  ],
+  "thresholds": [
+    {
+      "class": "iir",
+      "setting": "resonant order 4 (poles 0.95)",
+      "fault": "coefficients",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 26.91641375768032,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 421.5124000337188,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 2528.085238960135,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 186854.19515069795,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 658744.7258003936,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 15156146.421810897,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 673729417.9881449,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 658744.7258003936,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 2528.085238960135,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "resonant order 4 (poles 0.95)",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 26.91641375768032,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 188.53432729835095,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 2879.978804399008,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 37925.27762064394,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 686787.019229453,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 9765597.67316538,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 202957791.8447615,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 9765597.67316538,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 2879.978804399008,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "butter(4, 0.2)",
+      "fault": "coefficients",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 29.778546293057698,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 249.09042150508768,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 3290.162035892838,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 23407.73603116524,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 594260.6251175842,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 10618344.678641932,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 337198019.44433725,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 23407.73603116524,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 3290.162035892838,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "butter(4, 0.2)",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 29.778546293057698,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 534.7407773326788,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 7528.419941927142,
+          "default": 0,
+          "calibrated": 1
+        },
+        {
+          "bits": 12,
+          "loss_eps": 131113.34527238677,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 1904370.8868099658,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 29440832.718183886,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 506602146.6095492,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 1904370.8868099658,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 131113.34527238677,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "cheby1(6, 1, 0.3)",
+      "fault": "coefficients",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 121.70842314688558,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 413.8481066356676,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 42696.07897877816,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 607119.6722347917,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 6056778.628426523,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 179947478.47963327,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 1313755888.21554,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 6056778.628426523,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 42696.07897877816,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "cheby1(6, 1, 0.3)",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 121.70842314688558,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 469.2863767008841,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 6691.959945212434,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 12,
+          "loss_eps": 112563.4875209885,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 1638865.4609394297,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 26438722.433583196,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 439802877.4058054,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 26438722.433583196,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 112563.4875209885,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "ellip(4, 0.5, 40, 0.25)",
+      "fault": "coefficients",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 17.97463525104025,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 233.40115574520746,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 2869.4361885618014,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 15844.34888576922,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 1152608.3741204117,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 18063528.81494334,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 339955367.0981264,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 1152608.3741204117,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 2869.4361885618014,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "ellip(4, 0.5, 40, 0.25)",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 17.97463525104025,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 208.9262816617083,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 2991.8948857567093,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 50203.035366211334,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 745873.9533244008,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 11634717.256342357,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 196062186.82683033,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 745873.9533244008,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 2991.8948857567093,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "butter(2, 0.01)",
+      "fault": "coefficients",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 131.64648692018474,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 511.0419646363264,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 1284.618733620345,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 12,
+          "loss_eps": 245139.16454862268,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 13982370.892097386,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 111812415.32599956,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 4913613561.181077,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 13982370.892097386,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 245139.16454862268,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "iir",
+      "setting": "butter(2, 0.01)",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 131.64648692018474,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 327.1042521875871,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 6921.723654969526,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 12,
+          "loss_eps": 172580.84269962827,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 16,
+          "loss_eps": 1695950.445729131,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 32952381.686073557,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 393190657.9633654,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 32952381.686073557,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 1695950.445729131,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "resampler",
+      "setting": "2/3",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 10.38589342424633,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 104.86530473287016,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 1708.9014323806123,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 26981.69845068469,
+          "default": 2,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 464959.242908468,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 6788143.8735943595,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 114514162.34180127,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 464959.242908468,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 1708.9014323806123,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "resampler",
+      "setting": "3/2",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 0.8935640573168228,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 9.104909524832726,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 126.94329145529431,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 2596.5714130140464,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 46565.99336894692,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 649122.8082979136,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 9656816.93742671,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 2596.5714130140464,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 126.94329145529431,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "resampler",
+      "setting": "5/4",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 0.8838907523755418,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 9.315865037551353,
+          "default": 0,
+          "calibrated": 1
+        },
+        {
+          "bits": 8,
+          "loss_eps": 180.04153188269828,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 2223.0256513113623,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 56866.746289239556,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 507125.99280309246,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 10570944.623385489,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 2223.0256513113623,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 180.04153188269828,
+      "calibrated_false_alarm_at_0": 0
+    },
+    {
+      "class": "resampler",
+      "setting": "1/4",
+      "fault": "arithmetic",
+      "rows": [
+        {
+          "bits": 0,
+          "loss_eps": 30.217853303050678,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 4,
+          "loss_eps": 392.71785086078734,
+          "default": 0,
+          "calibrated": 0
+        },
+        {
+          "bits": 8,
+          "loss_eps": 5457.64405034401,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 12,
+          "loss_eps": 92618.09933655255,
+          "default": 0,
+          "calibrated": 3
+        },
+        {
+          "bits": 16,
+          "loss_eps": 1382548.455659037,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 20,
+          "loss_eps": 21425146.18242647,
+          "default": 3,
+          "calibrated": 3
+        },
+        {
+          "bits": 24,
+          "loss_eps": 370232743.73628974,
+          "default": 3,
+          "calibrated": 3
+        }
+      ],
+      "default": 1382548.455659037,
+      "default_false_alarm_at_0": 0,
+      "calibrated": 5457.64405034401,
+      "calibrated_false_alarm_at_0": 0
+    }
+  ]
+}

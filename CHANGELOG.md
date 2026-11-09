@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- Precision mutants (`mutants/precision_mutants.py`, `benchmarks/precision_mutants.py`): operators
+  that keep every property but lose accuracy, graded from 0 to 24 dropped significand bits, and the
+  smallest loss the relations detect for each operator class (`docs/blind-spots.md`).
+- `benchmarks/precision_oracles.py` compares the relations with default, fixed (1e-7) and calibrated
+  tolerances, and a differential `assert_allclose`, on the same precision mutants.
+- `dp.calibrate(..., base=None)` keeps no analytic floor, so calibrating a trusted implementation
+  gives a tolerance tighter than the default model. The default is unchanged.
+- `benchmarks/calibrated_tolerance.py` checks other correct implementations against a tolerance
+  calibrated on a trusted one, and measures detection thresholds on five filters and four ratios.
+- CI: the macOS calibration job runs on `macos-15` (`macos-14` runners are no longer assigned).
+
 ## 0.1.3 (2026-11-04)
 
 Fixes found by the October 2026 reviews of the library and the article.

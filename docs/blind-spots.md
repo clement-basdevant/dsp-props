@@ -234,6 +234,169 @@ compare its worst ratio (`tol.worst`, `tol.summary()`) with a trusted library
 calibrated on the same lengths, or lower `max_plausible` to the accuracy you
 require, so that calibration refuses anything worse.
 
+### How large an accuracy loss the relations detect
+
+`python benchmarks/precision_mutants.py` measures it with precision mutants
+(`mutants/precision_mutants.py`): operators that compute the right thing with
+fewer significand bits in one place, from 0 to 24 bits dropped (1 to about
+1e7 ε). The loss is measured against an accurate reference, as the worst
+relative error over N = 1…512 in units of ε; detection is `dp.verify` with
+the default tolerance, 200 inputs per relation, 3 seeds
+(`benchmarks/precision_mutants.json`). A family is caught "from" a loss when
+that level and every larger one fail on all 3 seeds.
+
+| Class and fault | Not caught up to | Caught from | By |
+| --- | --- | --- | --- |
+| FFT, twiddle table rounded | 21 ε | 90 ε | circular shift, inversibility, Parseval, convolution |
+| IIR (order 4, poles at 0.95), coefficients rounded | 1.9e5 ε | 7.1e5 ε | transfer function |
+| IIR, input and output rounded | 6.9e5 ε | 3.0e6 ε | linearity |
+| 2/3 resampler, filter taps rounded | 6.2e7 ε (24 bits) | never | — |
+| 2/3 resampler, input and output rounded | 6.7e3 ε | 1.1e5 ε | linearity |
+| Streaming moving sum, state rounded between blocks | 750 ε | 7.1e3 ε | block invariance |
+
+Realistic precision faults in an FFT, same protocol:
+
+| FFT mutant | Loss | Caught (seeds) |
+| --- | --- | --- |
+| radix-2, twiddles by the recurrence w^k = w^(k−1) · w | 19 ε | 0/3 |
+| direct DFT with exp(−2iπkn/N), argument not reduced mod N | 805 ε | 3/3 |
+| one Goertzel recursion per bin | 1.4e4 ε | 3/3 |
+| radix-2, twiddle table in single precision | 2.5e8 ε | 3/3 |
+
+NumPy's FFT and the accurate versions of these mutants measure 2 to 3.5 ε and
+pass. Single-precision IIR coefficients (7e9 ε) are caught by the transfer
+function relation.
+
+What this says: for transforms, the relations tell an FFT a few tens of ε
+worse than NumPy from a correct one only from about 100 ε, the scale of the
+default tolerance. For the other classes the detectable loss is three to
+five orders of magnitude larger: the IIR bound is derived but grows with the
+order and the ℓ1 norms of the impulse responses (poles at 0.95 make it large),
+and filters without a dedicated model, resamplers and streaming processors use
+c = 1000. A fault confined to the coefficients of a filter whose response is
+not declared is never caught: the mutant is a different, equally valid,
+operator of the same class (the "wrong operator of the right class" blind
+spot above), whatever the loss.
+
+### The same faults against other oracles
+
+`python benchmarks/precision_oracles.py` runs the precision mutants against
+four oracles, same levels and seeds (`benchmarks/precision_oracles.json`):
+
+- **default**: the relations with the default tolerances (the table above);
+- **fixed 1e-7**: the same relations with a relative tolerance of 1e-7 on
+  the L2 error, the default `rtol` of `numpy.testing.assert_allclose`;
+- **calibrated**: the same relations with a tolerance calibrated on the
+  trusted implementation of the class (`numpy.fft.fft`, `lfilter`,
+  `resample_poly`, the moving sum) against a long double reference, without
+  analytic floor: `CalibratedTolerance(ratios, base=FFTTolerance(c=0))`;
+- **differential**: `numpy.testing.assert_allclose(mutant(x), trusted(x))`
+  with its defaults (elementwise, `rtol = 1e-7`, `atol = 0`) on the
+  calibration probe signals at 18 lengths. Unlike the three others, it needs
+  a trusted implementation to compare with.
+
+Smallest loss caught on all 3 seeds, with every larger level also caught:
+
+| Family | Default | Fixed 1e-7 | Calibrated | Differential |
+| --- | --- | --- | --- | --- |
+| FFT, twiddles rounded | 90 ε | never | 21 ε | 240 ε |
+| IIR, coefficients rounded | 7.1e5 ε | never | 1.7e3 ε | 7.1e5 ε |
+| IIR, input and output rounded | 3.0e6 ε | never | 2.9e3 ε | 190 ε |
+| Resampler, taps rounded | never | never | never | 1.5e7 ε |
+| Resampler, input and output rounded | 1.1e5 ε | never | 430 ε | 100 ε |
+| Streaming, state rounded | 7.1e3 ε | never | 28 ε | 750 ε |
+
+No oracle raised a false alarm on the correct implementations (level 0: the
+trusted implementations, and for the FFT a direct DFT with accurate twiddles,
+3.5 ε against 2.2 ε for NumPy), over 3 seeds. The calibrated ratios of the
+trusted implementations are 2.2 ε (FFT), 27 ε (IIR), 17 ε (resampler) and
+2.0 ε (moving sum).
+
+What this says:
+
+- A fixed relative tolerance of 1e-7 (4.5e8 ε) catches none of these faults,
+  up to 24 bits dropped.
+- With a tolerance calibrated on a trusted implementation, the relations catch
+  losses two to four orders of magnitude smaller than with the default models,
+  without a false alarm here: 21 ε for the FFT, 28 ε for the streaming
+  processor, 430 ε to 3e3 ε for the filters. The error model, not the
+  relations, sets what is detectable.
+- The differential `assert_allclose` is uneven: elementwise, it is strict on
+  the samples close to zero, so it catches some faults earlier than the
+  calibrated relations (IIR and resampler arithmetic) and others much later
+  (IIR coefficients), with results that depend on the probe signals (between
+  1 and 2 seeds out of 3 over a wide range of levels). It is the only oracle
+  that sees rounded resampler taps, because it compares with the very filter
+  the mutant was meant to implement.
+- By default `dp.calibrate` keeps the default model as a floor
+  (`base=FFTTolerance()`, 20 ε log2 N): it widens a tolerance where the
+  implementation measures worse and never tightens it. The calibrated column
+  uses `dp.calibrate(..., base=None)`, which keeps no analytic floor.
+- What the calibrated column assumes: a trusted implementation of the same
+  operator and an extended-precision reference to measure it, the same
+  ingredients as a differential test. Its advantage over `assert_allclose`
+  is a threshold that follows the size of the loss and does not depend on the
+  probe signals, not the absence of a reference.
+- The derived IIR model is pessimistic: on the five filters below it is 7 to
+  3000 times looser than a calibrated tolerance (first-order worst case,
+  growing with the ℓ1 norms of the impulse responses).
+
+### Does a calibrated tolerance hold for other implementations?
+
+`python benchmarks/calibrated_tolerance.py` calibrates, without analytic
+floor, a trusted implementation against long double, then checks other
+correct implementations of the same operator with that tolerance (200 inputs
+per relation, 3 seeds; `benchmarks/calibrated_tolerance.json`). Worst errors
+are measured against long double over N = 1…512 for the FFTs, over 100
+lengths up to 512 otherwise.
+
+| Trusted (calibrated on) | Other implementation | Its worst error | Seeds failing |
+| --- | --- | --- | --- |
+| `numpy.fft.fft` (2.2 ε) | `scipy.fft.fft` | 2.0 ε | 0/3 |
+| | radix-2, accurate twiddles | 4.8 ε | 0/3 |
+| | direct DFT, accurate twiddles | 4.5 ε | 0/3 |
+| | `torch.fft.fft` (CPU, torch 2.15) | 156 ε | 3/3 |
+| `lfilter`, five filters (27 to 275 ε) | `sosfilt(tf2sos(b, a))` | 47 to 631 ε | 0/3 each |
+| `resample_poly`, 2/3, 3/2, 5/4, 1/4 (1.2 to 57 ε) | direct polyphase convolution | 0.9 to 94 ε | 0/3 each |
+| moving sum (2.0 ε) | `np.convolve` with carried history | 1.5 ε | 0/3 |
+
+The filters are the resonant fourth-order filter of the mutants,
+`butter(4, 0.2)`, `cheby1(6, 1, 0.3)`, `ellip(4, 0.5, 40, 0.25)` and
+`butter(2, 0.01)`. `sosfilt` measures up to 2.7 times worse than `lfilter` on
+the same filter and still passes: the calibrated bound carries a margin of
+16 (8, times 2 for chained operations).
+
+The PyTorch FFT is the only one flagged. It is correct, but up to 156 ε where
+NumPy stays under 2.7 ε (N = 412; 82 ε against 1.1 ε at N = 354): a tolerance
+calibrated on NumPy is an accuracy requirement, and PyTorch does not meet it.
+Calibrate PyTorch on itself to test it for correctness rather than accuracy.
+
+A first version of the `np.convolve` moving sum used `mode="valid"`. It failed
+block invariance on every seed: NumPy swaps the arguments when the signal is
+shorter than the kernel, so an empty block returned two samples. That was a
+real bug, and the table shows the fixed version.
+
+Detection thresholds on the same filters and ratios (graded mutants, 0 to 24
+bits in steps of 4, smallest loss caught on every seed from there on; no false
+alarm at 0 bits):
+
+| Setting | Fault | Default | Calibrated |
+| --- | --- | --- | --- |
+| resonant order 4 | coefficients / arithmetic | 6.6e5 / 9.8e6 ε | 2.5e3 / 2.9e3 ε |
+| `butter(4, 0.2)` | coefficients / arithmetic | 2.3e4 / 1.9e6 ε | 3.3e3 / 1.3e5 ε |
+| `cheby1(6, 1, 0.3)` | coefficients / arithmetic | 6.1e6 / 2.6e7 ε | 4.3e4 / 1.1e5 ε |
+| `ellip(4, 0.5, 40, 0.25)` | coefficients / arithmetic | 1.2e6 / 7.5e5 ε | 2.9e3 / 3.0e3 ε |
+| `butter(2, 0.01)` | coefficients / arithmetic | 1.4e7 / 3.3e7 ε | 2.5e5 / 1.7e6 ε |
+| resampler 2/3 | arithmetic | 4.6e5 ε | 1.7e3 ε |
+| resampler 3/2 | arithmetic | 2.6e3 ε | 130 ε |
+| resampler 5/4 | arithmetic | 2.2e3 ε | 180 ε |
+| resampler 1/4 | arithmetic | 1.4e6 ε | 5.5e3 ε |
+
+Steps of 4 bits make these thresholds coarser (a factor 16) than the 2-bit
+steps of the previous tables. The gain of calibration varies from 7 to 3400
+with the filter: it is largest where the derived model is most pessimistic
+(poles close to the unit circle, high order).
+
 ## Hidden state
 
 Each relation call builds its inputs and calls the operator several times. An

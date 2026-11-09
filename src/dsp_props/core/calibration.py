@@ -124,12 +124,24 @@ class CalibrationError(AssertionError):
     """Raised by ``calibrate`` when the measured error is too large to be rounding."""
 
 
+_DEFAULT_BASE = object()
+
+
 def calibrate(op, reference=extended_dft, lengths=range(1, 257), trials=6, *,
-              margin=8.0, max_plausible=1e6, seed=0) -> CalibratedTolerance:
+              margin=8.0, max_plausible=1e6, seed=0, base=_DEFAULT_BASE) -> CalibratedTolerance:
     """Measure ``op`` against ``reference`` on random signals of each length.
 
     The default reference is ``extended_dft``; pass ``reference=doubledouble_dft``
     to force the platform-independent one.
+
+    ``base`` is the analytic model kept as a floor. By default it is the
+    default transform model (20 eps log2 N), so calibration only widens a
+    tolerance where the implementation measures worse. ``base=None`` keeps
+    no analytic floor (only the underflow floor of ``FFTTolerance(c=0)``):
+    the tolerance is then the measured error times ``margin`` and the
+    number of chained operations, which is how calibration tightens a
+    tolerance. Calibrate a trusted implementation with ``base=None`` and
+    declare the operator under test with the result.
 
     Raises ``CalibrationError`` when the error is too large to be rounding
     (``max_plausible`` eps): calibrating a wrong operator would hide its bug.
@@ -146,7 +158,11 @@ def calibrate(op, reference=extended_dft, lengths=range(1, 257), trials=6, *,
                 "beyond any plausible rounding error"
             )
         ratios[n] = worst
-    return CalibratedTolerance(ratios=ratios, margin=margin)
+    if base is _DEFAULT_BASE:
+        base = FFTTolerance()
+    elif base is None:
+        base = FFTTolerance(c=0.0)
+    return CalibratedTolerance(ratios=ratios, margin=margin, base=base)
 
 
 def _probe_signals(n, trials, rng):

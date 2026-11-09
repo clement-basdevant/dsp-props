@@ -3,6 +3,7 @@ import pytest
 
 import dsp_props as dp
 from dsp_props.core import CalibratedTolerance, CalibrationError, longdouble_dft, norm, relative_error
+from dsp_props.core.tolerance import FFTTolerance
 
 
 def test_numpy_fft_is_within_a_few_eps():
@@ -39,6 +40,26 @@ def test_calibrated_tolerance_still_catches_mutants():
         m.__wrapped__ if hasattr(m, "__wrapped__") else m.__dsp_props__.func
     )
     assert not dp.verify(spec, max_examples=100, raise_on_failure=False).ok
+
+
+def test_calibration_keeps_the_default_floor_unless_asked():
+    tol = dp.calibrate(np.fft.fft, lengths=range(1, 33), trials=2)
+    assert tol.bound(512, np.float64, 1.0) >= FFTTolerance().bound(512, np.float64, 1.0)
+    tight = dp.calibrate(np.fft.fft, lengths=range(1, 33), trials=2, base=None)
+    assert tight.bound(512, np.float64, 1.0) < FFTTolerance().bound(512, np.float64, 1.0)
+    assert tight.ratios == tol.ratios
+
+
+def test_tight_calibration_catches_an_fft_the_default_tolerance_lets_through():
+    """Twiddles by recurrence (about 20 eps) pass the default model, not a tolerance calibrated on NumPy."""
+    from mutants.precision_mutants import declare_fft, radix2_recursive_twiddles
+
+    lengths = range(1, 513)
+    tight = dp.calibrate(np.fft.fft, lengths=lengths, trials=2, base=None)
+    assert dp.verify(declare_fft(radix2_recursive_twiddles), max_examples=50, seed=0, raise_on_failure=False).ok
+    assert not dp.verify(declare_fft(radix2_recursive_twiddles, tight), max_examples=50, seed=0,
+                         raise_on_failure=False).ok
+    assert dp.verify(declare_fft(np.fft.fft, tight), max_examples=50, seed=0, raise_on_failure=False).ok
 
 
 # --------------------------------------------------------------- reference without extended long double
