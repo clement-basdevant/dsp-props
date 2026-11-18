@@ -71,6 +71,7 @@ class Failure:
     error: BaseException
     example: Any = None  # the shrunk input, as passed to the relation's check
     examples_tried: int | None = None  # inputs generated before the first failure
+    has_example: bool = False  # whether ``example`` was recorded (some relations take ``None``)
 
     def __str__(self):
         return f"{self.relation}: {self.error}"

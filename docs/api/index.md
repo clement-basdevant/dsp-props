@@ -9,5 +9,6 @@ Generated from the docstrings of the source code.
 | [`dsp_props.generators`](generators.md) | Hypothesis strategies for signals, lengths and block splits. |
 | [`dsp_props.relations`](relations.md) | One class per metamorphic relation. |
 | [`dsp_props.report`](report.md) | `Report`, `Failure`, `PropertyViolation` and the HTML renderer. |
+| [`dsp_props.regression`](regression.md) | Regression tests written from minimal counterexamples: `write_regression_tests`, `replay`, `to_source`. |
 | [`dsp_props.adapters`](adapters.md) | Loading C functions through `ctypes`. |
 | [`dsp_props.cli`](cli.md) | The `dsp-props check` command. |

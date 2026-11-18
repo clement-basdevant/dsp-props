@@ -31,6 +31,10 @@ Options (command line, or ``ini`` keys without the leading dashes and with ``_``
   first on the next run (default ``.hypothesis/examples`` in the root
   directory, Hypothesis's own; ``none`` disables it). Keep this directory
   between CI runs (a cache) to replay past counterexamples;
+- ``--dsp-props-regressions [DIR]``: on failure, write a plain regression test
+  replaying the minimal counterexample without Hypothesis
+  (``test_regression_<operator>.py``), next to the test module, or in ``DIR``
+  (relative to the root directory). Off by default;
 - ``-p no:dsp_props`` disables the plugin.
 """
 
@@ -52,9 +56,15 @@ def pytest_addoption(parser):
                     help="draw the same inputs on every run")
     group.addoption("--dsp-props-database", default=None, metavar="DIR",
                     help="example database (default .hypothesis/examples; 'none' disables it)")
+    group.addoption("--dsp-props-regressions", nargs="?", const="same", default=None, metavar="DIR",
+                    help="on failure, write test_regression_<operator>.py replaying the minimal "
+                         "counterexample, next to the test module or in DIR")
     parser.addini("dsp_props_profile", "dsp-props cost profile (fast, default, nightly)", default="")
     parser.addini("dsp_props_derandomize", "draw the same inputs on every run", type="bool", default=False)
     parser.addini("dsp_props_database", "dsp-props example database directory, or 'none'", default="")
+    parser.addini("dsp_props_regressions",
+                  "write regression tests on failure: 'same' (next to the test module) or a directory",
+                  default="")
 
 
 def _declared(obj):
@@ -121,9 +131,10 @@ def _location(operator, default_path, name):
 class RelationFailure(AssertionError):
     """A violated relation, with the ``Failure`` that ``dp.verify`` recorded."""
 
-    def __init__(self, failure):
+    def __init__(self, failure, regression=None):
         super().__init__(str(failure))
         self.failure = failure
+        self.regression = regression
 
 
 class RelationItem(pytest.Item):
@@ -164,7 +175,27 @@ class RelationItem(pytest.Item):
         report = verify(self.operator, relations=[self.relation], raise_on_failure=False,
                         profile=profile, derandomize=derandomize, database=database)
         if report.failures:
-            raise RelationFailure(report.failures[0])
+            raise RelationFailure(report.failures[0], self._write_regression(report))
+
+    def _write_regression(self, report):
+        config = self.config
+        where = config.getoption("dsp_props_regressions") or config.getini("dsp_props_regressions") or ""
+        if not where or where.lower() == "none":
+            return None
+        from .regression import write_regression_tests
+
+        module = self.collector.parent.module if isinstance(self.collector.parent, pytest.Module) else None
+        if where == "same":
+            directory = self.collector.path.parent
+        else:
+            directory = Path(where)
+            if not directory.is_absolute():
+                directory = Path(config.rootpath) / directory
+        try:
+            return write_regression_tests(self.operator, report, directory,
+                                          modules=[module] if module is not None else [])
+        except (ValueError, OSError) as exc:
+            return exc
 
     def repr_failure(self, excinfo, style=None):
         if not isinstance(excinfo.value, RelationFailure):
@@ -183,6 +214,19 @@ class RelationItem(pytest.Item):
             lines.append(f"  first failure after {f.examples_tried} generated input(s)")
         if not isinstance(f.error, AssertionError):
             lines.append(f"  raised {type(f.error).__name__}: {f.error}")
+        written = excinfo.value.regression
+        if isinstance(written, Exception):
+            lines.append(f"  no regression test written: {written}")
+        elif written is not None:
+            path = written.path
+            if path is not None and path.resolve().is_relative_to(Path(self.config.rootpath).resolve()):
+                path = path.resolve().relative_to(Path(self.config.rootpath).resolve())
+            if written.added:
+                lines.append(f"  regression test written: {path}::{written.added[0]}")
+            elif path is not None:
+                lines.append(f"  regression test already in {path}")
+            for _, why in written.skipped:
+                lines.append(f"  no regression test written: {why}")
         return "\n".join(lines)
 
     def reportinfo(self):

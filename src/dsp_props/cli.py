@@ -5,6 +5,7 @@
     dsp-props check mypkg.filters:my_fft      # one operator
     dsp-props check mypkg --json report.json --examples 500
     dsp-props check mypkg --profile fast      # 30 inputs per relation
+    dsp-props check mypkg --regressions tests # write tests replaying each counterexample
 
 Exit status: 0 if every operator passes, 1 if any relation fails, 2 on usage errors.
 """
@@ -66,6 +67,20 @@ def discover(target):
     return found
 
 
+def _write_regressions(op, report, directory):
+    from .regression import write_regression_tests
+
+    try:
+        written = write_regression_tests(op, report, directory)
+    except (ValueError, OSError) as exc:
+        print(f"    no regression test written: {exc}")
+        return
+    for name in written.added:
+        print(f"    regression test written: {written.path}::{name}")
+    for relation, why in written.skipped:
+        print(f"    no regression test for {relation}: {why}")
+
+
 def _check(args):
     sys.path.insert(0, ".")
     targets = []
@@ -90,6 +105,8 @@ def _check(args):
         print(f"{'ok  ' if report.ok else 'FAIL'} {name}  ({len(report.checked)} relations, {dt:.1f}s)")
         if not report.ok or args.verbose:
             print("\n".join("    " + line for line in str(report).splitlines()[1:]))
+        if not report.ok and args.regressions:
+            _write_regressions(op, report, args.regressions)
 
     print(f"\n{len(targets) - failed}/{len(targets)} operators pass")
     if args.json:
@@ -121,6 +138,9 @@ def main(argv=None):
                             "default from DSP_PROPS_PROFILE")
     check.add_argument("--database", metavar="DIR",
                        help="Hypothesis example database: save failing inputs there, replay them first")
+    check.add_argument("--regressions", metavar="DIR",
+                       help="write test_regression_<operator>.py files replaying each minimal "
+                            "counterexample (plain pytest, no Hypothesis) into DIR")
     check.add_argument("--derandomize", action="store_true", help="reproducible inputs (for CI)")
     check.add_argument("--json", help="write the full report as JSON")
     check.add_argument("--markdown", help="write the report as Markdown")
