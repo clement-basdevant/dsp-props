@@ -2,6 +2,8 @@
 
 Le schéma directeur complet (état de l'art, catalogue de propriétés, feuille de route, pistes de publication) est maintenu dans le document de projet : https://claude.ai/code/artifact/a8c9b15e-7a21-480b-9455-3732a46f1e03
 
+Critique et feuille de route au 17/11/2026 : [critique-2026-11.md](critique-2026-11.md).
+
 ## Résumé
 
 - **Objectif** : une couche DSP au-dessus d'Hypothesis : relations métamorphiques, générateurs de signaux, tolérances par opérateur.
