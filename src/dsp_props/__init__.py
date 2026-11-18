@@ -21,7 +21,7 @@ from .api import (
 )
 from .core import calibrate
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 __all__ = [
     "core",

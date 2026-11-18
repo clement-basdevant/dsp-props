@@ -200,8 +200,7 @@ with `max_n = 512`, 29 % of the splits drawn have more than 8 blocks and the
 median is 3 blocks. A processor that fails only on a specific irregular
 pattern of many blocks (say, an empty block right after its tenth call) can
 escape, since such a pattern is neither regular nor likely among arbitrary
-cuts. `benchmarks/campaign.py` keeps its own copy of the generator, still
-capped at 9 blocks.
+cuts. `benchmarks/campaign.py` uses the same generator.
 
 **Why.** The number of splits of N samples grows exponentially; arbitrary cuts
 come first so that counterexamples shrink towards few blocks.

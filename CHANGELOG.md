@@ -1,7 +1,18 @@
 # Changelog
 
-## Unreleased
+## 0.1.4 (2026-11-18)
 
+- pytest plugin (entry point `pytest11`): an operator declared in a test module becomes one test
+  per relation (`test_x.py::my_fft::parseval`), with the minimal counterexample in the report
+  (`docs/pytest.md`). `-p no:dsp_props` disables it.
+- `dp.verify(relations=..., database=...)`: failing inputs are saved in Hypothesis's example
+  database and replayed first.
+- Cost profiles `fast` (30 inputs), `default` (200) and `nightly` (2000), chosen with `profile=`,
+  `dp.set_profile`, `DSP_PROPS_PROFILE`, `dsp-props check --profile` or `--dsp-props-profile`.
+- `benchmarks/make_results.py` generates `benchmarks/results.md` and `results.tex` from the
+  benchmark results; the numbers quoted in the README, `CLAUDE.md` and the docs are checked
+  against them in CI.
+- CI: lint job (ruff, mypy on `src/`), coverage, internal suite on the `fast` profile, nightly run.
 - Precision mutants (`mutants/precision_mutants.py`, `benchmarks/precision_mutants.py`): operators
   that keep every property but lose accuracy, graded from 0 to 24 dropped significand bits, and the
   smallest loss the relations detect for each operator class (`docs/blind-spots.md`).
@@ -12,6 +23,9 @@
 - `benchmarks/calibrated_tolerance.py` checks other correct implementations against a tolerance
   calibrated on a trusted one, and measures detection thresholds on five filters and four ratios.
 - CI: the macOS calibration job runs on `macos-15` (`macos-14` runners are no longer assigned).
+- `benchmarks/campaign.py` uses the library's `block_splits` (arbitrary cuts up to max(N, 16)
+  blocks, one-sample blocks, fixed-size blocks) instead of its own copy limited to nine blocks.
+- `benchmarks/validation.json`: false-positive runs redone on the current code.
 
 ## 0.1.3 (2026-11-04)
 
