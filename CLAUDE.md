@@ -74,6 +74,11 @@ alors la calibration au lieu du modèle par défaut (une tolérance déclarée l
 `--compare` : régression de précision entre deux versions (erreur > 2 × l'enregistrée, mêmes
 signaux sondes). Doc : `docs/tolerances.md`.
 
+Doc orientée tâche (action 2.5) : `docs/quickstart.md` (« tester votre filtre en 5 minutes », une
+recette par tâche) et `docs/gallery.md` (bugs réels : bloc vide `lfilter`/`sosfilt`, `gust` avec
+zéros en fin et pôles proches de zéro, précision de la FFT PyTorch), scripts dans
+`examples/gallery/` inclus par `pymdownx.snippets` et vérifiés par `tests/test_gallery.py`.
+
 ## Commandes
 
 ```bash

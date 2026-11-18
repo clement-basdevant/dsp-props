@@ -8,7 +8,7 @@ DSP code is usually tested by comparing its output with a reference (MATLAB, Sci
 
 > Status: alpha. The six phases of the [development plan](https://github.com/clement-basdevant/dsp-props/blob/main/docs/schema-directeur.md) (in French) are complete; version 0.1.4 on PyPI.
 
-**Documentation:** [dsp-props.readthedocs.io](https://dsp-props.readthedocs.io/) (tutorial, tolerance models, known blind spots, API reference).
+**Documentation:** [dsp-props.readthedocs.io](https://dsp-props.readthedocs.io/) (a 5-minute quickstart, tutorial, tolerance models, known blind spots, a gallery of real bugs, API reference).
 
 ## Example
 

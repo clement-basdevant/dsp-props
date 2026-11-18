@@ -43,6 +43,9 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight
   - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
 
 extra_javascript:
   - javascripts/mathjax.js
@@ -66,11 +69,13 @@ plugins:
 
 nav:
   - Home: index.md
+  - Test your filter in 5 minutes: quickstart.md
   - Tutorial: tutorial.md
   - Running with pytest: pytest.md
   - Relations catalogue: relations.md
   - Choosing a tolerance: tolerances.md
   - What the relations don't see: blind-spots.md
+  - "Gallery: bugs in real libraries": gallery.md
   - API reference:
       - Overview: api/index.md
       - dsp_props: api/dsp_props.md
