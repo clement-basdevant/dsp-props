@@ -6,7 +6,7 @@ import numpy as np
 from hypothesis import strategies as st
 
 from ..core.tolerance import ToleranceError, assert_close, check_precision, norm
-from ..generators import complex_signals, lengths, signals, signal_pairs
+from ..generators import complex_signals, lengths, signal_pairs, signals
 from .base import Relation
 
 COEFFS = [1.0, -1.0, 2.0, 0.5, 1j, -0.75 + 0.25j, 3.0 - 2.0j]

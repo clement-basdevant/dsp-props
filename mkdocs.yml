@@ -67,6 +67,7 @@ plugins:
 nav:
   - Home: index.md
   - Tutorial: tutorial.md
+  - Running with pytest: pytest.md
   - Relations catalogue: relations.md
   - Choosing a tolerance: tolerances.md
   - What the relations don't see: blind-spots.md
@@ -79,3 +80,4 @@ nav:
       - dsp_props.report: api/report.md
       - dsp_props.adapters: api/adapters.md
       - dsp_props.cli: api/cli.md
+      - dsp_props.pytest_plugin: api/pytest_plugin.md

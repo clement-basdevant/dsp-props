@@ -1,21 +1,25 @@
 """dsp-props: property-based testing for digital signal processing code."""
 
 from . import core, generators, relations
-from .core import calibrate
 from .api import (
-    PropertyViolation,
-    Report,
+    PROFILES,
     LTISpec,
     MultirateSpec,
-    resampler,
+    Profile,
+    PropertyViolation,
+    Report,
     StreamingSpec,
-    lti_filter,
     TransformSpec,
+    get_profile,
+    lti_filter,
+    resampler,
+    set_profile,
     stateful,
     streaming,
     transform,
     verify,
 )
+from .core import calibrate
 
 __version__ = "0.1.3"
 
@@ -33,6 +37,10 @@ __all__ = [
     "stateful",
     "StreamingSpec",
     "verify",
+    "Profile",
+    "PROFILES",
+    "get_profile",
+    "set_profile",
     "Report",
     "TransformSpec",
     "PropertyViolation",

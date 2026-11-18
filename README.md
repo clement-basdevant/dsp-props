@@ -67,6 +67,10 @@ class MyFilter:
 dp.stateful(lambda block, z: scipy.signal.lfilter(b, a, block, zi=z), init_state=np.zeros(2))
 ```
 
+## pytest
+
+Installing dsp-props adds a pytest plugin: a declared operator in a test module becomes one test per relation (`test_filters.py::my_fft::parseval`), with its minimal counterexample in the pytest report. Cost profiles set the search depth (`--dsp-props-profile fast`, 30 inputs per relation, for every commit; `nightly`, 2000, for scheduled runs), and failing inputs are saved in Hypothesis's example database and replayed first on the next run. See [Running with pytest](https://dsp-props.readthedocs.io/en/latest/pytest/).
+
 ## Command line
 
 `dsp-props check` finds every operator declared in a module or file and verifies it:
@@ -84,7 +88,7 @@ ok   examples/filters.py:resample_2_3  (5 relations, 2.8s)
 3/4 operators pass
 ```
 
-Targets: `package.module`, `file.py`, `module:operator`. Options: `--json`, `--markdown`, `--html`, `--examples N`, `--derandomize` (reproducible inputs in CI). The exit code is 1 if a relation fails, which is enough to block a CI run.
+Targets: `package.module`, `file.py`, `module:operator`. Options: `--json`, `--markdown`, `--html`, `--examples N`, `--profile fast|default|nightly`, `--database DIR` (replay saved counterexamples), `--derandomize` (reproducible inputs in CI). The exit code is 1 if a relation fails, which is enough to block a CI run.
 
 ## C code
 
@@ -102,7 +106,7 @@ dp.verify(dp.streaming()(c_block_processor(lib, "biquad", state_size=2)))
 
 ## Calibrated tolerances
 
-A fixed ε · log N bound does not describe every library: over N = 2…1200, the PyTorch FFT (MKL) reaches 195 ε against 4 ε for NumPy, depending on the factorisation of N. The default constants are wide on purpose, so an FFT a few tens of ε less accurate than NumPy still passes them (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md)). `dp.calibrate` is the recommended path for a tight tolerance: it measures the actual error against an extended-precision reference (long double where it is extended, a double-double DFT elsewhere) and derives the tolerance from it:
+A fixed ε · log N bound does not describe every library: over N = 2…<!-- r:profile.n_max -->1200<!-- /r -->, the PyTorch FFT (MKL) reaches <!-- r:profile.torch.worst -->195 ε<!-- /r --> against <!-- r:profile.numpy.worst -->4.1 ε<!-- /r --> for NumPy, depending on the factorisation of N. The default constants are wide on purpose, so an FFT a few tens of ε less accurate than NumPy still passes them (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md)). `dp.calibrate` is the recommended path for a tight tolerance: it measures the actual error against an extended-precision reference (long double where it is extended, a double-double DFT elsewhere) and derives the tolerance from it:
 
 ```python
 tol = dp.calibrate(torch_fft, lengths=range(1, 513))   # refuses a wrong operator
@@ -117,7 +121,7 @@ tight = dp.calibrate(np.fft.fft, lengths=range(1, 513), base=None)
 dp.transform(inverse=np.fft.ifft, parseval=True, tolerance=tight)(my_fft)
 ```
 
-On the precision mutants, this catches an FFT from 21 ε of error instead of 90 ε, and filters and resamplers 7 to 3400 times earlier than the default models, with no false alarm on twelve other correct implementations (`benchmarks/calibrated_tolerance.py`). It is an accuracy requirement: the PyTorch FFT, correct but up to 156 ε where NumPy stays under 2.7 ε, does not meet one calibrated on NumPy.
+On the precision mutants, this catches an FFT from <!-- r:oracles.fft_twiddles.calibrated -->21 ε<!-- /r --> of error instead of <!-- r:precision.fft_twiddles.default -->90 ε<!-- /r -->, and filters and resamplers <!-- r:calibrated.gain_min -->7<!-- /r --> to <!-- r:calibrated.gain_max -->3400<!-- /r --> times earlier than the default models, with no false alarm on <!-- r:calibrated.correct_without_alarm -->13<!-- /r --> other correct implementations (`benchmarks/calibrated_tolerance.py`). It is an accuracy requirement: the PyTorch FFT, correct but up to <!-- r:calibrated.torch_fft -->156 ε<!-- /r --> where NumPy stays under <!-- r:calibrated.numpy_fft -->2.7 ε<!-- /r -->, does not meet one calibrated on NumPy.
 
 `python benchmarks/error_profile.py` produces the full error profile (`benchmarks/error_profile.csv`), and `python benchmarks/plot_error_profile.py` the figure below.
 
@@ -125,7 +129,7 @@ On the precision mutants, this catches an FFT from 21 ε of error instead of 90 
 
 ## Validating the tool: the mutant suite
 
-`mutants/` contains 31 deliberately buggy implementations, in six families. They were written by hand, by the author of the relations and in their vocabulary (each mutant breaks a structural property a relation states), so the mutation score measures that the relations catch the faults they were designed for, not their power on independent faults:
+`mutants/` contains <!-- r:mutants.total -->31<!-- /r --> deliberately buggy implementations, in six families. They were written by hand, by the author of the relations and in their vocabulary (each mutant breaks a structural property a relation states), so the mutation score measures that the relations catch the faults they were designed for, not their power on independent faults:
 
 | Family | Mutants |
 | --- | --- |
@@ -142,9 +146,9 @@ python mutants/run_mutants.py
 Mutation score: 31/31 (100%)
 ```
 
-These mutants break properties. Precision mutants, which keep every property and lose accuracy (rounded twiddles, coefficients, arithmetic or state), are measured separately by `python benchmarks/precision_mutants.py`: with the default tolerances, an FFT is caught from about 90 ε of error, a streaming processor from about 7e3 ε, an IIR filter or a resampler from 1e5 to 3e6 ε, and a fault confined to undeclared filter coefficients is never caught (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md#how-large-an-accuracy-loss-the-relations-detect)). `python benchmarks/precision_oracles.py` compares with other oracles: a fixed relative tolerance of 1e-7 catches none of these faults, and a tolerance calibrated on a trusted implementation (`dp.calibrate(..., base=None)`) lowers the thresholds to 21 ε (FFT), 28 ε (streaming) and 430 to 3e3 ε (filters).
+These mutants break properties. Precision mutants, which keep every property and lose accuracy (rounded twiddles, coefficients, arithmetic or state), are measured separately by `python benchmarks/precision_mutants.py`: with the default tolerances, an FFT is caught from about <!-- r:precision.fft_twiddles.default -->90 ε<!-- /r --> of error, a streaming processor from about <!-- r:precision.streaming_state.default -->7.1e3 ε<!-- /r -->, a resampler from <!-- r:precision.resampler_arithmetic.default -->1.1e5 ε<!-- /r --> and an IIR filter from <!-- r:precision.iir_coefficients.default -->7.1e5 ε<!-- /r --> to <!-- r:precision.iir_arithmetic.default -->3.0e6 ε<!-- /r -->, and a fault confined to undeclared filter coefficients is never caught (see [the blind spots](https://github.com/clement-basdevant/dsp-props/blob/main/docs/blind-spots.md#how-large-an-accuracy-loss-the-relations-detect)). `python benchmarks/precision_oracles.py` compares with other oracles: a fixed relative tolerance of 1e-7 catches none of these faults, and a tolerance calibrated on a trusted implementation (`dp.calibrate(..., base=None)`) lowers the thresholds to <!-- r:oracles.fft_twiddles.calibrated -->21 ε<!-- /r --> (FFT), <!-- r:oracles.streaming_state.calibrated -->28 ε<!-- /r --> (streaming), <!-- r:oracles.resampler_arithmetic.calibrated -->430 ε<!-- /r --> (resampler) and <!-- r:oracles.iir_coefficients.calibrated -->1.7e3 ε<!-- /r --> to <!-- r:oracles.iir_arithmetic.calibrated -->2.9e3 ε<!-- /r --> (IIR filter).
 
-Counterexamples are tiny. In a run with every `dp.verify` seeded with 0, for 26 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response) the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 28 of 31 mutants fail within the first 3 generated inputs. The exceptions are expected: 15 samples for `filtfilt` declared causal, which falls back to `lfilter` on short inputs, 34 for a filter that changes after 64 samples (the time-invariance relation delays the input), and 192 for the DC-gain and aliasing relations, which need long signals. `mutants/run_mutants.py` fixes no seed, so these counts vary between runs (the run recorded in `benchmarks/mutant_results.json` gave 26 and 26); `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records a run.
+Counterexamples are tiny. In a run with every `dp.verify` seeded with 0, for 26 of 30 mutants (excluding `iir_wrong_gain`, detected on the impulse response) the signal shrunk by Hypothesis has at most 3 samples (median: 2), and 28 of 31 mutants fail within the first 3 generated inputs. The exceptions are expected: 15 samples for `filtfilt` declared causal, which falls back to `lfilter` on short inputs, 34 for a filter that changes after 64 samples (the time-invariance relation delays the input), and 192 for the DC-gain and aliasing relations, which need long signals. `mutants/run_mutants.py` fixes no seed, so these counts vary between runs (the run recorded in `benchmarks/mutant_results.json` gave <!-- r:mutants.small_counterexamples -->26<!-- /r --> and <!-- r:mutants.fail_within_3 -->26<!-- /r -->); `python mutants/run_mutants.py --json benchmarks/mutant_results.json` records a run.
 
 Every report gives the smallest input found and can be exported:
 
@@ -202,12 +206,17 @@ python -m pytest
 
 ## Roadmap
 
-1. **Foundations**: generators, basic relations, tests on `numpy.fft` *(done)*
-2. **Tolerance engine**: error models per operator class, calibration against extended precision *(done)*
-3. **Advanced relations**: causality, bounded gain, block streaming, multirate *(done)*
-4. **Mutant suite**: 31 hand-written mutants in six families, campaign on 46 real targets *(done; to be extended)*
-5. **Shrinking and reporting**: small counterexamples, HTML report *(done)*
-6. **Auto-discovery and C adapter** *(done: `dsp-props check`, `dsp_props.adapters`)*
+The six phases of the [development plan](https://github.com/clement-basdevant/dsp-props/blob/main/docs/schema-directeur.md) (foundations, tolerance engine, advanced relations, mutant suite, shrinking and reporting, auto-discovery and C adapter) are done. Next:
+
+1. **Regression tests generated from counterexamples**, replayed without Hypothesis.
+2. **Calibration by default**, with a versioned tolerance profile and a mode that compares the accuracy of two versions of a library.
+3. **Single against double precision** and subnormal inputs, which close the blind spot of rounded resampler coefficients.
+4. **Generated parameters**: filter orders from 0 up, poles close to the unit circle, rates L/M with L = M = 1.
+5. **External evidence**: a corpus of historical bugs in `numpy.fft`, `scipy.signal`, librosa and torchaudio, and automatic mutation of real DSP code.
+
+## Measured numbers
+
+The numbers this README and the documentation quote come from the result files of the benchmark scripts (`benchmarks/*.json`, `benchmarks/error_profile.csv`). `python benchmarks/make_results.py` turns them into [`benchmarks/results.md`](benchmarks/results.md) and `benchmarks/results.tex`, and rewrites every quoted number; CI runs it with `--check` and fails if a number copied into the text no longer matches its source.
 
 ## Citation
 

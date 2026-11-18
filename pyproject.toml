@@ -35,10 +35,13 @@ Issues = "https://github.com/clement-basdevant/dsp-props/issues"
 [project.scripts]
 dsp-props = "dsp_props.cli:main"
 
+[project.entry-points.pytest11]
+dsp_props = "dsp_props.pytest_plugin"
+
 [project.optional-dependencies]
 # transfer-function checks, IIR error model and the examples use scipy.signal
 scipy = ["scipy>=1.11"]
-dev = ["pytest>=7", "scipy>=1.11", "build", "twine"]
+dev = ["pytest>=7", "coverage>=7", "scipy>=1.11", "build", "twine", "ruff>=0.6", "mypy>=1.10"]
 # documentation site (mkdocs build --strict); MkDocs 2 drops the plugin system
 docs = ["mkdocs>=1.6,<2", "mkdocs-material>=9.5", "mkdocstrings[python]>=0.26"]
 
@@ -54,3 +57,34 @@ packages = ["src/dsp_props"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+extend-exclude = ["proofs", "paper", "papers"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "W", "I", "UP", "B"]
+# B023: lambdas built in loops bind their loop variable through default arguments where it matters
+ignore = ["B023", "B905", "E741"]  # E741: l, I, O are usual names in DSP formulas; B905: zip(strict=) where lengths match by construction
+
+[tool.ruff.lint.per-file-ignores]
+"benchmarks/**" = ["E402"]  # scripts put the repository on sys.path before importing it
+"mutants/**" = ["E402"]
+"benchmarks/campaign.py" = ["E731"]
+
+[tool.mypy]
+python_version = "3.12"  # numpy 2.5 stubs use the 3.12 type statement; the code targets 3.10 (ruff UP rules)
+files = ["src/dsp_props"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
+
+[tool.coverage.run]
+# run as `coverage run -m pytest`: the pytest plugin imports dsp_props before pytest-cov starts
+source = ["dsp_props"]
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true

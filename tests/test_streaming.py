@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 import dsp_props as dp
 
@@ -42,11 +43,13 @@ def test_correct_block_processor_passes():
     assert dp.verify(dp.streaming()(MovingSum), max_examples=100).ok
 
 
+@pytest.mark.full_examples
 def test_state_reset_mutant_is_detected():
     report = dp.verify(dp.streaming()(ForgetfulMovingSum), max_examples=100, raise_on_failure=False)
     assert not report.ok
 
 
+@pytest.mark.full_examples
 def test_state_lost_after_many_blocks_is_detected():
     report = dp.verify(dp.streaming()(ForgetsAtTenthCall), max_examples=100, raise_on_failure=False)
     assert not report.ok

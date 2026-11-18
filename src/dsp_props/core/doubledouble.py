@@ -92,9 +92,11 @@ def _sin_cos(ph, pl):
     ch, cl = np.ones_like(ph), np.zeros_like(ph)
     for k in range(_TAYLOR_TERMS, 0, -1):
         # sin: 1 - x^2 t / ((2k)(2k+1)); cos: 1 - x^2 t / ((2k-1)(2k))
-        th, tl = _div_d(*_mul(x2h, x2l, sh, sl), float(2 * k * (2 * k + 1)))
+        mh, ml = _mul(x2h, x2l, sh, sl)
+        th, tl = _div_d(mh, ml, float(2 * k * (2 * k + 1)))
         sh, sl = _one_minus(th, tl)
-        th, tl = _div_d(*_mul(x2h, x2l, ch, cl), float((2 * k - 1) * 2 * k))
+        mh, ml = _mul(x2h, x2l, ch, cl)
+        th, tl = _div_d(mh, ml, float((2 * k - 1) * 2 * k))
         ch, cl = _one_minus(th, tl)
     sh, sl = _mul(ph, pl, sh, sl)
     return (sh, sl), (ch, cl)

@@ -37,14 +37,15 @@ import scipy.signal as ss
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT), str(ROOT / "benchmarks")]
 
+from comparison.approaches import FixedTolerance  # noqa: E402
+from precision_mutants import LENGTHS, REFERENCES, _callable, _run_stream, measured_loss  # noqa: E402
+
 import dsp_props as dp  # noqa: E402
 from dsp_props.core.calibration import CalibratedTolerance, _probe_signals, calibrate  # noqa: E402
 from dsp_props.core.iir import longdouble_lfilter  # noqa: E402
 from dsp_props.core.tolerance import FFTTolerance  # noqa: E402
-from comparison.approaches import FixedTolerance  # noqa: E402
 from mutants import precision_mutants as pm  # noqa: E402
 from mutants.streaming_mutants import MovingSum  # noqa: E402
-from precision_mutants import LENGTHS, REFERENCES, _callable, _run_stream, measured_loss  # noqa: E402
 
 ORACLES = ["default", "fixed", "calibrated", "differential"]
 
@@ -154,7 +155,7 @@ def main():
         cells = []
         for o in ORACLES:
             v = s[o]["caught_from_loss_eps"]
-            cells.append(f"{('%.2g' % v) if v is not None else 'never':>15} [{s[o]['false_alarm_at_0_bits']}]")
+            cells.append(f"{f'{v:.2g}' if v is not None else 'never':>15} [{s[o]['false_alarm_at_0_bits']}]")
         print(f"  {family:<22}" + "".join(f"{c:>20}" for c in cells))
     if args.json:
         pathlib.Path(args.json).write_text(json.dumps(out, indent=2, default=float))

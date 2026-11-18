@@ -20,6 +20,7 @@ def bounded_amplitudes(monkeypatch):
     monkeypatch.setattr(signals_module, "AMPLITUDES", BOUNDED)
 
 
+@pytest.mark.full_examples
 def test_fft_that_silently_returns_complex64_is_caught(bounded_amplitudes):
     # No Parseval relation: the other relations used to compare complex64
     # outputs with a single-precision tolerance and passed.
@@ -33,6 +34,7 @@ def test_fft_that_silently_returns_complex64_is_caught(bounded_amplitudes):
         assert "complex64" in str(failure.error) and "float64" in str(failure.error)
 
 
+@pytest.mark.full_examples
 def test_filter_that_silently_returns_float32_is_caught(bounded_amplitudes):
     b, a = ss.butter(2, 0.2)
 
@@ -60,6 +62,7 @@ class _FIRToFloat32:
         return np.convolve(buf, self.h)[len(self.tail): len(self.tail) + len(x)].astype(np.float32)
 
 
+@pytest.mark.full_examples
 def test_streaming_processor_that_returns_float32_is_caught(bounded_amplitudes):
     report = dp.verify(dp.streaming()(_FIRToFloat32), max_examples=50, raise_on_failure=False)
     assert not report.ok

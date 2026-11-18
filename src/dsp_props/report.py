@@ -5,7 +5,7 @@ from __future__ import annotations
 import html
 import json
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -70,7 +70,7 @@ class Failure:
     relation: str
     error: BaseException
     example: Any = None  # the shrunk input, as passed to the relation's check
-    examples_tried: Optional[int] = None  # inputs generated before the first failure
+    examples_tried: int | None = None  # inputs generated before the first failure
 
     def __str__(self):
         return f"{self.relation}: {self.error}"
