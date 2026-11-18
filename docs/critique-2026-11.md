@@ -2,6 +2,12 @@
 
 17 novembre 2026 · Clément Basdevant
 
+> **Mise à jour du 18 novembre 2026.** Deux constats de ce document étaient déjà périmés le jour
+> de sa rédaction. `benchmarks/validation.py --only false-positives` n'est plus cassé :
+> `_instrumented_assert_close` accepte `precision=` depuis ed5cb0f (18/10), et `validation.json`
+> a été relancé après #7 à #10. C'est donc la PR #15 qui avait raison ; elle est fusionnée. Les
+> autres points restent valables ; leur suivi est dans le plan d'avancement de novembre.
+
 ## Diagnostic d'ensemble
 
 dsp-props est solide sur le plan scientifique, mais il n'est encore utile qu'à son auteur. Toutes les preuves de valeur viennent du dépôt lui-même : on n'a pas encore d'utilisateur extérieur, pas de ticket ouvert par un tiers, ni de projet qui l'ait adopté.
@@ -110,5 +116,3 @@ L'ordre suit une règle simple : d'abord solder la dette, ensuite rendre l'outil
 - **Élargir une tolérance pour faire taire une alarme.** C'est la règle du projet, et c'est aussi ce qui rend l'outil crédible.
 - **Soumettre JOSS trop tôt.** Un refus pour manque d'impact coûte plus cher que deux mois d'attente avec un vrai utilisateur.
 - **Multiplier les chiffres recopiés à la main.** Tant qu'ils ne sont pas générés, chaque PR risque d'en désynchroniser un.
-
-Document de travail : https://claude.ai/artifact/NdrJAUkw9zR8C7dWsbN1mM
