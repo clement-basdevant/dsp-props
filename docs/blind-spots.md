@@ -69,10 +69,20 @@ filters of order 0 or 1, or filters whose numerator is shorter than the
 denominator, and the declared filters had orders 4 and 2; four `upfirdn` faults
 change only its default arguments, which the declarations never used.
 
-**Declare each operator for several representative parameter sets, including
-degenerate ones**: order 0 and 1 filters, a numerator shorter than the
-denominator, rate 1, default arguments. A module-level dictionary of declared
-operators is picked up by `dsp-props check`:
+**Declare a family, whose parameters are drawn too** (`dp.family`, see
+[the catalogue](relations.md#operator-families-dpfamily)): the parameter
+strategies shrink towards order 0 and 1 filters, a numerator shorter than the
+denominator and rate 1, and a family can also draw whether default
+arguments are used. In the comparison benchmark
+(`benchmarks/comparison`), declaring a family instead of one operator raises
+the share of functional faults caught from <!-- r:comparison.lfilter.dsp_props -->86 %<!-- /r --> to
+<!-- r:comparison.lfilter.params -->100 %<!-- /r --> on `lfilter` (<!-- r:comparison.lfilter.mutants -->51<!-- /r --> mutants) and from
+<!-- r:comparison.upfirdn.dsp_props -->72 %<!-- /r --> to <!-- r:comparison.upfirdn.params -->97 %<!-- /r --> on `upfirdn`
+(<!-- r:comparison.upfirdn.mutants -->36<!-- /r --> mutants); the one left drops the last input sample, a
+value fault that every relation sees consistently. Otherwise, declare each operator
+for several representative parameter sets, including degenerate ones. A
+module-level dictionary of declared operators is picked up by
+`dsp-props check`:
 
 ```python
 from scipy import signal

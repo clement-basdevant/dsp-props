@@ -23,3 +23,10 @@ Every name below is also importable from `dsp_props.generators`.
         - signal_pairs
         - block_splits
         - split_blocks
+
+::: dsp_props.generators.parameters
+    options:
+      members:
+        - iir_coefficients
+        - fir_taps
+        - rate_pairs

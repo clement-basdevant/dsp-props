@@ -89,3 +89,11 @@ scripts; do not edit. A number quoted in the documentation is marked
 | `profile.scipy.worst_n` | 1091 | `error_profile.csv` |
 | `profile.torch.worst` | 195 ε | `error_profile.csv` |
 | `profile.torch.worst_n` | 596 | `error_profile.csv` |
+| `comparison.lfilter.dsp_props` | 86 % | `comparison/summary.json` |
+| `comparison.lfilter.params` | 100 % | `comparison/summary.json` |
+| `comparison.lfilter.sop` | 100 % | `comparison/summary.json` |
+| `comparison.lfilter.mutants` | 51 | `comparison/summary.json` |
+| `comparison.upfirdn.dsp_props` | 72 % | `comparison/summary.json` |
+| `comparison.upfirdn.params` | 97 % | `comparison/summary.json` |
+| `comparison.upfirdn.sop` | 89 % | `comparison/summary.json` |
+| `comparison.upfirdn.mutants` | 36 | `comparison/summary.json` |

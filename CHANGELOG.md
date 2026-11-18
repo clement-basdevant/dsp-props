@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Operator families: `@dp.family(params)` on a factory that returns a declared operator draws the
+  parameters with the signals, and the counterexample is `(parameters, input)`, both shrunk.
+  Parameter strategies in `dp.generators`: `iir_coefficients` (stable filters of order 0 up,
+  numerators shorter or longer than the denominator, `a[0] != 1`), `fir_taps`, `rate_pairs`
+  (coprime, `(1, 1)` included). The comparison benchmark gains the approach `dsp-props/params`.
 - `float32=True` on any declaration (float64 precision) adds the `float32 consistency` relation:
   the output on a float32 signal agrees with the output on the same values in float64, to float32
   accuracy, and is at least float32. It catches a float32 path that differs from the float64 one

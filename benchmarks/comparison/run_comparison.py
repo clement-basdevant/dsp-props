@@ -111,7 +111,10 @@ def _job(args):
                     record.update(error=float("inf"), crashed=True, exception=type(exc).__name__)
             else:
                 decls_f, sop_f, _ = suites.SUBJECTS[subject]
-                decls = decls_f(mod) if approach != "sop" else {}
+                if approach == "dsp-props/params":
+                    decls = suites.FAMILY_DECLS.get(subject, decls_f)(mod)
+                else:
+                    decls = decls_f(mod) if approach != "sop" else {}
                 sop_tests = sop_f(mod) if approach == "sop" else []
                 record.update(approaches.run_approach(approach, decls, sop_tests, seed))
         signal.setitimer(signal.ITIMER_REAL, 0)

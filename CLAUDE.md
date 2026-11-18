@@ -46,6 +46,10 @@ def my_fft(x): return np.fft.fft(x)
 dp.verify(my_fft)   # lève PropertyViolation avec un contre-exemple minimal
 ```
 
+Familles d'opérateurs (`dp.family`, action 2.4) : une fabrique décorée reçoit des paramètres
+tirés (`dp.generators.iir_coefficients`, `fir_taps`, `rate_pairs`, ou toute stratégie) et
+renvoie un opérateur déclaré ; contre-exemple `(paramètres, entrée)`, rétrécis ensemble.
+
 Déclarations disponibles : transformées (complexe, entrée réelle, linéaire générique comme
 la DCT), filtres LTI (fonction de transfert et borne de gain optionnelles), rééchantillonneurs
 rationnels, processeurs en streaming ou à état. Adaptateurs NumPy, SciPy, PyTorch, et C via
