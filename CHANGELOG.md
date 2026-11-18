@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.4 (2026-11-18)
 
 - Precision mutants (`mutants/precision_mutants.py`, `benchmarks/precision_mutants.py`): operators
   that keep every property but lose accuracy, graded from 0 to 24 dropped significand bits, and the
@@ -12,6 +12,9 @@
 - `benchmarks/calibrated_tolerance.py` checks other correct implementations against a tolerance
   calibrated on a trusted one, and measures detection thresholds on five filters and four ratios.
 - CI: the macOS calibration job runs on `macos-15` (`macos-14` runners are no longer assigned).
+- `benchmarks/campaign.py` uses the library's `block_splits` (arbitrary cuts up to max(N, 16)
+  blocks, one-sample blocks, fixed-size blocks) instead of its own copy limited to nine blocks.
+- `benchmarks/validation.json`: false-positive runs redone on the current code.
 
 ## 0.1.3 (2026-11-04)
 

@@ -6,7 +6,7 @@ doivent tenir pour toute implémentation correcte, avec une tolérance dérivée
 d'erreur, et on rapporte le plus petit contre-exemple.
 
 Auteur : Clément Basdevant (Nicolas Boganski, retiré des auteurs pour l'instant, est cité dans les remerciements). Papier JOSS en préparation (`paper/paper.md`, `paper/paper.bib`).
-Version 0.1.3 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développement :
+Version 0.1.4 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développement :
 `docs/schema-directeur.md`. Tickets de bugs à poster en amont : `papers/tickets-a-poster.md`.
 
 ## Les trois briques
@@ -115,8 +115,7 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
     échantillon et blocs de taille fixe (avant : au plus 8 blocs).
 - Limites restantes (détail dans `docs/blind-spots.md`) : fenêtre de réponse impulsionnelle
   plafonnée à 2^16 ; une précision par déclaration ; `longdouble_lfilter` sans repli
-  double-double ; `benchmarks/campaign.py` garde sa propre copie de `block_splits` plafonnée
-  à 9 blocs ; écart de précision entre la tolérance par défaut (20 ε log2 N) et le refus de
+  double-double ; écart de précision entre la tolérance par défaut (20 ε log2 N) et le refus de
   `dp.calibrate` (1e6 ε), où une FFT à facteurs de rotation récursifs (38 ε) passe.
 - Résultats en amont, à leur juste taille :
   - `lfilter` sur bloc vide avec état initial : redécouverte de scipy/scipy#22571, déjà

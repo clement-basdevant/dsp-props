@@ -21,7 +21,7 @@ from hypothesis import strategies as st  # noqa: E402
 
 import dsp_props as dp  # noqa: E402
 from dsp_props.core import FFTTolerance, assert_close, norm  # noqa: E402
-from dsp_props.generators import lengths, signals  # noqa: E402
+from dsp_props.generators import block_splits, lengths, signals, split_blocks  # noqa: E402
 
 TOL = FFTTolerance()
 TARGETS = []
@@ -62,18 +62,6 @@ def stable_iir(draw, max_order=6):
     if not np.any(b):
         b[0] = 1.0
     return b, a
-
-
-@st.composite
-def block_splits(draw, n):
-    """Split points for block processing, including blocks of size 0 and 1."""
-    cuts = draw(st.lists(st.integers(0, n), max_size=8))
-    return sorted(cuts)
-
-
-def blocks(x, cuts):
-    edges = [0, *cuts, len(x)]
-    return [x[i:j] for i, j in zip(edges[:-1], edges[1:])]
 
 
 # --------------------------------------------------------------------------
@@ -217,7 +205,7 @@ def _(case):
     whole = ss.lfilter(b, a, x)
     zi = np.zeros(max(len(a), len(b)) - 1)
     parts = []
-    for blk in blocks(x, cuts):
+    for blk in split_blocks(x, cuts):
         y, zi = ss.lfilter(b, a, blk, zi=zi)
         parts.append(y)
     assert_close(np.concatenate(parts), whole, FFTTolerance(c=1000), what="lfilter blocks")
@@ -231,7 +219,7 @@ def _(case):
     whole = ss.sosfilt(sos, x)
     zi = np.zeros((sos.shape[0], 2))
     parts = []
-    for blk in blocks(x, cuts):
+    for blk in split_blocks(x, cuts):
         y, zi = ss.sosfilt(sos, blk, zi=zi)
         parts.append(y)
     assert_close(np.concatenate(parts), whole, FFTTolerance(c=1000), what="sosfilt blocks")
