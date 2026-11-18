@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Regression tests from counterexamples: on failure, `--dsp-props-regressions [DIR]` (pytest),
+  `dsp-props check --regressions DIR` or `dp.write_regression_tests` write
+  `test_regression_<operator>.py`, one plain test per minimal counterexample, replayed exactly and
+  without Hypothesis (`dsp_props.regression.replay`). A case is written only if replaying it from
+  its source fails.
+- `dp.verify` records each counterexample as drawn, before the operator runs, so an operator that
+  writes into its input no longer reports the overwritten input.
+
 ## 0.1.4 (2026-11-18)
 
 - pytest plugin (entry point `pytest11`): an operator declared in a test module becomes one test

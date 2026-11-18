@@ -78,6 +78,7 @@ nav:
       - dsp_props.generators: api/generators.md
       - dsp_props.relations: api/relations.md
       - dsp_props.report: api/report.md
+      - dsp_props.regression: api/regression.md
       - dsp_props.adapters: api/adapters.md
       - dsp_props.cli: api/cli.md
       - dsp_props.pytest_plugin: api/pytest_plugin.md

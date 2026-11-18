@@ -102,6 +102,55 @@ derandomized (`--dsp-props-derandomize`, `derandomize=True`) or seeded
 (`seed=`). `dp.verify(..., database="dir")` and `dsp-props check --database dir`
 use the same mechanism outside pytest.
 
+## Regression tests from counterexamples
+
+The example database replays past failures, but it lives outside version
+control and Hypothesis only consults it when it runs. To keep a found bug as
+an ordinary test, ask for regression tests. Here `Streamed` is a block processor that resets its `lfilter` state on an
+empty block:
+
+```
+$ pytest tests/test_my_filters.py --dsp-props-regressions
+Streamed violates block invariance
+  block invariance (cuts=[1, 1]): L2 error 3.603e-01 exceeds tolerance 8.512e-14 (N=2, ref norm 3.834e-01)
+  minimal input: ([1, 0], (1, 1))
+  full input:    (array([1., 0.]), [1, 1])
+  first failure after 21 generated input(s)
+  regression test written: tests/test_regression_streamed.py::test_block_invariance_21acb26e
+```
+
+Each failure adds one plain test function to `test_regression_<operator>.py`,
+next to the test module (or in `DIR` with `--dsp-props-regressions DIR`, or the
+`dsp_props_regressions` ini key):
+
+```python
+# dsp-props operator: test_my_filters:Streamed
+from test_my_filters import Streamed as OPERATOR
+
+
+# block invariance (cuts=[1, 1]): L2 error 3.603e-01 exceeds tolerance 8.512e-14 (N=2, ref norm
+# 3.834e-01)
+# found by dsp-props 0.1.4 on 2026-11-18
+def test_block_invariance_21acb26e():
+    inputs = (np.array([1.0, 0.0], dtype=np.float64), [1, 1])
+    replay(OPERATOR, "block invariance", inputs)
+```
+
+The test calls the relation once on the minimal input, without Hypothesis:
+it fails as long as the bug is there, passes once it is fixed, and costs one
+call. The input is written exactly (every float, NaN, infinity and `-0.0`
+round-trips bit for bit), and a case is only written if replaying it from
+its source fails, so a non-reproducible failure (hidden state, randomness)
+gives no test. Running again adds only new counterexamples. Commit the file;
+delete a test once it no longer guards anything.
+
+The operator is imported by name when the generated file can import its
+module (a test module in the same directory, a package), and loaded from its
+file with `dsp_props.regression.load_operator` otherwise. Outside pytest,
+`dsp-props check mypkg --regressions tests/` and
+`dp.write_regression_tests(op, dp.verify(op, raise_on_failure=False), "tests/")`
+write the same files.
+
 ## Options
 
 | Command line | `ini` key | Default |
@@ -109,3 +158,4 @@ use the same mechanism outside pytest.
 | `--dsp-props-profile` | `dsp_props_profile` | `DSP_PROPS_PROFILE`, else `default` |
 | `--dsp-props-derandomize` | `dsp_props_derandomize` | off |
 | `--dsp-props-database` | `dsp_props_database` | `.hypothesis/examples` |
+| `--dsp-props-regressions [DIR]` | `dsp_props_regressions` (`same` or a directory) | off |

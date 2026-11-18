@@ -69,7 +69,7 @@ dp.stateful(lambda block, z: scipy.signal.lfilter(b, a, block, zi=z), init_state
 
 ## pytest
 
-Installing dsp-props adds a pytest plugin: a declared operator in a test module becomes one test per relation (`test_filters.py::my_fft::parseval`), with its minimal counterexample in the pytest report. Cost profiles set the search depth (`--dsp-props-profile fast`, 30 inputs per relation, for every commit; `nightly`, 2000, for scheduled runs), and failing inputs are saved in Hypothesis's example database and replayed first on the next run. See [Running with pytest](https://dsp-props.readthedocs.io/en/latest/pytest/).
+Installing dsp-props adds a pytest plugin: a declared operator in a test module becomes one test per relation (`test_filters.py::my_fft::parseval`), with its minimal counterexample in the pytest report. Cost profiles set the search depth (`--dsp-props-profile fast`, 30 inputs per relation, for every commit; `nightly`, 2000, for scheduled runs), failing inputs are saved in Hypothesis's example database and replayed first on the next run, and `--dsp-props-regressions` turns each minimal counterexample into a plain regression test to commit. See [Running with pytest](https://dsp-props.readthedocs.io/en/latest/pytest/).
 
 ## Command line
 

@@ -20,6 +20,7 @@ from .api import (
     verify,
 )
 from .core import calibrate
+from .regression import write_regression_tests
 
 __version__ = "0.1.4"
 
@@ -44,4 +45,5 @@ __all__ = [
     "Report",
     "TransformSpec",
     "PropertyViolation",
+    "write_regression_tests",
 ]

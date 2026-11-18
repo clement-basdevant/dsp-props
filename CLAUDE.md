@@ -54,7 +54,10 @@ dans un module de test (ou listé dans `dsp_props_operators`) devient un test pa
 (`test_x.py::my_fft::parseval`). Profils de coût : `fast` (30 entrées), `default` (200),
 `nightly` (2000), par `--dsp-props-profile`, `--profile`, `profile=` ou `DSP_PROPS_PROFILE` ;
 un `max_examples` explicite l'emporte. Base d'exemples Hypothesis `.hypothesis/examples`
-rejouée en premier (inactive avec `seed=` ou `derandomize`). Doc : `docs/pytest.md`.
+rejouée en premier (inactive avec `seed=` ou `derandomize`). Tests de non-régression générés
+(`dsp_props/regression.py`) : `--dsp-props-regressions [DIR]`, `dsp-props check --regressions DIR`
+ou `dp.write_regression_tests` écrivent `test_regression_<op>.py`, un test pytest simple par
+contre-exemple minimal, rejoué exactement sans Hypothesis. Doc : `docs/pytest.md`.
 
 ## Commandes
 
@@ -162,6 +165,5 @@ nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les 
 - CLI qui devine la catégorie d'une fonction non déclarée (signature, nom, docstring).
 - Relations de multicadence avancées (identités nobles), stabilité BIBO, cohérence
   float32/float64, dénormaux.
-- Génération automatique de tests de non-régression à partir des contre-exemples.
 - Code C embarqué en virgule fixe.
 - Propriétés d'estimateurs : biais, variance contre la borne de Cramér-Rao.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import os
 import time
 from collections.abc import Callable
@@ -362,11 +363,13 @@ def _database(database):
 def _hypothesis_test(rel, spec, max_examples, derandomize, seed=None, database=None, key=b""):
     def run_inner(inputs):
         trace["calls"] += 1
+        snapshot = copy.deepcopy(inputs)  # as drawn, even if the operator writes into its input
         try:
             rel.check(spec, inputs)
         except Exception:
             # Hypothesis replays the shrunk example last, so this ends as the minimal input.
-            trace["example"] = inputs
+            trace["example"] = snapshot
+            trace["has_example"] = True
             if trace["first_failure"] is None:
                 trace["first_failure"] = trace["calls"]
             raise
@@ -379,7 +382,7 @@ def _hypothesis_test(rel, spec, max_examples, derandomize, seed=None, database=N
                    print_blob=False)(given(rel.inputs(spec))(run_inner))
     if seed is not None:
         run = _seed(seed)(run)
-    trace: dict[str, Any] = {"calls": 0, "example": None, "first_failure": None}
+    trace: dict[str, Any] = {"calls": 0, "example": None, "has_example": False, "first_failure": None}
     return run, trace
 
 
@@ -436,7 +439,8 @@ def verify(func, *, max_examples=None, raise_on_failure=True, derandomize=False,
             error = exc
         seconds[rel.name] = time.perf_counter() - t0
         if error is not None:
-            failures.append(Failure(rel.name, error, trace["example"], trace["first_failure"]))
+            failures.append(Failure(rel.name, error, trace["example"], trace["first_failure"],
+                                    has_example=trace["has_example"]))
     report = Report(getattr(func, "__name__", repr(func)), checked, failures,
                     kind=type(spec).__name__.replace("Spec", "").lower(),
                     examples_per_relation=max_examples, seconds=seconds)
