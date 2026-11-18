@@ -65,6 +65,7 @@ class TransformSpec:
     tolerance: ToleranceModel = field(default_factory=FFTTolerance)
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
+    tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
 
     @property
     def relations(self):
@@ -101,6 +102,7 @@ class StreamingSpec:
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
+    tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
 
     @property
     def relations(self):
@@ -121,6 +123,7 @@ class LTISpec:
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
+    tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
 
     @property
     def relations(self):
@@ -148,6 +151,7 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     precision: it then gets float32 inputs within float32 range.
     """
     precision = _precision(precision)
+    declared = tolerance is not None
     if transfer is not None:
         from .core.iir import check_stable
 
@@ -162,7 +166,8 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
 
     def decorate(func):
         func.__dsp_props__ = LTISpec(func=func, causal=causal, transfer=transfer, max_gain=max_gain,
-                                     tolerance=tolerance, max_n=max_n, precision=precision)
+                                     tolerance=tolerance, max_n=max_n, precision=precision,
+                                     tolerance_declared=declared)
         return func
 
     return decorate
@@ -187,6 +192,7 @@ class MultirateSpec:
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
+    tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
 
     @property
     def relations(self):
@@ -223,7 +229,7 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
         func.__dsp_props__ = MultirateSpec(func=func, up=up, down=down, causal=causal, length=rule,
                                            dc_gain=dc_gain, ripple=ripple, stopband=stopband,
                                            tolerance=tolerance or FFTTolerance(c=1000.0), max_n=max_n,
-                                           precision=precision)
+                                           precision=precision, tolerance_declared=tolerance is not None)
         return func
 
     return decorate
@@ -242,7 +248,8 @@ def streaming(*, tolerance=None, max_n=512, precision=np.float64):
 
     def decorate(make):
         make.__dsp_props__ = StreamingSpec(make=make, tolerance=tolerance or FFTTolerance(c=1000.0),
-                                           max_n=max_n, precision=precision)
+                                           max_n=max_n, precision=precision,
+                                           tolerance_declared=tolerance is not None)
         return make
 
     return decorate
@@ -305,6 +312,7 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
             tolerance=tolerance or FFTTolerance(),
             max_n=max_n,
             precision=precision,
+            tolerance_declared=tolerance is not None,
         )
         return func
 
@@ -393,7 +401,7 @@ def _operator_key(func):
 
 
 def verify(func, *, max_examples=None, raise_on_failure=True, derandomize=False, seed=None,
-           profile=None, relations=None, database=None) -> Report:
+           profile=None, relations=None, database=None, tolerances=None) -> Report:
     """Run every relation declared for ``func`` and return a report.
 
     ``max_examples`` is the number of inputs per relation; without it, the
@@ -406,10 +414,19 @@ def verify(func, *, max_examples=None, raise_on_failure=True, derandomize=False,
     ``database`` is a Hypothesis example database, or a directory for one:
     failing inputs are saved there and replayed first on the next run
     (``None``, the default, saves nothing).
+    ``tolerances`` is a tolerance file (``tolerances.json``, written by
+    ``dsp-props calibrate``, or a ``ToleranceFile``): if it holds a
+    calibration of ``func``, that calibration replaces the default tolerance
+    model (a tolerance given in the declaration still wins). ``None`` reads
+    the path from the ``DSP_PROPS_TOLERANCES`` environment variable, if set;
+    ``"none"`` ignores it.
     """
     spec = getattr(func, "__dsp_props__", None)
     if spec is None:
         raise TypeError(f"{func!r} has no dsp-props declaration (use @dp.transform, @dp.lti_filter, @dp.resampler or @dp.streaming)")
+    from .tolerances import apply
+
+    spec, tolerance_source = apply(spec, func, tolerances)
     if max_examples is None:
         max_examples = get_profile(profile).max_examples
     selected = spec.relations
@@ -443,7 +460,7 @@ def verify(func, *, max_examples=None, raise_on_failure=True, derandomize=False,
                                     has_example=trace["has_example"]))
     report = Report(getattr(func, "__name__", repr(func)), checked, failures,
                     kind=type(spec).__name__.replace("Spec", "").lower(),
-                    examples_per_relation=max_examples, seconds=seconds)
+                    examples_per_relation=max_examples, seconds=seconds, tolerance=tolerance_source)
     if failures and raise_on_failure:
         raise PropertyViolation(report)
     return report

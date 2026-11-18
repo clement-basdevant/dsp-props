@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Versioned calibrations: `dsp-props calibrate TARGETS --tolerances tolerances.json` measures the
+  declared operators against an extended-precision reference (extended DFT for `dft` and `rdft`
+  transforms, `longdouble_lfilter` for LTI filters with `transfer=`) and stores the errors per
+  length with the library versions (`dp.ToleranceFile`). `dp.verify(tolerances=...)`,
+  `dsp-props check --tolerances`, `--dsp-props-tolerances` (pytest) and `DSP_PROPS_TOLERANCES` then
+  use the stored calibration instead of the default model; a tolerance given in the declaration
+  still wins. `Report.tolerance` says which applied.
+- Precision regressions: `dsp-props calibrate ... --compare` (`ToleranceFile.compare`) measures
+  again on the same probes and reports the lengths whose error grew by more than a factor (2).
 - Regression tests from counterexamples: on failure, `--dsp-props-regressions [DIR]` (pytest),
   `dsp-props check --regressions DIR` or `dp.write_regression_tests` write
   `test_regression_<operator>.py`, one plain test per minimal counterexample, replayed exactly and
