@@ -1,0 +1,3201 @@
+{
+ "examples": 200,
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "bugs": [
+  {
+   "key": "scipy-upfirdn-length",
+   "library": "scipy",
+   "function": "upfirdn",
+   "title": "upfirdn output length computed from the padded filter",
+   "refs": [
+    "scipy/scipy#12159"
+   ],
+   "fix_commit": "6bc1c1c6df",
+   "ours": false,
+   "trigger": "up > 1 and len(h) not a multiple of up: the length used the filter padded to a multiple of up",
+   "faulty_versions": {
+    "python": "3.8.20",
+    "numpy": "1.18.5",
+    "scipy": "1.4.1"
+   },
+   "fixed_versions": {
+    "python": "3.8.20",
+    "numpy": "1.18.5",
+    "scipy": "1.5.0"
+   },
+   "fixed_label": "1.5.0",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "upfirdn",
+       "relation": "output length",
+       "examples_tried": 5,
+       "counterexample_length": 1,
+       "message": "output length: N = 1 gave 2 output samples, expected 1"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "upfirdn",
+       "relation": "output length",
+       "examples_tried": 31,
+       "counterexample_length": 1,
+       "message": "output length: N = 1 gave 2 output samples, expected 1"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "upfirdn",
+       "relation": "output length",
+       "examples_tried": 4,
+       "counterexample_length": 1,
+       "message": "output length: N = 1 gave 2 output samples, expected 1"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    5,
+    31,
+    4
+   ],
+   "counterexample_lengths": [
+    1,
+    1,
+    1
+   ],
+   "seconds": 32.1,
+   "faulty_runs": [
+    {
+     "upfirdn": {
+      "seconds": 7.3,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance"
+      ],
+      "failures": {
+       "output length": {
+        "message": "output length: N = 1 gave 2 output samples, expected 1",
+        "examples_tried": 5,
+        "counterexample_length": 1,
+        "counterexample": [
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           2,
+           1
+          ]
+         ],
+         1
+        ]
+       }
+      }
+     }
+    },
+    {
+     "upfirdn": {
+      "seconds": 4.0,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance"
+      ],
+      "failures": {
+       "output length": {
+        "message": "output length: N = 1 gave 2 output samples, expected 1",
+        "examples_tried": 31,
+        "counterexample_length": 1,
+        "counterexample": [
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           2,
+           1
+          ]
+         ],
+         1
+        ]
+       }
+      }
+     }
+    },
+    {
+     "upfirdn": {
+      "seconds": 4.1,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance"
+      ],
+      "failures": {
+       "output length": {
+        "message": "output length: N = 1 gave 2 output samples, expected 1",
+        "examples_tried": 4,
+        "counterexample_length": 1,
+        "counterexample": [
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           2,
+           1
+          ]
+         ],
+         1
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "upfirdn": {
+      "seconds": 7.8,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "upfirdn": {
+      "seconds": 4.2,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "upfirdn": {
+      "seconds": 4.2,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-decimate-iir-stability",
+   "library": "scipy",
+   "function": "decimate",
+   "title": "decimate's IIR filter in (b, a) form is unstable",
+   "refs": [
+    "scipy/scipy#16096"
+   ],
+   "fix_commit": "010196647b",
+   "ours": false,
+   "trigger": "default ftype='iir' (Chebyshev order 8) applied as a transfer function: inaccurate for large q",
+   "faulty_versions": {
+    "python": "3.8.20",
+    "numpy": "1.23.5",
+    "scipy": "1.9.3"
+   },
+   "fixed_versions": {
+    "python": "3.8.20",
+    "numpy": "1.23.5",
+    "scipy": "1.10.0"
+   },
+   "fixed_label": "1.10.0",
+   "rediscovered_seeds": 0,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": [
+      {
+       "operator": "decimate",
+       "relation": "linearity",
+       "message": "linearity: L2 error 4.123e-12 exceeds tolerance 3.386e-12 (N=5, ref norm 6.568e+00)"
+      }
+     ]
+    },
+    {
+     "seed": 1,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": [
+      {
+       "operator": "decimate",
+       "relation": "linearity",
+       "message": "linearity: L2 error 3.077e-12 exceeds tolerance 2.527e-12 (N=4, ref norm 5.690e+00)"
+      }
+     ]
+    },
+    {
+     "seed": 2,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": [
+      {
+       "operator": "decimate",
+       "relation": "linearity",
+       "message": "linearity: L2 error 4.123e-12 exceeds tolerance 3.386e-12 (N=5, ref norm 6.568e+00)"
+      }
+     ]
+    }
+   ],
+   "inputs_before_first_failure": [],
+   "counterexample_lengths": [],
+   "seconds": 43.9,
+   "faulty_runs": [
+    {
+     "decimate": {
+      "seconds": 6.3,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.2,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.5,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "decimate": {
+      "seconds": 9.6,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 4.123e-12 exceeds tolerance 3.386e-12 (N=5, ref norm 6.568e+00)",
+        "examples_tried": 94,
+        "counterexample_length": 31,
+        "counterexample": [
+         [
+          7,
+          "'dlti-fir'"
+         ],
+         [
+          [
+           {
+            "N": 31,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           },
+           {
+            "N": 31,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 31
+           }
+          ],
+          1.0,
+          -1.0
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 7.8,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 3.077e-12 exceeds tolerance 2.527e-12 (N=4, ref norm 5.690e+00)",
+        "examples_tried": 7,
+        "counterexample_length": 22,
+        "counterexample": [
+         [
+          7,
+          "'dlti-fir'"
+         ],
+         [
+          [
+           {
+            "N": 22,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           },
+           {
+            "N": 22,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 22
+           }
+          ],
+          1.0,
+          -1.0
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 8.8,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 4.123e-12 exceeds tolerance 3.386e-12 (N=5, ref norm 6.568e+00)",
+        "examples_tried": 52,
+        "counterexample_length": 31,
+        "counterexample": [
+         [
+          7,
+          "'dlti-fir'"
+         ],
+         [
+          [
+           {
+            "N": 31,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           },
+           {
+            "N": 31,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 31
+           }
+          ],
+          1.0,
+          -1.0
+         ]
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-decimate-dlti",
+   "library": "scipy",
+   "function": "decimate",
+   "title": "decimate mishandles a user-supplied dlti filter",
+   "refs": [
+    "scipy/scipy#17845",
+    "scipy/scipy#17881"
+   ],
+   "fix_commit": "cf1999530f",
+   "ours": false,
+   "trigger": "ftype given as a dlti instance: a FIR went through zpk2sos, complex coefficients through sosfilt",
+   "faulty_versions": {
+    "python": "3.9.25",
+    "numpy": "1.24.4",
+    "scipy": "1.10.1"
+   },
+   "fixed_versions": {
+    "python": "3.9.25",
+    "numpy": "1.24.4",
+    "scipy": "1.11.0"
+   },
+   "fixed_label": "1.11.0",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "decimate",
+       "relation": "linearity",
+       "examples_tried": 94,
+       "counterexample_length": 97,
+       "message": "linearity: L2 error 2.165e-12 exceeds tolerance 8.462e-13 (N=14, ref norm 1.001e+00)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "decimate",
+       "relation": "linearity",
+       "examples_tried": 7,
+       "counterexample_length": 36,
+       "message": "linearity: L2 error 1.267e-12 exceeds tolerance 5.746e-13 (N=6, ref norm 1.001e+00)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "decimate",
+       "relation": "linearity",
+       "examples_tried": 52,
+       "counterexample_length": 31,
+       "message": "linearity: L2 error 3.456e-12 exceeds tolerance 2.917e-12 (N=4, ref norm 6.568e+00)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    94,
+    7,
+    52
+   ],
+   "counterexample_lengths": [
+    97,
+    36,
+    31
+   ],
+   "seconds": 46.0,
+   "faulty_runs": [
+    {
+     "decimate": {
+      "seconds": 10.0,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 2.165e-12 exceeds tolerance 8.462e-13 (N=14, ref norm 1.001e+00)",
+        "examples_tried": 94,
+        "counterexample_length": 97,
+        "counterexample": [
+         [
+          7,
+          "'dlti-fir'"
+         ],
+         [
+          [
+           {
+            "N": 97,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           },
+           {
+            "N": 97,
+            "dtype": "float64",
+            "max_abs": 0.001,
+            "nonzero": 1
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 8.0,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 1.267e-12 exceeds tolerance 5.746e-13 (N=6, ref norm 1.001e+00)",
+        "examples_tried": 7,
+        "counterexample_length": 36,
+        "counterexample": [
+         [
+          7,
+          "'dlti-fir'"
+         ],
+         [
+          [
+           {
+            "N": 36,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           },
+           {
+            "N": 36,
+            "dtype": "float64",
+            "max_abs": 0.001,
+            "nonzero": 1
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 8.9,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 3.456e-12 exceeds tolerance 2.917e-12 (N=4, ref norm 6.568e+00)",
+        "examples_tried": 52,
+        "counterexample_length": 31,
+        "counterexample": [
+         [
+          8,
+          "'dlti-fir'"
+         ],
+         [
+          [
+           {
+            "N": 31,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           },
+           {
+            "N": 31,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 31
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "decimate": {
+      "seconds": 6.7,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.6,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 6.0,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-dst-ortho",
+   "library": "scipy",
+   "function": "dst",
+   "title": "norm='ortho' wrong for DST types 2 and 3",
+   "refs": [
+    "scipy/scipy#18452",
+    "scipy/scipy#18613"
+   ],
+   "fix_commit": "299df543da",
+   "ours": false,
+   "trigger": "dst/idst type 2 or 3 with norm='ortho': wrong scaling of one coefficient",
+   "faulty_versions": {
+    "python": "3.10.20",
+    "numpy": "1.26.4",
+    "scipy": "1.11.4"
+   },
+   "fixed_versions": {
+    "python": "3.10.20",
+    "numpy": "1.26.4",
+    "scipy": "1.12.0"
+   },
+   "fixed_label": "1.12.0",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "dst",
+       "relation": "parseval",
+       "examples_tried": 1,
+       "counterexample_length": 2,
+       "message": "parseval: ||f(x)||/sqrt(1) = 1.000000e+00 but ||x|| = 1.414214e+00 (N=2)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "dst",
+       "relation": "parseval",
+       "examples_tried": 1,
+       "counterexample_length": 2,
+       "message": "parseval: ||f(x)||/sqrt(1) = 1.118034e+00 but ||x|| = 1.000000e+00 (N=2)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "dst",
+       "relation": "parseval",
+       "examples_tried": 1,
+       "counterexample_length": 2,
+       "message": "parseval: ||f(x)||/sqrt(1) = 1.118034e+00 but ||x|| = 1.000000e+00 (N=2)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    1,
+    1,
+    1
+   ],
+   "counterexample_lengths": [
+    2,
+    2,
+    2
+   ],
+   "seconds": 56.8,
+   "faulty_runs": [
+    {
+     "dst": {
+      "seconds": 8.7,
+      "checked": [
+       "linearity",
+       "parseval",
+       "inversibility"
+      ],
+      "failures": {
+       "parseval": {
+        "message": "parseval: ||f(x)||/sqrt(1) = 1.000000e+00 but ||x|| = 1.414214e+00 (N=2)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         [
+          2,
+          "'ortho'"
+         ],
+         {
+          "N": 2,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 2,
+          "samples": [
+           1.0,
+           1.0
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "dst": {
+      "seconds": 8.4,
+      "checked": [
+       "linearity",
+       "parseval",
+       "inversibility"
+      ],
+      "failures": {
+       "parseval": {
+        "message": "parseval: ||f(x)||/sqrt(1) = 1.118034e+00 but ||x|| = 1.000000e+00 (N=2)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         [
+          2,
+          "'ortho'"
+         ],
+         {
+          "N": 2,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 1,
+          "samples": [
+           1.0,
+           0.0
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "dst": {
+      "seconds": 8.5,
+      "checked": [
+       "linearity",
+       "parseval",
+       "inversibility"
+      ],
+      "failures": {
+       "parseval": {
+        "message": "parseval: ||f(x)||/sqrt(1) = 1.118034e+00 but ||x|| = 1.000000e+00 (N=2)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         [
+          2,
+          "'ortho'"
+         ],
+         {
+          "N": 2,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 1,
+          "samples": [
+           1.0,
+           0.0
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "dst": {
+      "seconds": 10.4,
+      "checked": [
+       "linearity",
+       "parseval",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "dst": {
+      "seconds": 10.0,
+      "checked": [
+       "linearity",
+       "parseval",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "dst": {
+      "seconds": 10.1,
+      "checked": [
+       "linearity",
+       "parseval",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-fht-odd",
+   "library": "scipy",
+   "function": "fht",
+   "title": "fht zeroes an imaginary part that exists for odd n",
+   "refs": [
+    "scipy/scipy#21668"
+   ],
+   "fix_commit": "170f9e69a5",
+   "ours": false,
+   "trigger": "fht with an odd number of points",
+   "faulty_versions": {
+    "python": "3.12.3",
+    "numpy": "1.26.4",
+    "scipy": "1.14.1"
+   },
+   "fixed_versions": {
+    "python": "3.12.3",
+    "numpy": "1.26.4",
+    "scipy": "1.15.0"
+   },
+   "fixed_label": "1.15.0",
+   "rediscovered_seeds": 0,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [],
+   "counterexample_lengths": [],
+   "seconds": 21.1,
+   "faulty_runs": [
+    {
+     "fht": {
+      "seconds": 3.6,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "fht": {
+      "seconds": 3.2,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "fht": {
+      "seconds": 3.4,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "fht": {
+      "seconds": 3.7,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "fht": {
+      "seconds": 3.2,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "fht": {
+      "seconds": 3.1,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-resample-complex",
+   "library": "scipy",
+   "function": "resample",
+   "title": "resample: unpaired Nyquist bin and complex signals",
+   "refs": [
+    "scipy/scipy#14569",
+    "scipy/scipy#22814"
+   ],
+   "fix_commit": "34cf1d9e16",
+   "ours": false,
+   "trigger": "resample of an even-length signal (unpaired Nyquist bin), complex input, num=2",
+   "faulty_versions": {
+    "python": "3.12.3",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3"
+   },
+   "fixed_versions": {
+    "python": "3.12.3",
+    "numpy": "2.2.6",
+    "scipy": "1.16.0"
+   },
+   "fixed_label": "1.16.0",
+   "rediscovered_seeds": 2,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "resample",
+       "relation": "inversibility",
+       "examples_tried": 59,
+       "counterexample_length": 2,
+       "message": "inversibility: L2 error 7.071e-01 exceeds tolerance 6.280e-15 (N=2, ref norm 1.414e+00)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "resample",
+       "relation": "inversibility",
+       "examples_tried": 77,
+       "counterexample_length": 2,
+       "message": "inversibility: L2 error 3.536e-01 exceeds tolerance 7.692e-15 (N=2, ref norm 1.732e+00)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    59,
+    77
+   ],
+   "counterexample_lengths": [
+    2,
+    2
+   ],
+   "seconds": 54.1,
+   "faulty_runs": [
+    {
+     "resample": {
+      "seconds": 11.2,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {
+       "inversibility": {
+        "message": "inversibility: L2 error 7.071e-01 exceeds tolerance 6.280e-15 (N=2, ref norm 1.414e+00)",
+        "examples_tried": 59,
+        "counterexample_length": 2,
+        "counterexample": [
+         2,
+         {
+          "N": 2,
+          "dtype": "complex128",
+          "max_abs": 1.0,
+          "nonzero": 2,
+          "samples": [
+           {
+            "re": 1.0,
+            "im": 0.0
+           },
+           {
+            "re": -1.0,
+            "im": 1.2246467991473532e-16
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "resample": {
+      "seconds": 10.3,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {
+       "inversibility": {
+        "message": "inversibility: L2 error 3.536e-01 exceeds tolerance 7.692e-15 (N=2, ref norm 1.732e+00)",
+        "examples_tried": 77,
+        "counterexample_length": 2,
+        "counterexample": [
+         2,
+         {
+          "N": 2,
+          "dtype": "complex128",
+          "max_abs": 1.4142135623730951,
+          "nonzero": 2,
+          "samples": [
+           {
+            "re": 1.0,
+            "im": 1.0
+           },
+           {
+            "re": 0.0,
+            "im": 1.0
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "resample": {
+      "seconds": 8.2,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "resample": {
+      "seconds": 8.3,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "resample": {
+      "seconds": 7.6,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "resample": {
+      "seconds": 6.9,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-lfilter-empty",
+   "library": "scipy",
+   "function": "lfilter",
+   "title": "lfilter raises on an empty block with an initial state",
+   "refs": [
+    "scipy/scipy#22571"
+   ],
+   "fix_commit": "c1badd5cc6",
+   "ours": false,
+   "trigger": "lfilter(b, a, x, zi=zi) with len(x) == 0 (FIR and IIR paths)",
+   "faulty_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "fixed_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "2.0.0.dev0+git20261116.287d3f4"
+   },
+   "fixed_label": "nightly",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "lfilter (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 10,
+       "counterexample_length": 1,
+       "message": "Hypothesis found 2 distinct failures. (2 sub-exceptions)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "lfilter (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 37,
+       "counterexample_length": 1,
+       "message": "Hypothesis found 2 distinct failures. (2 sub-exceptions)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "lfilter (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 24,
+       "counterexample_length": 1,
+       "message": "ValueError: v cannot be empty"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    10,
+    37,
+    24
+   ],
+   "counterexample_lengths": [
+    1,
+    1,
+    1
+   ],
+   "seconds": 22.1,
+   "faulty_runs": [
+    {
+     "lfilter (streaming)": {
+      "seconds": 6.1,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "Hypothesis found 2 distinct failures. (2 sub-exceptions)",
+        "examples_tried": 10,
+        "counterexample_length": 1,
+        "counterexample": [
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          }
+         ],
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "lfilter (streaming)": {
+      "seconds": 1.6,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "Hypothesis found 2 distinct failures. (2 sub-exceptions)",
+        "examples_tried": 37,
+        "counterexample_length": 1,
+        "counterexample": [
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          }
+         ],
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "lfilter (streaming)": {
+      "seconds": 0.7,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 24,
+        "counterexample_length": 1,
+        "counterexample": [
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          }
+         ],
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "lfilter (streaming)": {
+      "seconds": 7.3,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "lfilter (streaming)": {
+      "seconds": 2.2,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "lfilter (streaming)": {
+      "seconds": 2.0,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-sosfilt-empty",
+   "library": "scipy",
+   "function": "sosfilt",
+   "title": "sosfilt raises on an empty block with an initial state",
+   "refs": [
+    "scipy/scipy#26406",
+    "scipy/scipy#26415"
+   ],
+   "fix_commit": "5ccd743e5e",
+   "ours": true,
+   "trigger": "sosfilt(sos, x, zi=zi) with len(x) == 0",
+   "faulty_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "fixed_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "2.0.0.dev0+git20261116.287d3f4"
+   },
+   "fixed_label": "nightly",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "sosfilt (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 29,
+       "counterexample_length": 1,
+       "message": "ValueError: cannot reshape array of size 0 into shape (0)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "sosfilt (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 12,
+       "counterexample_length": 1,
+       "message": "ValueError: cannot reshape array of size 0 into shape (0)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "sosfilt (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 9,
+       "counterexample_length": 1,
+       "message": "ValueError: cannot reshape array of size 0 into shape (0)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    29,
+    12,
+    9
+   ],
+   "counterexample_lengths": [
+    1,
+    1,
+    1
+   ],
+   "seconds": 26.3,
+   "faulty_runs": [
+    {
+     "sosfilt (streaming)": {
+      "seconds": 9.3,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: cannot reshape array of size 0 into shape (0)",
+        "examples_tried": 29,
+        "counterexample_length": 1,
+        "counterexample": [
+         {
+          "N": 6,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 2,
+          "samples": [
+           1.0,
+           0.0,
+           0.0,
+           1.0,
+           0.0,
+           0.0
+          ]
+         },
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "sosfilt (streaming)": {
+      "seconds": 0.4,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: cannot reshape array of size 0 into shape (0)",
+        "examples_tried": 12,
+        "counterexample_length": 1,
+        "counterexample": [
+         {
+          "N": 6,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 2,
+          "samples": [
+           1.0,
+           0.0,
+           0.0,
+           1.0,
+           0.0,
+           0.0
+          ]
+         },
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "sosfilt (streaming)": {
+      "seconds": 0.4,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: cannot reshape array of size 0 into shape (0)",
+        "examples_tried": 9,
+        "counterexample_length": 1,
+        "counterexample": [
+         {
+          "N": 6,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 2,
+          "samples": [
+           1.0,
+           0.0,
+           0.0,
+           1.0,
+           0.0,
+           0.0
+          ]
+         },
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "sosfilt (streaming)": {
+      "seconds": 9.9,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "sosfilt (streaming)": {
+      "seconds": 2.2,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "sosfilt (streaming)": {
+      "seconds": 2.0,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-decimate-complex-zeros",
+   "library": "scipy",
+   "function": "decimate",
+   "title": "decimate checks the poles twice, not the zeros",
+   "refs": [
+    "scipy/scipy#17881"
+   ],
+   "fix_commit": "8e2ddfdfe3",
+   "ours": false,
+   "trigger": "a dlti filter with real poles and complex zeros",
+   "faulty_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "fixed_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "2.0.0.dev0+git20261116.287d3f4"
+   },
+   "fixed_label": "nightly",
+   "rediscovered_seeds": 0,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [],
+   "counterexample_lengths": [],
+   "seconds": 36.9,
+   "faulty_runs": [
+    {
+     "decimate": {
+      "seconds": 6.4,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.4,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.7,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "decimate": {
+      "seconds": 6.4,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.3,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "decimate": {
+      "seconds": 5.2,
+      "checked": [
+       "linearity",
+       "output length",
+       "periodic time invariance",
+       "DC gain"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "scipy-shorttimefft-padding",
+   "library": "scipy",
+   "function": "ShortTimeFFT",
+   "title": "ShortTimeFFT pads short signal slices wrongly",
+   "refs": [
+    "scipy/scipy#26418"
+   ],
+   "fix_commit": "a11c360740",
+   "ours": false,
+   "trigger": "a slice whose padded part is longer than the signal part (short signals or slices)",
+   "faulty_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+   },
+   "fixed_versions": {
+    "python": "3.13.18",
+    "numpy": "2.5.3",
+    "scipy": "2.0.0.dev0+git20261116.287d3f4"
+   },
+   "fixed_label": "nightly",
+   "rediscovered_seeds": 0,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [],
+   "counterexample_lengths": [],
+   "seconds": 32.2,
+   "faulty_runs": [
+    {
+     "ShortTimeFFT": {
+      "seconds": 6.6,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "ShortTimeFFT": {
+      "seconds": 4.4,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "ShortTimeFFT": {
+      "seconds": 4.2,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "ShortTimeFFT": {
+      "seconds": 6.5,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "ShortTimeFFT": {
+      "seconds": 4.2,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "ShortTimeFFT": {
+      "seconds": 4.0,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "librosa-preemphasis-glitch",
+   "library": "librosa",
+   "function": "preemphasis",
+   "title": "preemphasis warm-up glitch",
+   "refs": [
+    "librosa/librosa#1032",
+    "librosa/librosa#1159"
+   ],
+   "fix_commit": "478be6f",
+   "ours": false,
+   "trigger": "default zi = lfilter_zi(b, a), the steady state of a unit step: a constant offset on y[0]",
+   "faulty_versions": {
+    "python": "3.8.20",
+    "numpy": "1.18.5",
+    "scipy": "1.4.1",
+    "librosa": "0.7.2"
+   },
+   "fixed_versions": {
+    "python": "3.8.20",
+    "numpy": "1.18.5",
+    "scipy": "1.4.1",
+    "librosa": "0.8.0"
+   },
+   "fixed_label": "0.8.0",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "preemphasis",
+       "relation": "linearity",
+       "examples_tried": 2,
+       "counterexample_length": 2,
+       "message": "linearity: L2 error 5.000e-01 exceeds tolerance 5.329e-15 (N=2, ref norm 2.000e+00)"
+      }
+     ],
+     "both": [
+      {
+       "operator": "preemphasis",
+       "relation": "time invariance",
+       "examples_tried": 2,
+       "counterexample_length": 2,
+       "message": "time invariance (delay 1): L2 error 7.071e-01 exceeds tolerance 3.768e-15 (N=3, ref norm 1.414e+00)"
+      },
+      {
+       "operator": "preemphasis",
+       "relation": "transfer function",
+       "examples_tried": 2,
+       "counterexample_length": null,
+       "message": "transfer function: ||H_measured - H_declared|| = 2.179e+00 > 1.161e-14; worst bin w = 1.6535 rad/sample: measured 0.54129+0.498292j, declared 1.04129+0.498292j"
+      },
+      {
+       "operator": "preemphasis (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 9,
+       "counterexample_length": 1,
+       "message": "ValueError: v cannot be empty"
+      }
+     ],
+     "fixed_only": [
+      {
+       "operator": "preemphasis",
+       "relation": "causality",
+       "message": "causality (k=1): L2 error 1.000e+00 exceeds tolerance 4.289e-15 (N=1, ref norm 2.414e+00)"
+      }
+     ]
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "preemphasis",
+       "relation": "linearity",
+       "examples_tried": 2,
+       "counterexample_length": 127,
+       "message": "linearity: L2 error 5.000e-01 exceeds tolerance 3.003e-11 (N=127, ref norm 1.127e+04)"
+      }
+     ],
+     "both": [
+      {
+       "operator": "preemphasis",
+       "relation": "time invariance",
+       "examples_tried": 2,
+       "counterexample_length": 6,
+       "message": "time invariance (delay 1): L2 error 7.071e-01 exceeds tolerance 6.527e-18 (N=7, ref norm 2.449e-03)"
+      },
+      {
+       "operator": "preemphasis",
+       "relation": "transfer function",
+       "examples_tried": 2,
+       "counterexample_length": null,
+       "message": "transfer function: ||H_measured - H_declared|| = 2.179e+00 > 1.161e-14; worst bin w = 1.6535 rad/sample: measured 0.54129+0.498292j, declared 1.04129+0.498292j"
+      },
+      {
+       "operator": "preemphasis (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 21,
+       "counterexample_length": 1,
+       "message": "ValueError: v cannot be empty"
+      }
+     ],
+     "fixed_only": [
+      {
+       "operator": "preemphasis",
+       "relation": "causality",
+       "message": "causality (k=1): L2 error 1.000e+00 exceeds tolerance 4.289e-15 (N=1, ref norm 2.414e+00)"
+      }
+     ]
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "preemphasis",
+       "relation": "linearity",
+       "examples_tried": 2,
+       "counterexample_length": 2,
+       "message": "linearity: L2 error 5.000e-01 exceeds tolerance 5.329e-15 (N=2, ref norm 2.000e+00)"
+      }
+     ],
+     "both": [
+      {
+       "operator": "preemphasis",
+       "relation": "time invariance",
+       "examples_tried": 2,
+       "counterexample_length": 3,
+       "message": "time invariance (delay 1): L2 error 7.071e-01 exceeds tolerance 4.615e-15 (N=4, ref norm 1.732e+00)"
+      },
+      {
+       "operator": "preemphasis",
+       "relation": "transfer function",
+       "examples_tried": 2,
+       "counterexample_length": null,
+       "message": "transfer function: ||H_measured - H_declared|| = 2.179e+00 > 1.161e-14; worst bin w = 1.6535 rad/sample: measured 0.54129+0.498292j, declared 1.04129+0.498292j"
+      },
+      {
+       "operator": "preemphasis (streaming)",
+       "relation": "block invariance",
+       "examples_tried": 12,
+       "counterexample_length": 1,
+       "message": "ValueError: v cannot be empty"
+      }
+     ],
+     "fixed_only": [
+      {
+       "operator": "preemphasis",
+       "relation": "causality",
+       "message": "causality (k=1): L2 error 1.000e+00 exceeds tolerance 4.289e-15 (N=1, ref norm 2.414e+00)"
+      }
+     ]
+    }
+   ],
+   "inputs_before_first_failure": [
+    2,
+    2,
+    2
+   ],
+   "counterexample_lengths": [
+    2,
+    127,
+    2
+   ],
+   "seconds": 20.0,
+   "faulty_runs": [
+    {
+     "preemphasis": {
+      "seconds": 2.6,
+      "checked": [
+       "linearity",
+       "time invariance",
+       "causality",
+       "transfer function"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 5.000e-01 exceeds tolerance 5.329e-15 (N=2, ref norm 2.000e+00)",
+        "examples_tried": 2,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.5,
+         [
+          [
+           {
+            "N": 2,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1,
+            "samples": [
+             1.0,
+             0.0
+            ]
+           },
+           {
+            "N": 2,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1,
+            "samples": [
+             1.0,
+             0.0
+            ]
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       },
+       "time invariance": {
+        "message": "time invariance (delay 1): L2 error 7.071e-01 exceeds tolerance 3.768e-15 (N=3, ref norm 1.414e+00)",
+        "examples_tried": 2,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.5,
+         [
+          {
+           "N": 2,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 2,
+           "samples": [
+            1.0,
+            1.0
+           ]
+          },
+          1
+         ]
+        ]
+       },
+       "transfer function": {
+        "message": "transfer function: ||H_measured - H_declared|| = 2.179e+00 > 1.161e-14; worst bin w = 1.6535 rad/sample: measured 0.54129+0.498292j, declared 1.04129+0.498292j",
+        "examples_tried": 2,
+        "counterexample_length": null,
+        "counterexample": [
+         0.5,
+         null
+        ]
+       }
+      }
+     },
+     "preemphasis (streaming)": {
+      "seconds": 0.4,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 9,
+        "counterexample_length": 1,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "preemphasis": {
+      "seconds": 2.5,
+      "checked": [
+       "linearity",
+       "time invariance",
+       "causality",
+       "transfer function"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 5.000e-01 exceeds tolerance 3.003e-11 (N=127, ref norm 1.127e+04)",
+        "examples_tried": 2,
+        "counterexample_length": 127,
+        "counterexample": [
+         0.5,
+         [
+          [
+           {
+            "N": 127,
+            "dtype": "float64",
+            "max_abs": 0.001,
+            "nonzero": 127
+           },
+           {
+            "N": 127,
+            "dtype": "float64",
+            "max_abs": 1000.0,
+            "nonzero": 127
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       },
+       "time invariance": {
+        "message": "time invariance (delay 1): L2 error 7.071e-01 exceeds tolerance 6.527e-18 (N=7, ref norm 2.449e-03)",
+        "examples_tried": 2,
+        "counterexample_length": 6,
+        "counterexample": [
+         0.5,
+         [
+          {
+           "N": 6,
+           "dtype": "float64",
+           "max_abs": 0.001,
+           "nonzero": 6,
+           "samples": [
+            0.001,
+            0.001,
+            0.001,
+            0.001,
+            0.001,
+            0.001
+           ]
+          },
+          1
+         ]
+        ]
+       },
+       "transfer function": {
+        "message": "transfer function: ||H_measured - H_declared|| = 2.179e+00 > 1.161e-14; worst bin w = 1.6535 rad/sample: measured 0.54129+0.498292j, declared 1.04129+0.498292j",
+        "examples_tried": 2,
+        "counterexample_length": null,
+        "counterexample": [
+         0.5,
+         null
+        ]
+       }
+      }
+     },
+     "preemphasis (streaming)": {
+      "seconds": 0.6,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 21,
+        "counterexample_length": 1,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "preemphasis": {
+      "seconds": 3.0,
+      "checked": [
+       "linearity",
+       "time invariance",
+       "causality",
+       "transfer function"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 5.000e-01 exceeds tolerance 5.329e-15 (N=2, ref norm 2.000e+00)",
+        "examples_tried": 2,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.5,
+         [
+          [
+           {
+            "N": 2,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1,
+            "samples": [
+             1.0,
+             0.0
+            ]
+           },
+           {
+            "N": 2,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1,
+            "samples": [
+             1.0,
+             0.0
+            ]
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       },
+       "time invariance": {
+        "message": "time invariance (delay 1): L2 error 7.071e-01 exceeds tolerance 4.615e-15 (N=4, ref norm 1.732e+00)",
+        "examples_tried": 2,
+        "counterexample_length": 3,
+        "counterexample": [
+         0.5,
+         [
+          {
+           "N": 3,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 3,
+           "samples": [
+            1.0,
+            1.0,
+            1.0
+           ]
+          },
+          1
+         ]
+        ]
+       },
+       "transfer function": {
+        "message": "transfer function: ||H_measured - H_declared|| = 2.179e+00 > 1.161e-14; worst bin w = 1.6535 rad/sample: measured 0.54129+0.498292j, declared 1.04129+0.498292j",
+        "examples_tried": 2,
+        "counterexample_length": null,
+        "counterexample": [
+         0.5,
+         null
+        ]
+       }
+      }
+     },
+     "preemphasis (streaming)": {
+      "seconds": 0.5,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 12,
+        "counterexample_length": 1,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "preemphasis": {
+      "seconds": 2.4,
+      "checked": [
+       "linearity",
+       "time invariance",
+       "causality",
+       "transfer function"
+      ],
+      "failures": {
+       "time invariance": {
+        "message": "time invariance (delay 1): L2 error 1.414e+00 exceeds tolerance 2.512e-15 (N=3, ref norm 1.414e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 2,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 2,
+           "samples": [
+            1.0,
+            1.0
+           ]
+          },
+          1
+         ]
+        ]
+       },
+       "causality": {
+        "message": "causality (k=1): L2 error 1.000e+00 exceeds tolerance 4.289e-15 (N=1, ref norm 2.414e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 2,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0,
+            0.0
+           ]
+          },
+          1,
+          1.0
+         ]
+        ]
+       },
+       "transfer function": {
+        "message": "transfer function: ||H_measured - H_declared|| = 8.718e+00 > 7.743e-15; worst bin w = 0.0000 rad/sample: measured 3+0j, declared 1+0j",
+        "examples_tried": 1,
+        "counterexample_length": null,
+        "counterexample": [
+         0.0,
+         null
+        ]
+       }
+      }
+     },
+     "preemphasis (streaming)": {
+      "seconds": 0.4,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 9,
+        "counterexample_length": 1,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "preemphasis": {
+      "seconds": 2.3,
+      "checked": [
+       "linearity",
+       "time invariance",
+       "causality",
+       "transfer function"
+      ],
+      "failures": {
+       "time invariance": {
+        "message": "time invariance (delay 1): L2 error 1.414e+00 exceeds tolerance 2.512e-15 (N=3, ref norm 1.414e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 2,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 2,
+           "samples": [
+            1.0,
+            1.0
+           ]
+          },
+          1
+         ]
+        ]
+       },
+       "causality": {
+        "message": "causality (k=1): L2 error 1.000e+00 exceeds tolerance 4.289e-15 (N=1, ref norm 2.414e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 2,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0,
+            0.0
+           ]
+          },
+          1,
+          1.0
+         ]
+        ]
+       },
+       "transfer function": {
+        "message": "transfer function: ||H_measured - H_declared|| = 8.718e+00 > 7.743e-15; worst bin w = 0.0000 rad/sample: measured 3+0j, declared 1+0j",
+        "examples_tried": 1,
+        "counterexample_length": null,
+        "counterexample": [
+         0.0,
+         null
+        ]
+       }
+      }
+     },
+     "preemphasis (streaming)": {
+      "seconds": 0.5,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 21,
+        "counterexample_length": 1,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    },
+    {
+     "preemphasis": {
+      "seconds": 2.9,
+      "checked": [
+       "linearity",
+       "time invariance",
+       "causality",
+       "transfer function"
+      ],
+      "failures": {
+       "time invariance": {
+        "message": "time invariance (delay 3): L2 error 1.000e+00 exceeds tolerance 3.553e-15 (N=7, ref norm 2.000e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 4,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 4,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 4,
+           "samples": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+           ]
+          },
+          3
+         ]
+        ]
+       },
+       "causality": {
+        "message": "causality (k=1): L2 error 1.000e+00 exceeds tolerance 4.289e-15 (N=1, ref norm 2.414e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 2,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0,
+            0.0
+           ]
+          },
+          1,
+          1.0
+         ]
+        ]
+       },
+       "transfer function": {
+        "message": "transfer function: ||H_measured - H_declared|| = 8.718e+00 > 7.743e-15; worst bin w = 0.0000 rad/sample: measured 3+0j, declared 1+0j",
+        "examples_tried": 1,
+        "counterexample_length": null,
+        "counterexample": [
+         0.0,
+         null
+        ]
+       }
+      }
+     },
+     "preemphasis (streaming)": {
+      "seconds": 0.5,
+      "checked": [
+       "block invariance"
+      ],
+      "failures": {
+       "block invariance": {
+        "message": "ValueError: v cannot be empty",
+        "examples_tried": 12,
+        "counterexample_length": 1,
+        "counterexample": [
+         0.0,
+         [
+          {
+           "N": 1,
+           "dtype": "float64",
+           "max_abs": 1.0,
+           "nonzero": 1,
+           "samples": [
+            1.0
+           ]
+          },
+          [
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "librosa-stft-large-window",
+   "library": "librosa",
+   "function": "librosa.stft",
+   "title": "stft fails for large window sizes",
+   "refs": [
+    "librosa/librosa#1094"
+   ],
+   "fix_commit": "a391b30",
+   "ours": false,
+   "trigger": "n_fft so large that one frame exceeds librosa's memory block (n_fft above about 2^15)",
+   "faulty_versions": {
+    "python": "3.8.20",
+    "numpy": "1.18.5",
+    "scipy": "1.4.1",
+    "librosa": "0.7.2"
+   },
+   "fixed_versions": {
+    "python": "3.8.20",
+    "numpy": "1.18.5",
+    "scipy": "1.4.1",
+    "librosa": "0.8.0"
+   },
+   "fixed_label": "0.8.0",
+   "rediscovered_seeds": 0,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": false,
+     "faulty_only": [],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [],
+   "counterexample_lengths": [],
+   "seconds": 27.1,
+   "faulty_runs": [
+    {
+     "stft": {
+      "seconds": 6.4,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "stft": {
+      "seconds": 3.4,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "stft": {
+      "seconds": 3.5,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "stft": {
+      "seconds": 5.5,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "stft": {
+      "seconds": 3.5,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "stft": {
+      "seconds": 2.9,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  },
+  {
+   "key": "librosa-deemphasis-inplace",
+   "library": "librosa",
+   "function": "deemphasis",
+   "title": "deemphasis modifies its input in place",
+   "refs": [
+    "librosa/librosa#1362"
+   ],
+   "fix_commit": "c31f2f2",
+   "ours": false,
+   "trigger": "any call: y[0] -= zi writes into the caller's array",
+   "faulty_versions": {
+    "python": "3.8.20",
+    "numpy": "1.20.3",
+    "scipy": "1.6.3",
+    "librosa": "0.8.1"
+   },
+   "fixed_versions": {
+    "python": "3.8.20",
+    "numpy": "1.20.3",
+    "scipy": "1.6.3",
+    "librosa": "0.9.0"
+   },
+   "fixed_label": "0.9.0",
+   "rediscovered_seeds": 3,
+   "seeds": [
+    {
+     "seed": 0,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "deemphasis",
+       "relation": "linearity",
+       "examples_tried": 1,
+       "counterexample_length": 2,
+       "message": "linearity: L2 error 4.444e-01 exceeds tolerance 2.961e-15 (N=2, ref norm 6.667e-01)"
+      },
+      {
+       "operator": "deemphasis",
+       "relation": "inversibility",
+       "examples_tried": 1,
+       "counterexample_length": 2,
+       "message": "inversibility: L2 error 6.667e-01 exceeds tolerance 1.480e-15 (N=2, ref norm 3.333e-01)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 1,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "deemphasis",
+       "relation": "linearity",
+       "examples_tried": 1,
+       "counterexample_length": 17,
+       "message": "linearity: L2 error 2.222e-01 exceeds tolerance 1.472e-13 (N=17, ref norm 8.110e+00)"
+      },
+      {
+       "operator": "deemphasis",
+       "relation": "inversibility",
+       "examples_tried": 1,
+       "counterexample_length": 5,
+       "message": "inversibility: L2 error 3.333e-04 exceeds tolerance 2.174e-17 (N=5, ref norm 2.108e-03)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    },
+    {
+     "seed": 2,
+     "rediscovered": true,
+     "faulty_only": [
+      {
+       "operator": "deemphasis",
+       "relation": "linearity",
+       "examples_tried": 1,
+       "counterexample_length": 14,
+       "message": "linearity: L2 error 2.221e-01 exceeds tolerance 5.698e-15 (N=14, ref norm 3.370e-01)"
+      },
+      {
+       "operator": "deemphasis",
+       "relation": "inversibility",
+       "examples_tried": 1,
+       "counterexample_length": 2,
+       "message": "inversibility: L2 error 3.333e-01 exceeds tolerance 5.337e-15 (N=2, ref norm 1.202e+00)"
+      }
+     ],
+     "both": [],
+     "fixed_only": []
+    }
+   ],
+   "inputs_before_first_failure": [
+    1,
+    1,
+    1
+   ],
+   "counterexample_lengths": [
+    2,
+    5,
+    2
+   ],
+   "seconds": 12.9,
+   "faulty_runs": [
+    {
+     "deemphasis": {
+      "seconds": 1.0,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 4.444e-01 exceeds tolerance 2.961e-15 (N=2, ref norm 6.667e-01)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         [
+          [
+           {
+            "N": 2,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1,
+            "samples": [
+             1.0,
+             0.0
+            ]
+           },
+           {
+            "N": 2,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1,
+            "samples": [
+             1.0,
+             0.0
+            ]
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       },
+       "inversibility": {
+        "message": "inversibility: L2 error 6.667e-01 exceeds tolerance 1.480e-15 (N=2, ref norm 3.333e-01)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         {
+          "N": 2,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 1,
+          "samples": [
+           1.0,
+           0.0
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "deemphasis": {
+      "seconds": 1.5,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 2.222e-01 exceeds tolerance 1.472e-13 (N=17, ref norm 8.110e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 17,
+        "counterexample": [
+         0.0,
+         [
+          [
+           {
+            "N": 17,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 17
+           },
+           {
+            "N": 17,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 17
+           }
+          ],
+          1.0,
+          1.0
+         ]
+        ]
+       },
+       "inversibility": {
+        "message": "inversibility: L2 error 3.333e-04 exceeds tolerance 2.174e-17 (N=5, ref norm 2.108e-03)",
+        "examples_tried": 1,
+        "counterexample_length": 5,
+        "counterexample": [
+         0.0,
+         {
+          "N": 5,
+          "dtype": "float64",
+          "max_abs": 0.001,
+          "nonzero": 5,
+          "samples": [
+           0.001,
+           0.001,
+           0.001,
+           0.001,
+           0.001
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "deemphasis": {
+      "seconds": 1.1,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {
+       "linearity": {
+        "message": "linearity: L2 error 2.221e-01 exceeds tolerance 5.698e-15 (N=14, ref norm 3.370e-01)",
+        "examples_tried": 1,
+        "counterexample_length": 14,
+        "counterexample": [
+         0.0,
+         [
+          [
+           {
+            "N": 14,
+            "dtype": "float64",
+            "max_abs": 0.001,
+            "nonzero": 14
+           },
+           {
+            "N": 14,
+            "dtype": "float64",
+            "max_abs": 1.0,
+            "nonzero": 1
+           }
+          ],
+          1.0,
+          -1.0
+         ]
+        ]
+       },
+       "inversibility": {
+        "message": "inversibility: L2 error 3.333e-01 exceeds tolerance 5.337e-15 (N=2, ref norm 1.202e+00)",
+        "examples_tried": 1,
+        "counterexample_length": 2,
+        "counterexample": [
+         0.0,
+         {
+          "N": 2,
+          "dtype": "float64",
+          "max_abs": 1.0,
+          "nonzero": 2,
+          "samples": [
+           1.0,
+           1.0
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "fixed_runs": [
+    {
+     "deemphasis": {
+      "seconds": 2.7,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "deemphasis": {
+      "seconds": 2.6,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    },
+    {
+     "deemphasis": {
+      "seconds": 2.5,
+      "checked": [
+       "linearity",
+       "inversibility"
+      ],
+      "failures": {}
+     }
+    }
+   ]
+  }
+ ]
+}

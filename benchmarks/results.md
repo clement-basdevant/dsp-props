@@ -107,3 +107,14 @@ scripts; do not edit. A number quoted in the documentation is marked
 | `iir_structure.iir_coefficients.df2t` | 1.9e5 ε | `iir_structure.json` |
 | `iir_structure.iir_arithmetic.df1` | 1.5e6 ε | `iir_structure.json` |
 | `iir_structure.iir_arithmetic.df2t` | 1.5e6 ε | `iir_structure.json` |
+| `rediscovery.candidates` | 246 | `bugcorpus/triage.tsv` |
+| `rediscovery.in_scope` | 14 | `bugcorpus/triage.tsv` |
+| `rediscovery.bugs` | 12 | `rediscovery.json` |
+| `rediscovery.found` | 7 | `rediscovery.json` |
+| `rediscovery.found_all_seeds` | 6 | `rediscovery.json` |
+| `rediscovery.seeds` | 3 | `rediscovery.json` |
+| `rediscovery.examples` | 200 | `rediscovery.json` |
+| `rediscovery.inputs_median` | 4.5 | `rediscovery.json` |
+| `rediscovery.counterexample_median` | 2 | `rediscovery.json` |
+| `rediscovery.found_seeds` | 20 | `rediscovery.json` |
+| `rediscovery.small_counterexamples` | 15 | `rediscovery.json` |

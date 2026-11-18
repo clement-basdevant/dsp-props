@@ -12,8 +12,8 @@ from .precision import Float32Consistency
 
 
 @st.composite
-def _signal_and_splits(draw, max_n, dtype=np.float64):
-    n = draw(lengths(max_n))
+def _signal_and_splits(draw, max_n, dtype=np.float64, min_n=1):
+    n = draw(lengths(max_n, min_n))
     x = draw(signals(n, dtype))
     return x, draw(block_splits(n))
 
@@ -28,7 +28,7 @@ class BlockInvariance(Relation):
     name = "block invariance"
 
     def inputs(self, spec):
-        return _signal_and_splits(spec.max_n, spec.precision)
+        return _signal_and_splits(spec.max_n, spec.precision, min_n=spec.min_n)
 
     def check(self, spec, inputs):
         x, cuts = inputs

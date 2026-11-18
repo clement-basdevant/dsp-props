@@ -18,8 +18,8 @@ REAL_COEFFS = [1.0, -1.0, 2.0, 0.5, -0.75, 3.0]
 
 
 @st.composite
-def _signal(draw, max_n, dtype=np.float64):
-    n = draw(lengths(max_n))
+def _signal(draw, max_n, dtype=np.float64, min_n=1):
+    n = draw(lengths(max_n, min_n))
     return draw(signals(n, dtype))
 
 
@@ -30,7 +30,7 @@ class LTILinearity(Relation):
 
     def inputs(self, spec):
         c = st.sampled_from(REAL_COEFFS)
-        return st.tuples(signal_pairs(spec.max_n, dtype=spec.precision), c, c)
+        return st.tuples(signal_pairs(spec.max_n, dtype=spec.precision, min_n=spec.min_n), c, c)
 
     def check(self, spec, inputs):
         (x, y), a, b = inputs
@@ -46,7 +46,7 @@ class TimeInvariance(Relation):
     name = "time invariance"
 
     def inputs(self, spec):
-        return st.tuples(_signal(spec.max_n, spec.precision), st.integers(1, 32))
+        return st.tuples(_signal(spec.max_n, spec.precision, min_n=spec.min_n), st.integers(1, 32))
 
     def check(self, spec, inputs):
         x, s = inputs
@@ -70,15 +70,15 @@ class Causality(Relation):
 
     @staticmethod
     @st.composite
-    def _case(draw, max_n, dtype=np.float64):
-        n = draw(lengths(max_n).filter(lambda m: m >= 2))
+    def _case(draw, max_n, dtype=np.float64, min_n=1):
+        n = draw(lengths(max_n, max(2, min_n)))
         x = draw(signals(n, dtype))
         k = draw(st.integers(1, n - 1))
         bump = draw(st.sampled_from([1.0, -1e3, 1e-3]))
         return x, k, bump
 
     def inputs(self, spec):
-        return self._case(spec.max_n, spec.precision)
+        return self._case(spec.max_n, spec.precision, min_n=spec.min_n)
 
     def check(self, spec, inputs):
         x, k, bump = inputs
@@ -156,7 +156,7 @@ class BoundedGain(Relation):
         return spec.max_gain is not None
 
     def inputs(self, spec):
-        return lengths(spec.max_n).filter(lambda m: m >= 1)
+        return lengths(spec.max_n, spec.min_n)
 
     def check(self, spec, n):
         impulse = np.zeros(n, spec.precision)

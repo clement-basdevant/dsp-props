@@ -5,7 +5,7 @@
 
 Reads the JSON and CSV files the benchmark scripts write (``mutant_results.json``,
 ``precision_mutants.json``, ``precision_oracles.json``, ``calibrated_tolerance.json``,
-``validation.json``, ``error_profile.csv``) and derives one value per key, such as
+``validation.json``, ``error_profile.csv``, ``rediscovery.json``) and derives one value per key, such as
 ``precision.fft_twiddles.default`` = ``90 ε``. It then
 
 - writes ``benchmarks/results.md`` (one table: key, value, source file) and
@@ -189,9 +189,32 @@ def iir_structure(r: Results):
         r.add(f"iir_structure.{key}", eps(t["caught_from_loss_eps"]), src)
 
 
+def rediscovery(r: Results):
+    src = "rediscovery.json"
+    d = load(src)
+    rows = [b for b in d["bugs"] if "error" not in b and not b["ours"]]
+    found = [b for b in rows if b["rediscovered_seeds"] > 0]
+    firsts = [n for b in found for n in b["inputs_before_first_failure"]]  # one per (bug, seed) found
+    sizes = [n for b in found for n in b["counterexample_lengths"]]
+    triage = [line.split("\t") for line in (BENCH / "bugcorpus" / "triage.tsv").read_text(encoding="utf-8")
+              .splitlines()[2:] if line.strip()]
+    r.add("rediscovery.candidates", len(triage), "bugcorpus/triage.tsv")
+    r.add("rediscovery.in_scope", sum(t[5] == "in-scope" for t in triage), "bugcorpus/triage.tsv")
+    r.add("rediscovery.bugs", len(rows), src)
+    r.add("rediscovery.found", len(found), src)
+    r.add("rediscovery.found_all_seeds", sum(b["rediscovered_seeds"] == len(d["seeds"]) for b in rows), src)
+    r.add("rediscovery.seeds", len(d["seeds"]), src)
+    r.add("rediscovery.examples", d["examples"], src)
+    r.add("rediscovery.inputs_median", f"{statistics.median(firsts):g}", src)
+    r.add("rediscovery.counterexample_median", f"{statistics.median(sizes):g}", src)
+    r.add("rediscovery.found_seeds", len(sizes), src)
+    r.add("rediscovery.small_counterexamples", sum(n <= 2 for n in sizes), src)
+
+
 def collect() -> Results:
     r = Results()
-    for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison, iir_structure):
+    for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison, iir_structure,
+                 rediscovery):
         part(r)
     return r
 

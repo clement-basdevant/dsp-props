@@ -15,8 +15,8 @@ REAL_COEFFS = [1.0, -1.0, 2.0, 0.5, -0.75, 3.0]
 
 
 @st.composite
-def _signal(draw, max_n, complex=False, dtype=np.float64):
-    n = draw(lengths(max_n))
+def _signal(draw, max_n, complex=False, dtype=np.float64, min_n=1):
+    n = draw(lengths(max_n, min_n))
     return draw(complex_signals(n, dtype) if complex else signals(n, dtype))
 
 
@@ -36,7 +36,8 @@ class Linearity(Relation):
     def inputs(self, spec):
         coeffs = REAL_COEFFS if spec.real_input_only else COEFFS
         c = st.sampled_from(coeffs)
-        return st.tuples(signal_pairs(spec.max_n, complex=_accepts_complex(spec), dtype=spec.precision), c, c)
+        return st.tuples(signal_pairs(spec.max_n, complex=_accepts_complex(spec), dtype=spec.precision,
+                                      min_n=spec.min_n), c, c)
 
     def check(self, spec, inputs):
         (x, y), a, b = inputs
@@ -57,7 +58,8 @@ class CircularShift(Relation):
         return spec.is_fourier
 
     def inputs(self, spec):
-        return st.tuples(_signal(spec.max_n, _accepts_complex(spec), spec.precision), st.integers(-1024, 1024))
+        return st.tuples(_signal(spec.max_n, _accepts_complex(spec), spec.precision, min_n=spec.min_n),
+                         st.integers(-1024, 1024))
 
     def check(self, spec, inputs):
         x, s = inputs
@@ -80,7 +82,7 @@ class Parseval(Relation):
         return spec.parseval
 
     def inputs(self, spec):
-        return _signal(spec.max_n, _accepts_complex(spec), spec.precision)
+        return _signal(spec.max_n, _accepts_complex(spec), spec.precision, min_n=spec.min_n)
 
     def check(self, spec, x):
         n = len(x)
@@ -105,7 +107,7 @@ class HermitianSymmetry(Relation):
         return spec.kind == "dft" and spec.real_input_hermitian
 
     def inputs(self, spec):
-        return _signal(spec.max_n, dtype=spec.precision)
+        return _signal(spec.max_n, dtype=spec.precision, min_n=spec.min_n)
 
     def check(self, spec, x):
         fx = np.asarray(spec.func(x))
@@ -122,7 +124,7 @@ class Inversibility(Relation):
         return spec.inverse is not None
 
     def inputs(self, spec):
-        return _signal(spec.max_n, _accepts_complex(spec), spec.precision)
+        return _signal(spec.max_n, _accepts_complex(spec), spec.precision, min_n=spec.min_n)
 
     def check(self, spec, x):
         y = spec.invert(spec.func(x), len(x))
@@ -145,7 +147,8 @@ class ConvolutionTheorem(Relation):
         return spec.is_fourier and spec.inverse is not None
 
     def inputs(self, spec):
-        return signal_pairs(min(spec.max_n, 256), complex=_accepts_complex(spec), dtype=spec.precision)
+        return signal_pairs(max(spec.min_n, min(spec.max_n, 256)), complex=_accepts_complex(spec),
+                            dtype=spec.precision, min_n=spec.min_n)
 
     def check(self, spec, inputs):
         x, y = inputs
@@ -170,7 +173,7 @@ class RealBins(Relation):
         return spec.kind == "rdft"
 
     def inputs(self, spec):
-        return _signal(spec.max_n, dtype=spec.precision)
+        return _signal(spec.max_n, dtype=spec.precision, min_n=spec.min_n)
 
     def check(self, spec, x):
         n = len(x)

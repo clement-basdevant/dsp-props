@@ -18,14 +18,14 @@ from .precision import Float32Consistency
 
 
 @st.composite
-def _signal(draw, max_n, dtype=np.float64):
-    n = draw(lengths(max_n))
+def _signal(draw, max_n, dtype=np.float64, min_n=1):
+    n = draw(lengths(max_n, min_n))
     return draw(signals(n, dtype))
 
 
 def _long_length(spec):
     """Lengths long enough for the middle half of the output to be free of edge transients."""
-    n0 = 64 * max(spec.up, spec.down)
+    n0 = max(64 * max(spec.up, spec.down), spec.min_n)
     return st.integers(n0, max(n0, 4 * n0, spec.max_n))
 
 
@@ -43,7 +43,7 @@ class OutputLength(Relation):
         return spec.length is not None
 
     def inputs(self, spec):
-        return lengths(spec.max_n)
+        return lengths(spec.max_n, spec.min_n)
 
     def check(self, spec, n):
         got = len(np.asarray(spec.func(np.zeros(n, spec.precision))))
@@ -58,7 +58,7 @@ class PeriodicShift(Relation):
     name = "periodic time invariance"
 
     def inputs(self, spec):
-        return st.tuples(_signal(spec.max_n, spec.precision), st.integers(1, 8))
+        return st.tuples(_signal(spec.max_n, spec.precision, min_n=spec.min_n), st.integers(1, 8))
 
     def check(self, spec, inputs):
         x, s = inputs
