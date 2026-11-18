@@ -166,9 +166,19 @@ def error_profile(r: Results):
         r.add(f"profile.{lib}.worst_n", worst["N"], src)
 
 
+def comparison(r: Results):
+    d = load("comparison/summary.json")
+    src = "comparison/summary.json"
+    for subject in ("lfilter", "upfirdn"):
+        rates = d["kill_rates"][subject]["functional"]
+        for approach, key in (("dsp-props", "dsp_props"), ("dsp-props/params", "params"), ("sop", "sop")):
+            r.add(f"comparison.{subject}.{key}", f"{100 * rates[approach]['mean']:.0f} %", src)
+        r.add(f"comparison.{subject}.mutants", rates["dsp-props"]["n_mutants"], src)
+
+
 def collect() -> Results:
     r = Results()
-    for part in (mutants, precision, oracles, calibrated, validation, error_profile):
+    for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison):
         part(r)
     return r
 

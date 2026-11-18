@@ -66,6 +66,7 @@ class TransformSpec:
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
+    float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
 
     @property
     def relations(self):
@@ -103,6 +104,7 @@ class StreamingSpec:
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
+    float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
 
     @property
     def relations(self):
@@ -124,6 +126,7 @@ class LTISpec:
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
+    float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
 
     @property
     def relations(self):
@@ -131,7 +134,7 @@ class LTISpec:
 
 
 def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max_n=512,
-               precision=np.float64):
+               precision=np.float64, float32=False):
     """Declare a linear time-invariant filter applied with zero initial state.
 
     Checks linearity, time invariance and (if ``causal``) causality. With
@@ -149,6 +152,12 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     output less precise than it (float32 out of float64 in) is a failure.
     Declare ``precision=np.float32`` for an operator meant to run in single
     precision: it then gets float32 inputs within float32 range.
+
+    ``float32=True`` (every declaration takes it, with the default float64
+    precision) declares that the operator also runs in single precision: the
+    ``float32 consistency`` relation checks that its output on a float32 input
+    agrees with its output on the same values in float64, to float32
+    accuracy, and is at least float32.
     """
     precision = _precision(precision)
     declared = tolerance is not None
@@ -167,7 +176,7 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     def decorate(func):
         func.__dsp_props__ = LTISpec(func=func, causal=causal, transfer=transfer, max_gain=max_gain,
                                      tolerance=tolerance, max_n=max_n, precision=precision,
-                                     tolerance_declared=declared)
+                                     tolerance_declared=declared, float32=float32)
         return func
 
     return decorate
@@ -193,6 +202,7 @@ class MultirateSpec:
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
+    float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
 
     @property
     def relations(self):
@@ -204,7 +214,7 @@ class MultirateSpec:
 
 
 def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=1e-2,
-              stopband=0.1, tolerance=None, max_n=512, precision=np.float64):
+              stopband=0.1, tolerance=None, max_n=512, precision=np.float64, float32=False):
     """Declare a rational resampler (up by ``up``, down by ``down``), like ``resample_poly``.
 
     Checks linearity and periodic time invariance (an input delay of
@@ -213,7 +223,7 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
     ``"floor"``, or a callable), the DC gain within ``ripple`` away from the
     edges, and, when decimating, that a tone above the output Nyquist
     frequency comes out below ``stopband`` (relative amplitude). ``precision``
-    as for ``lti_filter``.
+    and ``float32`` as for ``lti_filter``.
     """
     precision = _precision(precision)
     if up < 1 or down < 1:
@@ -229,27 +239,28 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
         func.__dsp_props__ = MultirateSpec(func=func, up=up, down=down, causal=causal, length=rule,
                                            dc_gain=dc_gain, ripple=ripple, stopband=stopband,
                                            tolerance=tolerance or FFTTolerance(c=1000.0), max_n=max_n,
-                                           precision=precision, tolerance_declared=tolerance is not None)
+                                           precision=precision, tolerance_declared=tolerance is not None,
+                                           float32=float32)
         return func
 
     return decorate
 
 
-def streaming(*, tolerance=None, max_n=512, precision=np.float64):
+def streaming(*, tolerance=None, max_n=512, precision=np.float64, float32=False):
     """Declare a block processor: a class (or factory) whose instances have ``process(block)``.
 
     ``dp.verify`` then checks that a split into blocks gives the same output
     as one call. The splits drawn mix arbitrary cut points (up to
     ``max(N, 16)`` blocks, empty and one-sample blocks included), blocks of
     one sample, and blocks of a fixed size (see ``generators.block_splits``).
-    ``precision`` as for ``lti_filter``.
+    ``precision`` and ``float32`` as for ``lti_filter``.
     """
     precision = _precision(precision)
 
     def decorate(make):
         make.__dsp_props__ = StreamingSpec(make=make, tolerance=tolerance or FFTTolerance(c=1000.0),
                                            max_n=max_n, precision=precision,
-                                           tolerance_declared=tolerance is not None)
+                                           tolerance_declared=tolerance is not None, float32=float32)
         return make
 
     return decorate
@@ -280,7 +291,7 @@ def stateful(func, init_state, **kwargs):
 
 def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval_scale=None,
               real_input_hermitian=False, real_input_only=None, inverse_takes_length=None,
-              tolerance=None, max_n=512, precision=np.float64):
+              tolerance=None, max_n=512, precision=np.float64, float32=False):
     """Declare a function as a transform; ``dp.verify`` then checks it.
 
     ``kind="dft"``: complex DFT (shift and convolution theorems apply).
@@ -288,7 +299,7 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
     ``numpy.fft.rfft``; its inverse is called as ``inverse(X, N)``.
     ``kind="generic"``: any linear transform (DCT, wavelets, STFT...): only
     linearity, Parseval and inversibility are checked.
-    ``precision`` as for ``lti_filter``.
+    ``precision`` and ``float32`` as for ``lti_filter``.
     """
     precision = _precision(precision)
     if kind not in KINDS:
@@ -313,6 +324,7 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
             max_n=max_n,
             precision=precision,
             tolerance_declared=tolerance is not None,
+            float32=float32,
         )
         return func
 

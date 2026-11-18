@@ -20,6 +20,7 @@ from .api import (
     verify,
 )
 from .core import calibrate
+from .family import FamilySpec, family
 from .regression import write_regression_tests
 from .tolerances import PrecisionComparison, ToleranceFile
 
@@ -47,6 +48,8 @@ __all__ = [
     "TransformSpec",
     "PropertyViolation",
     "write_regression_tests",
+    "family",
+    "FamilySpec",
     "ToleranceFile",
     "PrecisionComparison",
 ]

@@ -7,6 +7,7 @@ from .multirate import (
     OutputLength,
     PeriodicShift,
 )
+from .precision import Float32Consistency
 from .streaming import STREAMING_RELATIONS, BlockInvariance
 from .transforms import (
     TRANSFORM_RELATIONS,
@@ -42,4 +43,5 @@ __all__ = [
     "ConvolutionTheorem",
     "RealBins",
     "TRANSFORM_RELATIONS",
+    "Float32Consistency",
 ]

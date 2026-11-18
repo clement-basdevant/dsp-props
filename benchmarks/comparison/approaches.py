@@ -10,6 +10,10 @@
   default of numpy.testing.assert_allclose), applied to the L2 error.
 * ``generic-pbt``: both replacements at once, i.e. the same relations
   written with Hypothesis alone.
+* ``dsp-props/params``: ``dsp-props`` plus operator families (``dp.family``,
+  plan action 2.4) whose parameters are drawn too: filter coefficients for
+  lfilter; taps, rates and default arguments for upfirdn
+  (``suites.FAMILY_DECLS``). Other subjects have no family.
 """
 
 from __future__ import annotations
@@ -33,7 +37,7 @@ from dsp_props.core.tolerance import ToleranceModel
 
 gen_signals = importlib.import_module("dsp_props.generators.signals")  # the package re-exports a function named signals
 
-APPROACHES = ["sop", "dsp-props", "dsp-props/uniform", "dsp-props/fixed-tol", "generic-pbt"]
+APPROACHES = ["sop", "dsp-props", "dsp-props/uniform", "dsp-props/fixed-tol", "generic-pbt", "dsp-props/params"]
 RANDOMISED = APPROACHES[1:]
 
 

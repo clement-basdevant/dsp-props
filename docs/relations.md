@@ -87,6 +87,61 @@ transients.
 | --- | --- |
 | `block invariance` | for a split drawn by `block_splits`, concatenating `process(block)` over the blocks of a fresh processor equals `process(x)` on another fresh processor. A split is one of three kinds: arbitrary cut points (up to max(N, 16) blocks, empty blocks and single samples included), blocks of one sample, or blocks of a fixed size B (the last one possibly shorter) |
 
+## Single and double precision: `float32=True`
+
+Every declaration takes `float32=True`, for an operator meant to run in both
+precisions (with the default float64 `precision`). It adds one relation:
+
+| Relation | Checked property |
+| --- | --- |
+| `float32 consistency` | for a real float32 signal x (amplitudes 1, 1e-3, 1e3), the output on x agrees with the output on the same values cast exactly to float64, within the declared tolerance model at float32 ε (relative to the input norm for LTI filters, to the float64 output otherwise); the float32 output may be float64, not less precise than float32 |
+
+It catches a float32 path that is not the float64 one: a dtype-dependent
+branch, coefficients stored in half precision for float32 input, an input
+rounded to float16, a float16 output. A fault common to both precisions
+(rounded resampler taps, say) leaves the two outputs consistent: that is
+what a calibration and `dsp-props calibrate --compare` are for (see
+[Choosing a tolerance](tolerances.md#precision-regressions-between-two-versions)).
+
+## Operator families: `dp.family`
+
+A declaration fixes its parameters (coefficients, rates, default arguments),
+so the relations vary only the input signal. `dp.family` draws the
+parameters too: the decorated factory takes the parameters and returns a
+declared operator, and every relation of the members is checked on
+parameters and signals drawn together.
+
+```python
+from scipy import signal
+import dsp_props as dp
+
+@dp.family(dp.generators.iir_coefficients(max_order=6))
+def lfilter(b, a):
+    return dp.lti_filter(transfer=(b, a))(lambda x: signal.lfilter(b, a, x))
+
+@dp.family(dp.generators.rate_pairs(max_rate=8))
+def resample(up, down):
+    return dp.resampler(up, down)(lambda x: signal.resample_poly(x, up, down))
+```
+
+The parameter strategies shrink towards the degenerate cases:
+
+| Strategy | Draws |
+| --- | --- |
+| `iir_coefficients(max_order=6)` | stable `(b, a)`: denominators of order 0 to `max_order` (real poles and conjugate pairs of radius 0 to 0.99), numerators of 1 to `max_order + 2` coefficients (shorter than, as long as or longer than the denominator), `a[0]` not always 1 |
+| `fir_taps(max_taps=16)` | 1 to `max_taps` coefficients, not all zero |
+| `rate_pairs(max_rate=8)` | coprime `(up, down)`, `(1, 1)` included |
+
+Any Hypothesis strategy works (`st.tuples(fir_taps(), rate_pairs(), st.booleans())`
+to draw whether default arguments are used, say); a tuple is unpacked into
+positional arguments, a dictionary into keyword arguments. A relation is
+kept if it applies to some member (alias rejection to a decimating pair) and
+skips the draws where it does not. The counterexample is
+`(parameters, input)`, both shrunk: a filter that forgets to divide by
+`a[0]` when it has no poles is reported with `b = [1]`, `a = [2]`.
+Each member keeps its own tolerance (`IIRTolerance(b, a)` for a filter
+declared with `transfer=`); tolerance files do not apply to families.
+
 ## Generated signals
 
 Every relation draws its signals from

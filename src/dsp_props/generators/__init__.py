@@ -1,3 +1,4 @@
+from .parameters import fir_taps, iir_coefficients, rate_pairs
 from .signals import (
     amplitudes,
     block_splits,
@@ -34,4 +35,7 @@ __all__ = [
     "signal_pairs",
     "block_splits",
     "split_blocks",
+    "iir_coefficients",
+    "fir_taps",
+    "rate_pairs",
 ]

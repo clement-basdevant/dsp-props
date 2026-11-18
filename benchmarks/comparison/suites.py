@@ -125,6 +125,16 @@ def lfilter_decls(mod):
     return {"lfilter_resonant": f4, "lfilter_a0_not_1": f2, "lfilter_streaming": stream}
 
 
+def lfilter_family_decls(mod):
+    """Approach dsp-props/params: the filter coefficients are drawn too (``dp.family``)."""
+
+    @dp.family(dp.generators.iir_coefficients(max_order=4, radii=(0.5, 0.0, 0.3, 0.9)))
+    def lfilter_params(b, a):
+        return dp.lti_filter(transfer=(b, a))(lambda x: mod.lfilter(b, a, x))
+
+    return {**lfilter_decls(mod), "lfilter_params": lfilter_params}
+
+
 def lfilter_sop(mod):
     x6 = np.linspace(0, 5, 6)
 
@@ -256,6 +266,29 @@ def upfirdn_decls(mod):
             lambda x, up=up, down=down: resample_poly(mod, x, up, down))
     out["upfirdn_as_fir"] = dp.lti_filter(transfer=(H15, [1.0]))(lambda x: mod.upfirdn(H15, x)[:len(x)])
     return out
+
+
+def upfirdn_family_decls(mod):
+    """Approach dsp-props/params: taps, rates and the use of default arguments are drawn too."""
+    from hypothesis import strategies as st
+
+    params = st.tuples(dp.generators.fir_taps(16), dp.generators.rate_pairs(4), st.booleans())
+
+    @dp.family(params)
+    def upfirdn_params(h, rates, defaults):
+        up, down = rates
+
+        def run(x):
+            if defaults and up == 1 and down == 1:
+                return mod.upfirdn(h, x)  # default arguments
+            if defaults and down == 1:
+                return mod.upfirdn(h, x, up)
+            return mod.upfirdn(h, x, up, down)
+
+        return dp.resampler(up, down, causal=True, length=lambda n: _output_len(len(h), n, up, down),
+                            dc_gain=None, stopband=None)(run)
+
+    return {**upfirdn_decls(mod), "upfirdn_params": upfirdn_params}
 
 
 def upfirdn_naive(x, h, up=1, down=1):
@@ -477,3 +510,6 @@ SUBJECTS = {
     "upfirdn": (upfirdn_decls, upfirdn_sop, upfirdn_oracle),
     "ola": (ola_decls, ola_sop, ola_oracle),
 }
+
+# Declarations of the approach dsp-props/params (operator families, plan action 2.4).
+FAMILY_DECLS = {"lfilter": lfilter_family_decls, "upfirdn": upfirdn_family_decls}
