@@ -7,3 +7,5 @@ dist/
 *.egg-info/
 .venv/
 site/
+.coverage
+coverage.xml

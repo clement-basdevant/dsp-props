@@ -246,21 +246,21 @@ that level and every larger one fail on all 3 seeds.
 
 | Class and fault | Not caught up to | Caught from | By |
 | --- | --- | --- | --- |
-| FFT, twiddle table rounded | 21 ε | 90 ε | circular shift, inversibility, Parseval, convolution |
-| IIR (order 4, poles at 0.95), coefficients rounded | 1.9e5 ε | 7.1e5 ε | transfer function |
-| IIR, input and output rounded | 6.9e5 ε | 3.0e6 ε | linearity |
-| 2/3 resampler, filter taps rounded | 6.2e7 ε (24 bits) | never | — |
-| 2/3 resampler, input and output rounded | 6.7e3 ε | 1.1e5 ε | linearity |
-| Streaming moving sum, state rounded between blocks | 750 ε | 7.1e3 ε | block invariance |
+| FFT, twiddle table rounded | <!-- r:precision.fft_twiddles.passes_up_to -->21 ε<!-- /r --> | <!-- r:precision.fft_twiddles.default -->90 ε<!-- /r --> | circular shift, inversibility, Parseval, convolution |
+| IIR (order 4, poles at 0.95), coefficients rounded | <!-- r:precision.iir_coefficients.passes_up_to -->1.9e5 ε<!-- /r --> | <!-- r:precision.iir_coefficients.default -->7.1e5 ε<!-- /r --> | transfer function |
+| IIR, input and output rounded | <!-- r:precision.iir_arithmetic.passes_up_to -->6.9e5 ε<!-- /r --> | <!-- r:precision.iir_arithmetic.default -->3.0e6 ε<!-- /r --> | linearity |
+| 2/3 resampler, filter taps rounded | <!-- r:precision.resampler_taps.passes_up_to -->6.2e7 ε<!-- /r --> (24 bits) | <!-- r:precision.resampler_taps.default -->never<!-- /r --> | — |
+| 2/3 resampler, input and output rounded | <!-- r:precision.resampler_arithmetic.passes_up_to -->6.7e3 ε<!-- /r --> | <!-- r:precision.resampler_arithmetic.default -->1.1e5 ε<!-- /r --> | linearity |
+| Streaming moving sum, state rounded between blocks | <!-- r:precision.streaming_state.passes_up_to -->750 ε<!-- /r --> | <!-- r:precision.streaming_state.default -->7.1e3 ε<!-- /r --> | block invariance |
 
 Realistic precision faults in an FFT, same protocol:
 
 | FFT mutant | Loss | Caught (seeds) |
 | --- | --- | --- |
-| radix-2, twiddles by the recurrence w^k = w^(k−1) · w | 19 ε | 0/3 |
-| direct DFT with exp(−2iπkn/N), argument not reduced mod N | 805 ε | 3/3 |
-| one Goertzel recursion per bin | 1.4e4 ε | 3/3 |
-| radix-2, twiddle table in single precision | 2.5e8 ε | 3/3 |
+| radix-2, twiddles by the recurrence w^k = w^(k−1) · w | <!-- r:precision.realistic.fft_radix2_recursive_twiddles.loss -->19 ε<!-- /r --> | <!-- r:precision.realistic.fft_radix2_recursive_twiddles.caught -->0/3<!-- /r --> |
+| direct DFT with exp(−2iπkn/N), argument not reduced mod N | <!-- r:precision.realistic.fft_naive_dft_unreduced.loss -->805 ε<!-- /r --> | <!-- r:precision.realistic.fft_naive_dft_unreduced.caught -->3/3<!-- /r --> |
+| one Goertzel recursion per bin | <!-- r:precision.realistic.fft_goertzel.loss -->1.4e4 ε<!-- /r --> | <!-- r:precision.realistic.fft_goertzel.caught -->3/3<!-- /r --> |
+| radix-2, twiddle table in single precision | <!-- r:precision.realistic.fft_radix2_single_twiddles.loss -->2.5e8 ε<!-- /r --> | <!-- r:precision.realistic.fft_radix2_single_twiddles.caught -->3/3<!-- /r --> |
 
 NumPy's FFT and the accurate versions of these mutants measure 2 to 3.5 ε and
 pass. Single-precision IIR coefficients (7e9 ε) are caught by the transfer
@@ -298,18 +298,18 @@ Smallest loss caught on all 3 seeds, with every larger level also caught:
 
 | Family | Default | Fixed 1e-7 | Calibrated | Differential |
 | --- | --- | --- | --- | --- |
-| FFT, twiddles rounded | 90 ε | never | 21 ε | 240 ε |
-| IIR, coefficients rounded | 7.1e5 ε | never | 1.7e3 ε | 7.1e5 ε |
-| IIR, input and output rounded | 3.0e6 ε | never | 2.9e3 ε | 190 ε |
-| Resampler, taps rounded | never | never | never | 1.5e7 ε |
-| Resampler, input and output rounded | 1.1e5 ε | never | 430 ε | 100 ε |
-| Streaming, state rounded | 7.1e3 ε | never | 28 ε | 750 ε |
+| FFT, twiddles rounded | <!-- r:oracles.fft_twiddles.default -->90 ε<!-- /r --> | <!-- r:oracles.fft_twiddles.fixed -->never<!-- /r --> | <!-- r:oracles.fft_twiddles.calibrated -->21 ε<!-- /r --> | <!-- r:oracles.fft_twiddles.differential -->240 ε<!-- /r --> |
+| IIR, coefficients rounded | <!-- r:oracles.iir_coefficients.default -->7.1e5 ε<!-- /r --> | <!-- r:oracles.iir_coefficients.fixed -->never<!-- /r --> | <!-- r:oracles.iir_coefficients.calibrated -->1.7e3 ε<!-- /r --> | <!-- r:oracles.iir_coefficients.differential -->7.1e5 ε<!-- /r --> |
+| IIR, input and output rounded | <!-- r:oracles.iir_arithmetic.default -->3.0e6 ε<!-- /r --> | <!-- r:oracles.iir_arithmetic.fixed -->never<!-- /r --> | <!-- r:oracles.iir_arithmetic.calibrated -->2.9e3 ε<!-- /r --> | <!-- r:oracles.iir_arithmetic.differential -->190 ε<!-- /r --> |
+| Resampler, taps rounded | <!-- r:oracles.resampler_taps.default -->never<!-- /r --> | <!-- r:oracles.resampler_taps.fixed -->never<!-- /r --> | <!-- r:oracles.resampler_taps.calibrated -->never<!-- /r --> | <!-- r:oracles.resampler_taps.differential -->1.5e7 ε<!-- /r --> |
+| Resampler, input and output rounded | <!-- r:oracles.resampler_arithmetic.default -->1.1e5 ε<!-- /r --> | <!-- r:oracles.resampler_arithmetic.fixed -->never<!-- /r --> | <!-- r:oracles.resampler_arithmetic.calibrated -->430 ε<!-- /r --> | <!-- r:oracles.resampler_arithmetic.differential -->100 ε<!-- /r --> |
+| Streaming, state rounded | <!-- r:oracles.streaming_state.default -->7.1e3 ε<!-- /r --> | <!-- r:oracles.streaming_state.fixed -->never<!-- /r --> | <!-- r:oracles.streaming_state.calibrated -->28 ε<!-- /r --> | <!-- r:oracles.streaming_state.differential -->750 ε<!-- /r --> |
 
 No oracle raised a false alarm on the correct implementations (level 0: the
 trusted implementations, and for the FFT a direct DFT with accurate twiddles,
 3.5 ε against 2.2 ε for NumPy), over 3 seeds. The calibrated ratios of the
-trusted implementations are 2.2 ε (FFT), 27 ε (IIR), 17 ε (resampler) and
-2.0 ε (moving sum).
+trusted implementations are <!-- r:oracles.trusted.fft -->2.2 ε<!-- /r --> (FFT), <!-- r:oracles.trusted.iir -->27 ε<!-- /r --> (IIR), <!-- r:oracles.trusted.resampler -->17 ε<!-- /r --> (resampler) and
+<!-- r:oracles.trusted.streaming -->2.0 ε<!-- /r --> (moving sum).
 
 What this says:
 
@@ -354,7 +354,7 @@ lengths up to 512 otherwise.
 | `numpy.fft.fft` (2.2 ε) | `scipy.fft.fft` | 2.0 ε | 0/3 |
 | | radix-2, accurate twiddles | 4.8 ε | 0/3 |
 | | direct DFT, accurate twiddles | 4.5 ε | 0/3 |
-| | `torch.fft.fft` (CPU, torch 2.15) | 156 ε | 3/3 |
+| | `torch.fft.fft` (CPU, torch 2.15) | <!-- r:calibrated.torch_fft -->156 ε<!-- /r --> | <!-- r:calibrated.torch_fft_seeds_failing -->3/3<!-- /r --> |
 | `lfilter`, five filters (27 to 275 ε) | `sosfilt(tf2sos(b, a))` | 47 to 631 ε | 0/3 each |
 | `resample_poly`, 2/3, 3/2, 5/4, 1/4 (1.2 to 57 ε) | direct polyphase convolution | 0.9 to 94 ε | 0/3 each |
 | moving sum (2.0 ε) | `np.convolve` with carried history | 1.5 ε | 0/3 |
@@ -392,7 +392,7 @@ alarm at 0 bits):
 | resampler 1/4 | arithmetic | 1.4e6 ε | 5.5e3 ε |
 
 Steps of 4 bits make these thresholds coarser (a factor 16) than the 2-bit
-steps of the previous tables. The gain of calibration varies from 7 to 3400
+steps of the previous tables. The gain of calibration varies from <!-- r:calibrated.gain_min -->7<!-- /r --> to <!-- r:calibrated.gain_max -->3400<!-- /r -->
 with the filter: it is largest where the derived model is most pessimistic
 (poles close to the unit circle, high order).
 

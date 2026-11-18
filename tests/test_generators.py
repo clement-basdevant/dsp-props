@@ -1,8 +1,8 @@
 import numpy as np
 from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from dsp_props.generators import block_splits, complex_signals, lengths, signal_pairs, signals, split_blocks
-from hypothesis import strategies as st
 
 
 @settings(max_examples=100, deadline=None)

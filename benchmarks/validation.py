@@ -31,9 +31,13 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path[:0] = [str(HERE / "comparison"), str(ROOT / "src"), str(ROOT)]
 
+import importlib  # noqa: E402
+
 import numpy as np  # noqa: E402
 import scipy.signal as ss  # noqa: E402
-from hypothesis import HealthCheck, given, seed as hseed, settings, strategies as st  # noqa: E402
+from hypothesis import HealthCheck, given, settings  # noqa: E402
+from hypothesis import seed as hseed
+from hypothesis import strategies as st
 
 import dsp_props as dp  # noqa: E402
 import dsp_props.relations.lti as rel_lti  # noqa: E402
@@ -43,7 +47,6 @@ import dsp_props.relations.transforms as rel_transforms  # noqa: E402
 from dsp_props.core import tolerance as tolmod  # noqa: E402
 from dsp_props.core.calibration import longdouble_dft  # noqa: E402
 from dsp_props.core.iir import longdouble_lfilter  # noqa: E402
-import importlib  # noqa: E402
 
 gen = importlib.import_module("dsp_props.generators.signals")  # the package re-exports a function named signals
 
@@ -145,7 +148,7 @@ def correct_targets():
         ("scipy.signal.lfilter", {k: v for k, v in suites.lfilter_decls(ScipyLfilter1D).items()
                                   if k != "lfilter_streaming"}),
         ("scipy.signal.sosfilt", {"sosfilt_butter4": dp.lti_filter(transfer=ss.butter(4, 0.2))(
-            lambda x, sos=ss.butter(4, 0.2, output="sos"): ss.sosfilt(sos, x))}),
+            lambda x, sos=ss.butter(4, 0.2, output="sos"): ss.sosfilt(sos, x))}),  # noqa: B008
         ("scipy.signal.resample_poly", {f"resample_poly_{u}_{d}": dp.resampler(u, d)(
             lambda x, u=u, d=d: ss.resample_poly(x, u, d)) for u, d in [(2, 3), (3, 1), (1, 2)]}),
     ]

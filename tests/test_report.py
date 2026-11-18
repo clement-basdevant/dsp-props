@@ -1,6 +1,7 @@
 import json
 
 import numpy as np
+import pytest
 
 import dsp_props as dp
 from dsp_props.report import describe
@@ -10,6 +11,7 @@ def _off_by_one(x):
     return np.roll(np.fft.fft(x), 1)
 
 
+@pytest.mark.full_examples
 def test_failure_carries_minimal_counterexample():
     f = dp.transform(inverse=np.fft.ifft)(_off_by_one)
     report = dp.verify(f, max_examples=100, raise_on_failure=False, derandomize=True)
@@ -20,6 +22,7 @@ def test_failure_carries_minimal_counterexample():
     assert "minimal input" in str(report)
 
 
+@pytest.mark.full_examples
 def test_json_and_markdown_exports():
     f = dp.transform(inverse=np.fft.ifft)(_off_by_one)
     report = dp.verify(f, max_examples=50, raise_on_failure=False, derandomize=True)

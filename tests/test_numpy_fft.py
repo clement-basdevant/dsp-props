@@ -34,6 +34,7 @@ def test_generic_transform_skips_dft_only_relations():
     assert "convolution theorem" not in names
 
 
+@pytest.mark.full_examples
 def test_inverse_that_drops_the_imaginary_part_is_caught():
     # ifft(X).real is correct for every real signal: only complex inputs expose it
     f = dp.transform(inverse=lambda X: np.fft.ifft(X).real, parseval=True,
@@ -51,6 +52,7 @@ def test_real_input_only_transforms_never_see_complex_input():
                      max_examples=50).ok
 
 
+@pytest.mark.full_examples
 @pytest.mark.parametrize("name", sorted(ALL_MUTANTS))
 def test_mutant_is_detected(name):
     report = dp.verify(ALL_MUTANTS[name], max_examples=150, raise_on_failure=False)

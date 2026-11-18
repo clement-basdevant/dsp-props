@@ -32,11 +32,13 @@ def test_correct_c_biquad_passes_lti_and_streaming(lib):
     dp.verify(dp.streaming()(c_block_processor(lib, "biquad", state_size=2)), max_examples=60)
 
 
+@pytest.mark.full_examples
 def test_single_precision_accumulator_is_caught(lib):
     f = dp.lti_filter(transfer=(B, A))(c_function(lib, "biquad_float_acc", state_size=2))
     assert not dp.verify(f, max_examples=60, raise_on_failure=False).ok
 
 
+@pytest.mark.full_examples
 def test_state_dropped_between_blocks_is_caught_only_by_streaming(lib):
     # one call over the whole signal is a correct filter...
     dp.verify(dp.lti_filter(transfer=(B, A))(c_function(lib, "biquad_drops_state", state_size=2)),

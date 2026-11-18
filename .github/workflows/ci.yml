@@ -4,8 +4,26 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "17 2 * * *"  # nightly bug hunt (default and nightly profiles)
+  workflow_dispatch:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - name: Ruff
+        run: ruff check .
+      - name: Types
+        run: mypy
+      - name: Quoted numbers match the benchmark results
+        run: python benchmarks/make_results.py --check
+
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -17,11 +35,23 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install -e ".[dev]"
-      - run: python -m pytest -q
+      # Failing inputs saved by earlier runs are replayed first (Hypothesis example database)
+      - uses: actions/cache@v4
+        with:
+          path: .hypothesis
+          key: hypothesis-${{ matrix.python-version }}-${{ github.run_id }}
+          restore-keys: hypothesis-${{ matrix.python-version }}-
+      - name: Tests (fast profile, with coverage)
+        run: coverage run -m pytest -q && coverage report
+        env:
+          DSP_PROPS_PROFILE: ${{ github.event_name == 'schedule' && 'default' || 'fast' }}
       - name: Mutation score
         run: python mutants/run_mutants.py
       - name: Command line
         run: dsp-props check examples/filters.py:fft examples/filters.py:lowpass examples/filters.py:resample_2_3 --derandomize
+      - name: Bug hunt (nightly profile)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: dsp-props check examples/filters.py:fft examples/filters.py:lowpass examples/filters.py:resample_2_3 --profile nightly --database .hypothesis/examples
       - name: Package builds
         run: python -m build && python -m twine check dist/*
 
