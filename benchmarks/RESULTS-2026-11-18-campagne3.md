@@ -47,8 +47,7 @@ les mêmes entrées float64 :
   scipy#26624 retire les zéros exacts et ne couvre pas les coefficients minuscules non nuls.
   Aucun ticket SciPy existant ne le signale (recherche du 18/11).
 
-Suite : ticket SciPy à poster par Clément (faits et reproducteur dans
-`papers/tickets-a-poster.md`, section 5). La cible de campagne reste telle quelle : elle
+Suite : ticket SciPy posté le 18/11 par Clément, scipy/scipy#26755. La cible de campagne reste telle quelle : elle
 détecte un vrai défaut, et doit passer quand SciPy l'aura corrigé.
 
 ## Comparaison avec la campagne 2

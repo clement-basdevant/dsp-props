@@ -9,7 +9,7 @@ Brouillons prêts, à poster depuis le compte GitHub du projet. Une fois posté,
 | 2 | scipy/scipy : tf2sos supprime les retards purs | posté : [scipy#26417](https://github.com/scipy/scipy/issues/26417) |
 | 3 | commentaire sur scipy#26406 : impact librosa | posté le 15/10/2026 sur [scipy#26406](https://github.com/scipy/scipy/issues/26406) |
 | 4 | scipy/scipy : filtfilt(method="gust") et zéros en fin de `a` ou `b` | posté le 04/11/2026 : [scipy#26610](https://github.com/scipy/scipy/issues/26610), correctif proposé dans [scipy#26624](https://github.com/scipy/scipy/pull/26624) (ouverte le 05/11/2026, en attente de revue) |
-| 5 | scipy/scipy : filtfilt(method="gust") imprécis avec des pôles proches de zéro | **à poster** (section 5) |
+| 5 | scipy/scipy : filtfilt(method="gust") imprécis avec des pôles proches de zéro | posté le 18/11/2026 : [scipy#26755](https://github.com/scipy/scipy/issues/26755) |
 
 ---
 
@@ -95,6 +95,8 @@ librosa.effects.preemphasis(np.array([]), coef=0.5, zi=np.zeros(1), return_zf=Tr
 ---
 
 ## 5. scipy/scipy : filtfilt(method="gust") et pôles proches de zéro
+
+Posté le 18/11/2026 : https://github.com/scipy/scipy/issues/26755
 
 **Le texte doit être écrit par toi** (politique IA de SciPy, comme pour la section 2). Ci-dessous,
 les faits et le code ; à toi la rédaction.
