@@ -305,6 +305,108 @@ not compute what the reference computes.
   the input instead, so for filters `IIRTolerance` is the model to use, and a
   calibration is best read as a measurement to compare with it.
 
+## A versioned calibration: `tolerances.json`
+
+A tolerance calibrated in a notebook is lost, and passing one by hand to every
+declaration is easy to forget. `dsp-props calibrate` measures the declared
+operators of a module or file and stores, for each, the error at every length
+with the library versions it was measured with, in a file to commit next to
+the tests:
+
+```text
+$ dsp-props calibrate examples/filters.py --tolerances tolerances.json
+FAIL examples/filters.py:buggy_fft: error of 9.01e+15 eps at N=2: the operator disagrees with the reference beyond any plausible rounding error
+ok   examples/filters.py:fft: worst error 3.04 eps over 256 lengths (0.1s)
+ok   examples/filters.py:lowpass: worst error 45.2 eps over 256 lengths (0.8s)
+skip examples/filters.py:resample_2_3: no built-in extended-precision reference for this MultirateSpec declaration (only dft and rdft transforms, and LTI filters with transfer=); pass reference=
+
+wrote tolerances.json
+```
+
+```json
+"filters:fft": {
+ "kind": "transform",
+ "reference": "extended_dft",
+ "lengths": "1-256", "trials": 6, "seed": 0,
+ "margin": 8.0, "chained": 2, "base_c": 0.0,
+ "worst": 3.042,
+ "ratios": {"1": 0.0, "2": 0.3898, "3": 0.4102, ...},
+ "calibrated_with": {"python": "3.13.18", "platform": "Linux-x86_64", "dsp_props": "0.1.4",
+                     "numpy": "2.5.3", "scipy": "1.18.1", "date": "2026-11-18"}
+}
+```
+
+The built-in references are the extended DFT for `kind="dft"` and
+`kind="rdft"` transforms and `longdouble_lfilter` for an LTI filter declared
+with `transfer=(b, a)` (where `long double` is extended). Other declarations
+are skipped; calibrate them in Python with their own reference. As with
+`dp.calibrate`, an error no rounding explains is refused (`buggy_fft` above),
+and stored ratios are rounded up, never down. The default is the tight
+tolerance (`base=None`: no analytic floor); `--floor 20` keeps the default
+transform model as a minimum.
+
+Then point the checks at the file, and the stored calibration becomes the
+tolerance of every operator it names, in place of the default model:
+
+| Where | How |
+| --- | --- |
+| `dp.verify` | `tolerances="tolerances.json"` |
+| `dsp-props check` | `--tolerances tolerances.json` |
+| pytest | `--dsp-props-tolerances tolerances.json`, or the ini key `dsp_props_tolerances` |
+| anywhere | the `DSP_PROPS_TOLERANCES` environment variable |
+
+A tolerance given in the declaration (`tolerance=...`) still wins, and an
+operator the file does not name keeps its default model. The report says
+which applied (`Report.tolerance`: `"default"`, `"declared"` or
+`"calibrated (tolerances.json)"`). Operators are named `module:attribute`
+(`module:REGISTRY[key]` for a dictionary); a file given to `dsp-props check`
+is named by its stem, as when pytest imports it, and an entry whose
+attribute alone is unique in the file also matches.
+
+In Python, `dp.ToleranceFile` does the same:
+
+```python
+tf = dp.ToleranceFile("tolerances.json")
+tf.calibrate(my_fft, lengths=range(1, 513))       # default reference for the declaration
+tf.calibrate(MyProcessor, reference=my_extended)  # any declaration, with its own reference
+tf.save()
+```
+
+## Precision regressions between two versions
+
+Recalibrating hides a loss of accuracy: the new tolerance simply follows the
+new error. `--compare` measures each operator again, on the probe signals of
+its calibration (same lengths, trials and seed), and reports the lengths
+where the error grew by more than a factor (2 by default; errors below 1 ε
+count as 1 ε, so that a length computed exactly does not turn rounding noise
+into a regression). It writes nothing and exits with 1 on a regression,
+which makes it a CI step after upgrading NumPy, SciPy or the library under
+test:
+
+Here the accurate radix-2 FFT of the test suite (`mutants/precision_mutants.py`)
+was calibrated as version 1.4.0 of a package, and version 1.5.0 computes its
+twiddle factors by recurrence:
+
+```text
+$ dsp-props calibrate mypkg.ffts --tolerances tolerances.json --compare
+LOSS mypkg.ffts:fft: worst error 2.98 eps recorded, 14.8 eps now; 81 length(s) less accurate by more than x2
+    N=198          1.16 eps ->       14.2 eps
+    N=244          1.12 eps ->       13.6 eps
+    N=230          1.12 eps ->       13.2 eps
+    ...
+    since the calibration: mypkg 1.4.0 -> 1.5.0
+```
+
+The versions recorded are Python's, the platform's, those of the usual
+numerical libraries that are imported (NumPy, SciPy, PyTorch...) and that of
+the top-level package defining the operator.
+
+(`ToleranceFile.compare` in Python.) This is finer than the relations: the
+FFT with recursive twiddles above passes every relation, even with the
+calibrated tolerance (`tests/test_tolerances.py`).
+The comparison is only as stable as the platform: calibrate and compare on
+the same kind of machine.
+
 ## Writing your own model
 
 A tolerance model is any object with a `bound(n, dtype, ref_norm)` method

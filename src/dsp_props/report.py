@@ -106,6 +106,7 @@ class Report:
     kind: str = ""
     examples_per_relation: int = 0
     seconds: dict = field(default_factory=dict)
+    tolerance: str = ""  # "default", "declared" or "calibrated (tolerances.json)"
 
     @property
     def ok(self):
@@ -128,6 +129,7 @@ class Report:
             "kind": self.kind,
             "ok": self.ok,
             "examples_per_relation": self.examples_per_relation,
+            "tolerance": self.tolerance,
             "relations": [
                 {
                     "name": name,

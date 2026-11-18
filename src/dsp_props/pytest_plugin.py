@@ -35,6 +35,9 @@ Options (command line, or ``ini`` keys without the leading dashes and with ``_``
   replaying the minimal counterexample without Hypothesis
   (``test_regression_<operator>.py``), next to the test module, or in ``DIR``
   (relative to the root directory). Off by default;
+- ``--dsp-props-tolerances FILE``: a tolerance file written by ``dsp-props
+  calibrate``; its calibrations replace the default tolerance of the
+  operators it names (default from ``DSP_PROPS_TOLERANCES``);
 - ``-p no:dsp_props`` disables the plugin.
 """
 
@@ -59,9 +62,12 @@ def pytest_addoption(parser):
     group.addoption("--dsp-props-regressions", nargs="?", const="same", default=None, metavar="DIR",
                     help="on failure, write test_regression_<operator>.py replaying the minimal "
                          "counterexample, next to the test module or in DIR")
+    group.addoption("--dsp-props-tolerances", default=None, metavar="FILE",
+                    help="tolerance file from `dsp-props calibrate` (default DSP_PROPS_TOLERANCES)")
     parser.addini("dsp_props_profile", "dsp-props cost profile (fast, default, nightly)", default="")
     parser.addini("dsp_props_derandomize", "draw the same inputs on every run", type="bool", default=False)
     parser.addini("dsp_props_database", "dsp-props example database directory, or 'none'", default="")
+    parser.addini("dsp_props_tolerances", "tolerance file from `dsp-props calibrate`", default="")
     parser.addini("dsp_props_regressions",
                   "write regression tests on failure: 'same' (next to the test module) or a directory",
                   default="")
@@ -172,8 +178,12 @@ class RelationItem(pytest.Item):
         from .api import verify
 
         profile, derandomize, database = self._settings()
+        tolerances = self.config.getoption("dsp_props_tolerances") or self.config.getini("dsp_props_tolerances")
+        if tolerances and not Path(tolerances).is_absolute() and tolerances.lower() != "none":
+            tolerances = str(Path(self.config.rootpath) / tolerances)
         report = verify(self.operator, relations=[self.relation], raise_on_failure=False,
-                        profile=profile, derandomize=derandomize, database=database)
+                        profile=profile, derandomize=derandomize, database=database,
+                        tolerances=tolerances or None)
         if report.failures:
             raise RelationFailure(report.failures[0], self._write_regression(report))
 

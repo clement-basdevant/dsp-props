@@ -6,8 +6,12 @@
     dsp-props check mypkg --json report.json --examples 500
     dsp-props check mypkg --profile fast      # 30 inputs per relation
     dsp-props check mypkg --regressions tests # write tests replaying each counterexample
+    dsp-props calibrate mypkg --tolerances tolerances.json            # measure, store
+    dsp-props check mypkg --tolerances tolerances.json                # verify with it
+    dsp-props calibrate mypkg --tolerances tolerances.json --compare  # precision regression?
 
-Exit status: 0 if every operator passes, 1 if any relation fails, 2 on usage errors.
+Exit status: 0 if every operator passes, 1 if any relation fails (``calibrate``: if
+calibration is refused, or ``--compare`` finds a precision regression), 2 on usage errors.
 """
 
 from __future__ import annotations
@@ -81,28 +85,88 @@ def _write_regressions(op, report, directory):
         print(f"    no regression test for {relation}: {why}")
 
 
-def _check(args):
+def _targets(names):
     sys.path.insert(0, ".")
     targets = []
-    for t in args.targets:
+    for t in names:
         try:
             targets += discover(t)
         except (ImportError, AttributeError, FileNotFoundError) as exc:
             print(f"dsp-props: cannot load {t}: {exc}", file=sys.stderr)
-            return 2
+            return None
     if not targets:
         print("dsp-props: no declared operator found (use @dp.transform, @dp.lti_filter, ...)", file=sys.stderr)
+        return None
+    return targets
+
+
+def _lengths(text):
+    """``"1-256"``, ``"1-64,100,128"`` -> a sorted list of lengths."""
+    out: set[int] = set()
+    for part in text.split(","):
+        first, _, last = part.strip().partition("-")
+        out.update(range(int(first), int(last or first) + 1))
+    if not out or min(out) < 1:
+        raise argparse.ArgumentTypeError(f"invalid lengths {text!r}")
+    return sorted(out)
+
+
+def _calibrate(args):
+    from .core.calibration import CalibrationError
+    from .tolerances import NoReferenceError, ToleranceFile
+
+    targets = _targets(args.targets)
+    if targets is None:
+        return 2
+    try:
+        file = ToleranceFile(args.tolerances)
+    except (ValueError, OSError) as exc:
+        print(f"dsp-props: {exc}", file=sys.stderr)
+        return 2
+    status, changed, results = 0, False, []
+    for name, op in targets:
+        t0 = time.perf_counter()
+        try:
+            if args.compare:
+                cmp = file.compare(op, factor=args.factor)
+                results.append(cmp.to_dict())
+                status |= not cmp.ok
+                print(f"{'ok  ' if cmp.ok else 'LOSS'} {cmp}  ({time.perf_counter() - t0:.1f}s)")
+            else:
+                tol = file.calibrate(op, lengths=args.lengths, trials=args.trials, margin=args.margin,
+                                     floor=args.floor, seed=args.seed)
+                changed = True
+                print(f"ok   {name}: worst error {tol.worst:.3g} eps over {len(tol.ratios)} lengths "
+                      f"({time.perf_counter() - t0:.1f}s)")
+        except NoReferenceError as exc:
+            print(f"skip {name}: {exc}")
+        except CalibrationError as exc:
+            status = 1
+            print(f"FAIL {name}: {exc}")
+        except KeyError as exc:
+            print(f"skip {name}: {exc.args[0]}")
+    if changed:
+        print(f"\nwrote {file.save()}")
+    if args.json:
+        pathlib.Path(args.json).write_text(json.dumps({"dsp_props": __version__, "operators": results}, indent=2))
+    return status
+
+
+def _check(args):
+    targets = _targets(args.targets)
+    if targets is None:
         return 2
 
     reports, failed = [], 0
     for name, op in targets:
         t0 = time.perf_counter()
         report = verify(op, max_examples=args.examples, raise_on_failure=False, derandomize=args.derandomize,
-                        profile=args.profile, database=args.database)
+                        profile=args.profile, database=args.database, tolerances=args.tolerances)
         dt = time.perf_counter() - t0
         failed += not report.ok
         reports.append((name, report))
-        print(f"{'ok  ' if report.ok else 'FAIL'} {name}  ({len(report.checked)} relations, {dt:.1f}s)")
+        calibrated = ", calibrated tolerance" if report.tolerance.startswith("calibrated") else ""
+        print(f"{'ok  ' if report.ok else 'FAIL'} {name}  ({len(report.checked)} relations, {dt:.1f}s{calibrated})")
         if not report.ok or args.verbose:
             print("\n".join("    " + line for line in str(report).splitlines()[1:]))
         if not report.ok and args.regressions:
@@ -141,12 +205,35 @@ def main(argv=None):
     check.add_argument("--regressions", metavar="DIR",
                        help="write test_regression_<operator>.py files replaying each minimal "
                             "counterexample (plain pytest, no Hypothesis) into DIR")
+    check.add_argument("--tolerances", metavar="FILE",
+                       help="tolerance file written by `dsp-props calibrate`: its calibrations replace the "
+                            "default tolerance of the operators it names (default from DSP_PROPS_TOLERANCES)")
     check.add_argument("--derandomize", action="store_true", help="reproducible inputs (for CI)")
     check.add_argument("--json", help="write the full report as JSON")
     check.add_argument("--markdown", help="write the report as Markdown")
     check.add_argument("--html", help="write the report as a standalone HTML page")
     check.add_argument("-v", "--verbose", action="store_true", help="list relations of passing operators too")
+    cal = sub.add_parser("calibrate", help="measure declared operators against an extended-precision reference "
+                                           "and store the result in a tolerance file, or compare with it")
+    cal.add_argument("targets", nargs="+", help="module, file.py, or module:attribute")
+    cal.add_argument("--tolerances", metavar="FILE", default="tolerances.json",
+                     help="the tolerance file (default tolerances.json); entries are added or replaced")
+    cal.add_argument("--compare", action="store_true",
+                     help="measure again on the same probes and report precision regressions; writes nothing")
+    cal.add_argument("--factor", type=float, default=2.0,
+                     help="with --compare: a length regresses when its error grows by more than this (2)")
+    cal.add_argument("--lengths", type=_lengths, default=None,
+                     help="lengths to measure, e.g. 1-256 or 1-64,100,128 (default 1 to min(256, max_n))")
+    cal.add_argument("--trials", type=int, default=6, help="Gaussian-noise probes per length (6)")
+    cal.add_argument("--margin", type=float, default=8.0, help="safety factor on the measured error (8)")
+    cal.add_argument("--floor", type=float, default=0.0,
+                     help="c of the analytic floor c eps log2 N kept under the measurement (0: none; "
+                          "20: never tighter than the default transform model)")
+    cal.add_argument("--seed", type=int, default=0, help="seed of the probe signals (0)")
+    cal.add_argument("--json", help="with --compare: write the comparison as JSON")
     args = parser.parse_args(argv)
+    if args.command == "calibrate":
+        return _calibrate(args)
     return _check(args)
 
 

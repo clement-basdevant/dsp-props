@@ -158,4 +158,5 @@ write the same files.
 | `--dsp-props-profile` | `dsp_props_profile` | `DSP_PROPS_PROFILE`, else `default` |
 | `--dsp-props-derandomize` | `dsp_props_derandomize` | off |
 | `--dsp-props-database` | `dsp_props_database` | `.hypothesis/examples` |
+| `--dsp-props-tolerances FILE` | `dsp_props_tolerances` | `DSP_PROPS_TOLERANCES`, else none ([calibrated tolerances](tolerances.md#a-versioned-calibration-tolerancesjson)) |
 | `--dsp-props-regressions [DIR]` | `dsp_props_regressions` (`same` or a directory) | off |

@@ -59,6 +59,15 @@ rejouée en premier (inactive avec `seed=` ou `derandomize`). Tests de non-régr
 ou `dp.write_regression_tests` écrivent `test_regression_<op>.py`, un test pytest simple par
 contre-exemple minimal, rejoué exactement sans Hypothesis. Doc : `docs/pytest.md`.
 
+Calibrations versionnées (`dsp_props/tolerances.py`, action 2.2) : `dsp-props calibrate CIBLES
+--tolerances tolerances.json` mesure chaque opérateur contre une référence étendue (DFT étendue
+pour `dft`/`rdft`, `longdouble_lfilter` pour un filtre avec `transfer=`) et stocke les rapports
+par longueur avec les versions des bibliothèques (`dp.ToleranceFile`) ; `dp.verify(tolerances=)`,
+`dsp-props check --tolerances`, `--dsp-props-tolerances` et `DSP_PROPS_TOLERANCES` utilisent
+alors la calibration au lieu du modèle par défaut (une tolérance déclarée l'emporte).
+`--compare` : régression de précision entre deux versions (erreur > 2 × l'enregistrée, mêmes
+signaux sondes). Doc : `docs/tolerances.md`.
+
 ## Commandes
 
 ```bash
@@ -72,6 +81,7 @@ python benchmarks/precision_oracles.py # mêmes mutants contre 4 oracles (A9, ~1
 python benchmarks/calibrated_tolerance.py # tolérance calibrée : fausses alarmes, 5 filtres, 4 rapports (~1 h)
 python benchmarks/campaign.py          # campagne sur 46 cibles réelles
 python benchmarks/error_profile.py     # profil d'erreur FFT, N = 2..1200
+dsp-props calibrate mod.py --tolerances tolerances.json [--compare]  # calibration versionnée
 python benchmarks/make_results.py      # chiffres cités (results.md/.tex, marqueurs <!-- r:clé -->) ; --check en CI
 ```
 
