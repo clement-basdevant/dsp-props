@@ -109,13 +109,15 @@ def test_relations_can_be_selected():
 def test_example_database_replays_the_counterexample_first(tmp_path):
     # no seed: Hypothesis neither saves nor replays examples under @seed or derandomize
     @dp.transform(kind="generic")
-    def nonlinear_for_some_lengths(x):  # not linear for 100 <= N < 110 only, so rarely hit by chance
+    def nonlinear_for_some_lengths(x):  # not linear for N >= 100 only: never Hypothesis's first, simplest example
+        # (A narrow window such as 100 <= N < 110 was sometimes missed by all 2000 examples.)
         x = np.asarray(x)
-        return x + (0.1 * x * np.abs(x) if 100 <= len(x) < 110 else 0.0)
+        return x + (0.1 * x * np.abs(x) if len(x) >= 100 else 0.0)
 
     first = dp.verify(nonlinear_for_some_lengths, relations=["linearity"], max_examples=2000,
                       database=tmp_path, raise_on_failure=False)
     assert not first.ok
+    assert first.failures[0].examples_tried > 1  # so a first-example failure below comes from the replay
     again = dp.verify(nonlinear_for_some_lengths, relations=["linearity"], max_examples=2000,
                       database=tmp_path, raise_on_failure=False)
     assert not again.ok
