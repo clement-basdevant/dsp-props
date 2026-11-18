@@ -173,9 +173,12 @@ float64 probe signals is refused as implausible.
 **Why.** One declaration fixes one precision, and the relations cannot see how
 an output was computed, only its value and dtype.
 
-**What to do.** Declare an operator meant to run in both precisions twice, once
-with each `precision`. Check a float32 operator with `dp.verify`, not
-`dp.calibrate`.
+**What to do.** Declare an operator meant to run in both precisions with
+`float32=True`: the `float32 consistency` relation then compares its float32
+output with its float64 output on the same values, which catches a float32
+path that differs from the float64 one. Declare it a second time with
+`precision=np.float32` to run every relation on float32 inputs. Check a
+float32 operator with `dp.verify`, not `dp.calibrate`.
 
 ### The IIR reference depends on `long double`
 
@@ -326,7 +329,13 @@ What this says:
   (IIR coefficients), with results that depend on the probe signals (between
   1 and 2 seeds out of 3 over a wide range of levels). It is the only oracle
   that sees rounded resampler taps, because it compares with the very filter
-  the mutant was meant to implement.
+  the mutant was meant to implement. A calibration against that ideal
+  filter does too, once compared with its earlier value:
+  `dsp-props calibrate --compare` (`ToleranceFile.compare`) reports the taps
+  rounded by 4 bits as a precision regression of the correct resampler
+  (`tests/test_tolerances.py::test_compare_sees_rounded_resampler_taps`).
+  The float32 consistency relation does not: the rounding is the same in both
+  precisions.
 - By default `dp.calibrate` keeps the default model as a floor
   (`base=FFTTolerance()`, 20 ε log2 N): it widens a tolerance where the
   implementation measures worse and never tightens it. The calibrated column
@@ -419,8 +428,9 @@ Declare unstable recursions with an explicit `tolerance=` and without `transfer`
 
 There are no relations for nonlinear operators, estimators (bias, variance
 against the Cramér-Rao bound), multirate identities beyond the L/M resampler
-(noble identities), float32/float64 consistency, denormal handling, or
-fixed-point code. Some of these are on the roadmap.
+(noble identities), denormal handling (flush-to-zero), or fixed-point code.
+float32/float64 consistency is checked only for real inputs, and only for
+operators declared with `float32=True`. Some of these are on the roadmap.
 
 ## Complementary, not competing
 

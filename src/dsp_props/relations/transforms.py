@@ -8,6 +8,7 @@ from hypothesis import strategies as st
 from ..core.tolerance import ToleranceError, assert_close, check_precision, norm
 from ..generators import complex_signals, lengths, signal_pairs, signals
 from .base import Relation
+from .precision import Float32Consistency
 
 COEFFS = [1.0, -1.0, 2.0, 0.5, 1j, -0.75 + 0.25j, 3.0 - 2.0j]
 REAL_COEFFS = [1.0, -1.0, 2.0, 0.5, -0.75, 3.0]
@@ -190,4 +191,5 @@ TRANSFORM_RELATIONS = [
     Inversibility(),
     ConvolutionTheorem(),
     RealBins(),
+    Float32Consistency(),
 ]

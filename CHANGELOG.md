@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `float32=True` on any declaration (float64 precision) adds the `float32 consistency` relation:
+  the output on a float32 signal agrees with the output on the same values in float64, to float32
+  accuracy, and is at least float32. It catches a float32 path that differs from the float64 one
+  (dtype-dependent branch, half-precision coefficients or input, float16 output).
 - Versioned calibrations: `dsp-props calibrate TARGETS --tolerances tolerances.json` measures the
   declared operators against an extended-precision reference (extended DFT for `dft` and `rdft`
   transforms, `longdouble_lfilter` for LTI filters with `transfer=`) and stores the errors per

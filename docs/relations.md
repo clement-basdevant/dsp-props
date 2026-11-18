@@ -87,6 +87,22 @@ transients.
 | --- | --- |
 | `block invariance` | for a split drawn by `block_splits`, concatenating `process(block)` over the blocks of a fresh processor equals `process(x)` on another fresh processor. A split is one of three kinds: arbitrary cut points (up to max(N, 16) blocks, empty blocks and single samples included), blocks of one sample, or blocks of a fixed size B (the last one possibly shorter) |
 
+## Single and double precision: `float32=True`
+
+Every declaration takes `float32=True`, for an operator meant to run in both
+precisions (with the default float64 `precision`). It adds one relation:
+
+| Relation | Checked property |
+| --- | --- |
+| `float32 consistency` | for a real float32 signal x (amplitudes 1, 1e-3, 1e3), the output on x agrees with the output on the same values cast exactly to float64, within the declared tolerance model at float32 ε (relative to the input norm for LTI filters, to the float64 output otherwise); the float32 output may be float64, not less precise than float32 |
+
+It catches a float32 path that is not the float64 one: a dtype-dependent
+branch, coefficients stored in half precision for float32 input, an input
+rounded to float16, a float16 output. A fault common to both precisions
+(rounded resampler taps, say) leaves the two outputs consistent: that is
+what a calibration and `dsp-props calibrate --compare` are for (see
+[Choosing a tolerance](tolerances.md#precision-regressions-between-two-versions)).
+
 ## Generated signals
 
 Every relation draws its signals from

@@ -195,3 +195,14 @@ def my_fft(x):
     result = pytester.runpytest("--dsp-props-profile", "fast", "--dsp-props-database", "none",
                                 "--dsp-props-tolerances", "tolerances.json", "-p", "no:cacheprovider")
     result.assert_outcomes(passed=5)
+
+
+def test_compare_sees_rounded_resampler_taps(tmp_path):
+    # the blind spot of the relations (docs/blind-spots.md): taps rounded to fewer bits keep every
+    # relation; measured against the ideal resampler, the version with 4 bits lost is a regression
+    correct = pm.declare_resampler(pm.resample_with_rounded_taps(0))
+    rounded = pm.declare_resampler(pm.resample_with_rounded_taps(4))
+    tf = dp.ToleranceFile(tmp_path / "t.json")
+    tf.calibrate(correct, reference=pm.longdouble_resample, lengths=range(1, 65), name="resampler")
+    assert tf.compare(correct, reference=pm.longdouble_resample, name="resampler").ok
+    assert not tf.compare(rounded, reference=pm.longdouble_resample, name="resampler").ok

@@ -8,6 +8,7 @@ from hypothesis import strategies as st
 from ..core.tolerance import assert_close, check_precision
 from ..generators import block_splits, lengths, signals, split_blocks
 from .base import Relation
+from .precision import Float32Consistency
 
 
 @st.composite
@@ -39,4 +40,4 @@ class BlockInvariance(Relation):
         assert_close(streamed, whole, spec.tolerance, what=f"{self.name} (cuts={cuts})", precision=spec.precision)
 
 
-STREAMING_RELATIONS = [BlockInvariance()]
+STREAMING_RELATIONS = [BlockInvariance(), Float32Consistency()]

@@ -14,6 +14,7 @@ from ..core.tolerance import assert_close, check_precision, norm
 from ..generators import lengths, signals
 from .base import Relation
 from .lti import LTILinearity
+from .precision import Float32Consistency
 
 
 @st.composite
@@ -124,4 +125,4 @@ class AliasRejection(Relation):
             )
 
 
-MULTIRATE_RELATIONS = [LTILinearity(), OutputLength(), PeriodicShift(), DCGain(), AliasRejection()]
+MULTIRATE_RELATIONS = [LTILinearity(), OutputLength(), PeriodicShift(), DCGain(), AliasRejection(), Float32Consistency()]

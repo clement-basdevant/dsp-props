@@ -17,7 +17,9 @@ Version 0.1.4 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développ
    invariance temporelle périodique d'un rééchantillonneur L/M, gain borné sur N <= max_n
    (pas une preuve de stabilité BIBO), invariance au découpage en blocs d'un processeur en
    streaming (découpages tirés par `block_splits` : coupures arbitraires jusqu'à max(N, 16)
-   blocs, vides et d'un échantillon compris, blocs d'un échantillon, blocs de taille fixe).
+   blocs, vides et d'un échantillon compris, blocs d'un échantillon, blocs de taille fixe),
+   cohérence float32/float64 (`float32=True` sur une déclaration float64 : sortie float32
+   proche de la sortie float64 à ε float32, entrées réelles seulement ; action 2.3).
 2. **Générateurs de signaux** (stratégies Hypothesis) : impulsions, constantes, sinusoïdes
    hors grille et quasi-Nyquist, paires de tons proches, signaux parcimonieux, bruit blanc ;
    longueurs pathologiques (1, 2, premiers, 2^k ± 1 : environ 15 % des longueurs tirées sur
@@ -116,7 +118,7 @@ nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les 
   de bits significatifs (0 à 24 bits perdus). Avec la tolérance par défaut, 3 graines : FFT
   attrapée à partir d'environ <!-- r:precision.fft_twiddles.default -->90 ε<!-- /r --> (<!-- r:precision.fft_twiddles.passes_up_to -->21 ε<!-- /r --> passe, twiddles récursifs à <!-- r:precision.realistic.fft_radix2_recursive_twiddles.loss -->19 ε<!-- /r --> passent), streaming
   à partir de <!-- r:precision.streaming_state.default -->7.1e3 ε<!-- /r -->, rééchantillonneur (arithmétique) de <!-- r:precision.resampler_arithmetic.default -->1.1e5 ε<!-- /r -->, IIR de <!-- r:precision.iir_coefficients.default -->7.1e5 ε<!-- /r --> (coefficients) à
-  <!-- r:precision.iir_arithmetic.default -->3.0e6 ε<!-- /r --> (arithmétique). Coefficients arrondis d'un rééchantillonneur : jamais attrapés.
+  <!-- r:precision.iir_arithmetic.default -->3.0e6 ε<!-- /r --> (arithmétique). Coefficients arrondis d'un rééchantillonneur : jamais attrapés par les relations (ni par la cohérence float32/float64, l'arrondi étant le même dans les deux précisions) ; `dsp-props calibrate --compare` contre le rééchantillonneur idéal les signale dès 4 bits perdus (test).
   Détail dans `docs/blind-spots.md`.
 - A9 (`benchmarks/precision_oracles.py`) : tolérance fixe 1e-7 ne détecte aucun de ces
   mutants ; tolérance calibrée sur l'implémentation de confiance, sans plancher analytique
@@ -173,7 +175,7 @@ nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les 
 ## Pistes ouvertes (fiche de projet)
 
 - CLI qui devine la catégorie d'une fonction non déclarée (signature, nom, docstring).
-- Relations de multicadence avancées (identités nobles), stabilité BIBO, cohérence
-  float32/float64, dénormaux.
+- Relations de multicadence avancées (identités nobles), stabilité BIBO, dénormaux
+  (flush-to-zero).
 - Code C embarqué en virgule fixe.
 - Propriétés d'estimateurs : biais, variance contre la borne de Cramér-Rao.
