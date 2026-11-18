@@ -190,6 +190,22 @@ python -m pip install -e ".[dev]"
 python -m pytest
 ```
 
+### Frozen environment
+
+To recompute the published numbers with the exact versions they were measured with (Python 3.12,
+Linux x86-64), install the locked dependencies, every one pinned with its hash, then the package:
+
+```
+python -m pip install --require-hashes --no-deps -r env/requirements-py312-linux.txt
+python -m pip install --no-deps --no-build-isolation .
+```
+
+The [`Dockerfile`](Dockerfile) does the same on a base image pinned by digest
+(`docker build -t dsp-props .`, then `docker run --rm dsp-props python -m pytest -q`). The lock
+covers the development, documentation and benchmark dependencies (PyTorch CPU, torchaudio,
+librosa, mpmath, matplotlib). `env/requirements.in` lists them, and `env/lock.sh` recompiles the
+lock with `uv`.
+
 ## Layout
 
 | Folder | Content |
@@ -202,6 +218,7 @@ python -m pytest
 | `benchmarks/` | Bug-hunting campaign, error profiles, evaluation of the article |
 | `proofs/` | Coq proofs of the relations and of the IIR error bound |
 | `docs/` | Development plan and documentation |
+| `env/` | Frozen environment: locked dependencies with hashes (`Dockerfile` at the root) |
 | `paper/`, `papers/` | Article, bibliography and drafts |
 
 ## Roadmap

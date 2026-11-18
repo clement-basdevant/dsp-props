@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Frozen environment for reproducibility: `env/requirements-py312-linux.txt`, every development,
+  documentation and benchmark dependency pinned with its hash (compiled by `env/lock.sh` from
+  `env/requirements.in`), and a `Dockerfile` on a base image pinned by digest. The nightly CI job
+  installs the lock and runs the tests in it.
 - `dp.array_api(func, xp=..., device=...)`: an operator written for PyTorch, CuPy, JAX or any Array
   API namespace takes and returns NumPy arrays, so that it can be declared like any other. Arguments
   and outputs are converted recursively (a `(y, state)` pair stays a pair), and dtypes are kept.
