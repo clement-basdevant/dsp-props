@@ -1784,7 +1784,7 @@
   },
   "dsp-props/params": {
    "median": 1.0,
-   "p90": 8.0
+   "p90": 7.0
   }
  },
  "counterexample_length": {
@@ -1810,8 +1810,8 @@
   },
   "dsp-props/params": {
    "median": 1.0,
-   "p90": 24.100000000000023,
-   "max": 269
+   "p90": 24.0,
+   "max": 294
   }
  },
  "seconds": {
@@ -1836,8 +1836,8 @@
    "total": 6606.609
   },
   "dsp-props/params": {
-   "median": 1.706,
-   "total": 3701.001
+   "median": 1.449,
+   "total": 3508.136
   }
  },
  "timeouts": {

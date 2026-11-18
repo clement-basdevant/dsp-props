@@ -30,7 +30,12 @@ Version 0.1.4 publiée sur PyPI (procédure : `RELEASING.md`). Plan de développ
    O(ε √log N)), mais c = 20 (transformées) et c = 1000 (filtres sans fonction de transfert,
    rééchantillonneurs, streaming) sont des constantes d'ingénierie, pas des bornes dérivées.
    Seul le modèle des filtres récursifs (`core/iir.py`) est dérivé, au premier ordre et pour
-   la forme directe I ; il croît avec l'ordre et les normes ℓ1 des réponses impulsionnelles.
+   la forme directe I (défaut, vérifié en Coq) ; il croît avec l'ordre et les normes ℓ1 des
+   réponses impulsionnelles. `structure="df2t"` (action 2.6) : borne de la forme directe II
+   transposée de `lfilter`, dérivée sur papier, 1 à 3 fois plus fine (`benchmarks/iir_structure.py`) ;
+   l'écart restant à l'erreur mesurée (médiane <!-- r:iir_structure.random_gap_median -->220<!-- /r --> fois) vient du pire cas, pas de la
+   structure. Jusqu'à 0.1.4, le gain de 1/A était calculé avant normalisation par a[0] (borne
+   |a[0]| fois trop petite si a[0] ≠ 1), corrigé.
    `dp.calibrate` (chemin recommandé pour une tolérance serrée, avec `base=None`) mesure une implémentation
    longueur par longueur contre `extended_dft` : FFT `long double` là où elle est étendue,
    DFT double-double sinon.

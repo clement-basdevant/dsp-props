@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- `IIRTolerance(b, a, structure="df2t")`: a first-order bound for the transposed direct form II
+  of `scipy.signal.lfilter` (three roundings per state instead of the length of the whole
+  recursion), 1 to 3 times tighter than the direct form I bound on usual designs
+  (`benchmarks/iir_structure.py`). The default stays `structure="df1"`, valid for any summation
+  order. Docs: the remaining gap to the measured error is the worst-case assumption, and `c = 1000`
+  is a guard, not a model, for resamplers and streaming processors.
+- Fix: `IIRTolerance` computed the gain of 1/A(z) before normalising by `a[0]`, so its bound was
+  `|a[0]|` times too small for a filter declared with `a[0] != 1` (too large when `|a[0]| < 1`).
 - Task-oriented documentation: "Test your filter in 5 minutes" (`docs/quickstart.md`, one recipe
   per task) and a gallery of defects found in real libraries (`docs/gallery.md`: empty blocks in
   SciPy's `lfilter` and `sosfilt`, `filtfilt(method="gust")` with trailing zeros and with poles

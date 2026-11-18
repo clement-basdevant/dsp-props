@@ -85,8 +85,14 @@ resampler or a streaming processor either: it is wide enough for their
 correct implementations (in `benchmarks/validation.json`, 2000 runs of correct
 implementations raised no false alarm, a measurement made before the latest
 changes to the relations) and still far below the error of a structural bug.
-When the coefficients of a recursive filter are known, the model below follows
-its conditioning instead.
+It is a guard against structural bugs, not a model of the rounding error:
+dsp-props derives no model for resamplers or streaming processors, because
+their declarations do not say how they compute. A resampler's taps and a
+processor's internal recursion are unknown to the declaration. For their
+accuracy, calibrate them against a reference
+([precision regressions](#precision-regressions-between-two-versions) show this
+for a resampler). When the coefficients of a recursive filter are known, the
+model below follows its conditioning instead.
 
 ## Recursive filters: `IIRTolerance`
 
@@ -109,10 +115,66 @@ in the style of Higham (2002), where
 - k = len(a) + len(b) − 1 grows with the order of the filter;
 - c = 4 by default, a margin on top of the first-order bound.
 
-The derivation covers the direct form I only. `scipy.signal.lfilter` computes a
-transposed direct form II, whose rounding errors enter differently; that the
-bound also holds for it is checked by the tests (`tests/test_iir.py`, against
-`longdouble_lfilter`), not proved.
+This bound holds for the direct form I whatever the order of the summations, so it is the
+default when the implementation is unknown. `scipy.signal.lfilter` and
+`sosfilt` compute other structures, and the tests check this bound against
+them (`tests/test_iir.py`, against `longdouble_lfilter`) without a proof.
+
+### The structure of `lfilter`: `structure="df2t"`
+
+`scipy.signal.lfilter` computes a transposed direct form II. Its states are
+z_k[n] = z_{k+1}[n−1] + b_k x[n] − a_k y[n], and its output is
+y[n] = z_1[n−1] + b_0 x[n]. Each state equation rounds three terms, and the
+output equation two. An error injected into z_k reaches y k samples later and
+is then filtered by 1/A(z). With s_k the impulse response from x to the state
+z_k, whose transfer function is (B_k A − A_k B)/A (B_k and A_k are the
+coefficients from index k on), the first-order bound is
+
+$$
+\|\hat y - y\|_2 \le c\,\varepsilon\,\|h_A\|_1 \Bigl[2\bigl(|b_0| + \|s_1\|_1\bigr)
++ 3 \sum_{k=1}^{p} \bigl(|b_k| + |a_k|\,\|h_{B/A}\|_1 + \|s_{k+1}\|_1\bigr)
++ \nu\,\bigl(\|b\|_1 + \|a_{1:}\|_1\,\|h_{B/A}\|_1\bigr)\Bigr]\|x\|_2
+$$
+
+where s_{p+1} = 0, and ν = 1 when a_0 ≠ 1, because `lfilter` then rounds the
+coefficients when it divides them by a_0. The derivation is on paper only; it
+is not checked in Coq.
+
+```python
+IIRTolerance(b, a, structure="df2t")   # for lfilter only
+```
+
+The direct form I bound multiplies every term by the length k of the whole
+recursion. Here, each state adds only three roundings. On the five filters of
+`benchmarks/calibrated_tolerance.py`, the df2t bound is
+<!-- r:iir_structure.named_ratio_min -->1.1<!-- /r --> to <!-- r:iir_structure.named_ratio_max -->2.8<!-- /r --> times
+smaller. On 80 random stable filters, it ranges from <!-- r:iir_structure.random_ratio_min -->0.62<!-- /r --> to
+<!-- r:iir_structure.random_ratio_max -->5.7<!-- /r --> times smaller, with a median of <!-- r:iir_structure.random_ratio_median -->2.0<!-- /r -->
+(`benchmarks/iir_structure.py`). It can be larger than the direct form I bound
+when a state carries far more energy than the output. Each bound applies to
+its own structure only.
+
+On the IIR precision mutants (`mutants/precision_mutants.py`, `lfilter`
+inside, 3 seeds, one bit per step), the df2t bound catches rounded
+coefficients from <!-- r:iir_structure.iir_coefficients.df2t -->1.9e5 ε<!-- /r --> of measured loss, against
+<!-- r:iir_structure.iir_coefficients.df1 -->7.1e5 ε<!-- /r --> with the default. A narrower arithmetic is caught at the same level with
+both bounds, <!-- r:iir_structure.iir_arithmetic.df2t -->1.5e6 ε<!-- /r --> with df2t and
+<!-- r:iir_structure.iir_arithmetic.df1 -->1.5e6 ε<!-- /r --> with the default: that loss comes from rounding
+the input and output, not from the recursion.
+
+Both bounds remain far above the error that `lfilter` actually makes: the
+median ratio is <!-- r:iir_structure.random_gap_median -->220<!-- /r --> on the random filters. Most of
+this gap comes from the worst-case assumption that every rounding error has
+the same sign and adds up, not from the structure. A rigorous bound cannot
+remove it. To get a tight tolerance, calibrate a trusted implementation
+(see [calibration](#calibration-dpcalibrate)), which is <!-- r:calibrated.gain_min -->7<!-- /r --> to
+<!-- r:calibrated.gain_max -->3400<!-- /r --> times tighter than the default on these five filters and four
+resampling ratios.
+
+`IIRTolerance` normalises b and a by a_0 before computing the gains. Up to
+version 0.1.4, the gain of 1/A(z) was computed before this normalisation, so
+the bound was |a_0| times too small (or too large when |a_0| < 1). Only filters
+declared with a_0 ≠ 1 are affected.
 
 The second term in the parenthesis matters: with clustered poles near the unit
 circle, the state grows far larger than the input and dominates the rounding.

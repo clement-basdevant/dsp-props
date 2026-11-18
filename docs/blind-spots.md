@@ -134,7 +134,12 @@ design, and they can be large in absolute terms:
   the general case);
 - `IIRTolerance` grows with the conditioning of the recursion, so an
   ill-conditioned filter (an eighth-order Butterworth at 0.05 × Nyquist as a
-  single transfer function) is checked to about 3e-5 relative error only;
+  single transfer function) is checked to about 3e-5 relative error only.
+  Like every worst-case bound, it stays far above the error of a correct
+  implementation (median ratio <!-- r:iir_structure.random_gap_median -->220<!-- /r --> for `lfilter` on random
+  filters); `structure="df2t"` divides it by about <!-- r:iir_structure.random_ratio_median -->2.0<!-- /r --> for `lfilter`, and
+  calibration is the way to a tight tolerance
+  ([the structure of `lfilter`](tolerances.md#the-structure-of-lfilter-structuredf2t));
 - comparisons are normwise: an error concentrated in a few output samples is
   compared with the norm of the whole output, so a small localised fault in a
   large-norm output can stay below the bound.
