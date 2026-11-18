@@ -22,6 +22,30 @@ state grows far larger than the input and dominates the rounding.
 
 Poles close to the unit circle make ||h||_1 large: the tolerance then grows
 as the filter becomes ill-conditioned, instead of producing false alarms.
+
+Transposed direct form II (``structure="df2t"``, the structure of
+``scipy.signal.lfilter``). With b, a normalised by a[0], padded to the same
+order p, and the states
+
+    y[n]   = z_1[n-1] + b_0 x[n]
+    z_k[n] = z_{k+1}[n-1] + b_k x[n] - a_k y[n]      (k = 1..p, z_{p+1} = 0)
+
+the output equation rounds two terms (gamma_2), each state equation three
+(gamma_3). A local error injected in z_k reaches y after k samples and is
+then filtered by 1/A(z), so with S_k(z) = (B_k(z) A(z) - A_k(z) B(z)) / A(z)
+the transfer function from x to z_k (B_k, A_k: the coefficients from index
+k on), to first order,
+
+    ||y_hat - y||_2 <= eps * ||h_A||_1 * [ 2 (|b_0| + ||s_1||_1)
+                         + 3 sum_k (|b_k| + |a_k| ||h_BA||_1 + ||s_{k+1}||_1)
+                         + nu (||b||_1 + (||a||_1 - 1) ||h_BA||_1) ] * ||x||_2
+
+where nu = 1 when a[0] != 1 (the coefficients are rounded when divided by
+a[0]) and 0 otherwise. Each state sums three terms instead of the
+p + q + 1 of the direct form I, so this bound is 1 to 3 times smaller on
+typical filters (``benchmarks/iir_structure.py``). It is a derivation on
+paper (``docs/tolerances.md``), not formalised in Coq, and it holds for the
+transposed direct form II only.
 """
 
 from __future__ import annotations
@@ -141,9 +165,39 @@ def tail_l1_bound(b, a, n):
     return float(best * scale)
 
 
+STRUCTURES = ("df1", "df2t")
+
+
+def df2t_gain(b, a):
+    """Bracket of the transposed direct form II bound (module docstring), times ||h_A||_1."""
+    b = np.atleast_1d(np.asarray(b, dtype=float))
+    a = np.atleast_1d(np.asarray(a, dtype=float))
+    rounded_norm = a[0] != 1.0
+    b, a = b / a[0], a / a[0]
+    p = max(len(a), len(b)) - 1
+    b = np.pad(b, (0, p + 1 - len(b)))
+    a = np.pad(a, (0, p + 1 - len(a)))
+    h_a = recursion_gain(a)
+    h_ba = recursion_gain(a, b)
+    # ||s_k||_1 for the states z_1..z_p, and 0 for z_{p+1}
+    s = [recursion_gain(a, np.convolve(b[k:], a) - np.convolve(a[k:], b)) for k in range(1, p + 1)] + [0.0]
+    total = 2 * (abs(b[0]) + s[0])
+    total += sum(3 * (abs(b[k]) + abs(a[k]) * h_ba + s[k]) for k in range(1, p + 1))
+    if rounded_norm:
+        total += float(np.sum(np.abs(b))) + float(np.sum(np.abs(a[1:]))) * h_ba
+    return h_a * total
+
+
 @dataclass
 class IIRTolerance(ToleranceModel):
     """Tolerance for lfilter-like recursions; see module docstring.
+
+    ``structure="df1"`` (the default) is the direct form I bound, checked in
+    Coq and valid for any summation order of the recursion, so it is the one
+    to use when the implementation is unknown; empirically it also covers
+    ``lfilter`` and ``sosfilt``. ``structure="df2t"`` is the bound of the
+    transposed direct form II, the structure of ``scipy.signal.lfilter``:
+    1 to 3 times tighter, and valid for that structure only.
 
     ``c = 4`` is a margin chosen on top of the first-order bound, not a
     constant of the derivation.
@@ -155,23 +209,30 @@ class IIRTolerance(ToleranceModel):
     b: tuple
     a: tuple
     c: float = 4.0
+    structure: str = "df1"
 
     def __post_init__(self):
         check_stable(self.b, self.a)
+        if self.structure not in STRUCTURES:
+            raise ValueError(f"structure must be one of {STRUCTURES}, got {self.structure!r}")
         self.b = tuple(np.atleast_1d(np.asarray(self.b, dtype=float)))
         self.a = tuple(np.atleast_1d(np.asarray(self.a, dtype=float)))
-        a0 = abs(self.a[0])
-        norm_b = float(np.sum(np.abs(self.b))) / a0
-        norm_a_tail = float(np.sum(np.abs(self.a[1:]))) / a0
-        self.h_a = recursion_gain(self.a)
-        self.h_ba = recursion_gain(self.a, self.b)
+        # the bounds are stated for a[0] = 1: normalise first (up to 0.1.4, h_a was the gain of
+        # 1/A(z) unnormalised, so the bound was |a[0]| times too small, or too large for |a[0]| < 1)
+        b, a = np.asarray(self.b) / self.a[0], np.asarray(self.a) / self.a[0]
+        norm_b = float(np.sum(np.abs(b)))
+        norm_a_tail = float(np.sum(np.abs(a[1:])))
+        self.h_a = recursion_gain(a)
+        self.h_ba = recursion_gain(a, b)
         self.gain = self.h_a * (norm_b + norm_a_tail * self.h_ba)
         self.order = len(self.a) + len(self.b) - 1
+        # the bound is c * eps * factor * ||x||
+        self.factor = self.order * self.gain if self.structure == "df1" else df2t_gain(self.b, self.a)
 
     def bound(self, n, dtype, ref_norm):
         eps = np.finfo(np.result_type(dtype, np.float32)).eps
         floor = np.finfo(np.result_type(dtype, np.float32)).tiny * n
-        return self.c * eps * self.order * self.gain * ref_norm + floor
+        return self.c * eps * self.factor * ref_norm + floor
 
 
 def longdouble_lfilter(b, a, x):

@@ -176,9 +176,22 @@ def comparison(r: Results):
         r.add(f"comparison.{subject}.mutants", rates["dsp-props"]["n_mutants"], src)
 
 
+def iir_structure(r: Results):
+    d = load("iir_structure.json")
+    src = "iir_structure.json"
+    ratios = [row["ratio"] for row in d["named"]]
+    r.add("iir_structure.named_ratio_min", sig(min(ratios), 2), src)
+    r.add("iir_structure.named_ratio_max", sig(max(ratios), 2), src)
+    for k in ("min", "median", "max"):
+        r.add(f"iir_structure.random_ratio_{k}", sig(d["random_ratio"][k], 2), src)
+    r.add("iir_structure.random_gap_median", sig(d["random_gap"]["median"], 2, plain=True), src)
+    for key, t in d["thresholds"].items():
+        r.add(f"iir_structure.{key}", eps(t["caught_from_loss_eps"]), src)
+
+
 def collect() -> Results:
     r = Results()
-    for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison):
+    for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison, iir_structure):
         part(r)
     return r
 

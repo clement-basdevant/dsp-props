@@ -97,3 +97,13 @@ scripts; do not edit. A number quoted in the documentation is marked
 | `comparison.upfirdn.params` | 97 % | `comparison/summary.json` |
 | `comparison.upfirdn.sop` | 89 % | `comparison/summary.json` |
 | `comparison.upfirdn.mutants` | 36 | `comparison/summary.json` |
+| `iir_structure.named_ratio_min` | 1.1 | `iir_structure.json` |
+| `iir_structure.named_ratio_max` | 2.8 | `iir_structure.json` |
+| `iir_structure.random_ratio_min` | 0.62 | `iir_structure.json` |
+| `iir_structure.random_ratio_median` | 2.0 | `iir_structure.json` |
+| `iir_structure.random_ratio_max` | 5.7 | `iir_structure.json` |
+| `iir_structure.random_gap_median` | 220 | `iir_structure.json` |
+| `iir_structure.iir_coefficients.df1` | 7.1e5 ε | `iir_structure.json` |
+| `iir_structure.iir_coefficients.df2t` | 1.9e5 ε | `iir_structure.json` |
+| `iir_structure.iir_arithmetic.df1` | 1.5e6 ε | `iir_structure.json` |
+| `iir_structure.iir_arithmetic.df2t` | 1.5e6 ε | `iir_structure.json` |
