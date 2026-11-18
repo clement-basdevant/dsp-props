@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Task-oriented documentation: "Test your filter in 5 minutes" (`docs/quickstart.md`, one recipe
+  per task) and a gallery of defects found in real libraries (`docs/gallery.md`: empty blocks in
+  SciPy's `lfilter` and `sosfilt`, `filtfilt(method="gust")` with trailing zeros and with poles
+  near zero, the precision of PyTorch's FFT), each with a script in `examples/gallery/` run by
+  `tests/test_gallery.py`.
 - Operator families: `@dp.family(params)` on a factory that returns a declared operator draws the
   parameters with the signals, and the counterexample is `(parameters, input)`, both shrunk.
   Parameter strategies in `dp.generators`: `iir_coefficients` (stable filters of order 0 up,

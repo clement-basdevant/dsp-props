@@ -114,11 +114,15 @@ C code can be tested through `ctypes` with
 
 ## Where to go next
 
+- [Test your filter in 5 minutes](quickstart.md): one recipe per task, from a
+  first check to precision regressions.
 - [Tutorial: test your own filter](tutorial.md): declarations, reading a
   counterexample, the command line, streaming processors.
 - [Choosing a tolerance](tolerances.md): the error models and `dp.calibrate`.
 - [What the relations don't see](blind-spots.md): known blind spots, and how to
   close some of them.
+- [Gallery](gallery.md): bugs found in SciPy and a precision gap in PyTorch,
+  each with its script.
 - [API reference](api/index.md).
 
 ## License
