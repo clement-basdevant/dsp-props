@@ -7,16 +7,16 @@ from .multirate import (
     OutputLength,
     PeriodicShift,
 )
-from .streaming import BlockInvariance, STREAMING_RELATIONS
+from .streaming import STREAMING_RELATIONS, BlockInvariance
 from .transforms import (
-    Linearity,
+    TRANSFORM_RELATIONS,
     CircularShift,
-    Parseval,
+    ConvolutionTheorem,
     HermitianSymmetry,
     Inversibility,
-    ConvolutionTheorem,
+    Linearity,
+    Parseval,
     RealBins,
-    TRANSFORM_RELATIONS,
 )
 
 __all__ = [

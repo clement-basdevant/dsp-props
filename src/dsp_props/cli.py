@@ -4,6 +4,7 @@
     dsp-props check src/filters.py            # a file
     dsp-props check mypkg.filters:my_fft      # one operator
     dsp-props check mypkg --json report.json --examples 500
+    dsp-props check mypkg --profile fast      # 30 inputs per relation
 
 Exit status: 0 if every operator passes, 1 if any relation fails, 2 on usage errors.
 """
@@ -19,7 +20,7 @@ import sys
 import time
 
 from . import __version__
-from .api import verify
+from .api import PROFILES, get_profile, verify
 
 
 def _load_module(target):
@@ -27,6 +28,8 @@ def _load_module(target):
     if path.suffix == ".py" and path.exists():
         name = "_dsp_props_target_" + path.stem
         spec = importlib.util.spec_from_file_location(name, path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"cannot import {path}")
         module = importlib.util.module_from_spec(spec)
         sys.path.insert(0, str(path.resolve().parent))
         sys.modules[name] = module
@@ -79,7 +82,8 @@ def _check(args):
     reports, failed = [], 0
     for name, op in targets:
         t0 = time.perf_counter()
-        report = verify(op, max_examples=args.examples, raise_on_failure=False, derandomize=args.derandomize)
+        report = verify(op, max_examples=args.examples, raise_on_failure=False, derandomize=args.derandomize,
+                        profile=args.profile, database=args.database)
         dt = time.perf_counter() - t0
         failed += not report.ok
         reports.append((name, report))
@@ -89,7 +93,7 @@ def _check(args):
 
     print(f"\n{len(targets) - failed}/{len(targets)} operators pass")
     if args.json:
-        data = {"dsp_props": __version__, "examples": args.examples,
+        data = {"dsp_props": __version__, "examples": args.examples or get_profile(args.profile).max_examples,
                 "operators": [{**r.to_dict(), "target": n} for n, r in reports]}
         pathlib.Path(args.json).write_text(json.dumps(data, indent=2))
     if args.markdown:
@@ -110,7 +114,13 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     check = sub.add_parser("check", help="verify every declared operator in modules or files")
     check.add_argument("targets", nargs="+", help="module, file.py, or module:attribute")
-    check.add_argument("--examples", type=int, default=200, help="inputs per relation (default 200)")
+    check.add_argument("--examples", type=int, default=None,
+                       help="inputs per relation (default: set by the profile, 200)")
+    check.add_argument("--profile", choices=sorted(PROFILES), default=None,
+                       help="cost profile: fast (30 inputs), default (200), nightly (2000); "
+                            "default from DSP_PROPS_PROFILE")
+    check.add_argument("--database", metavar="DIR",
+                       help="Hypothesis example database: save failing inputs there, replay them first")
     check.add_argument("--derandomize", action="store_true", help="reproducible inputs (for CI)")
     check.add_argument("--json", help="write the full report as JSON")
     check.add_argument("--markdown", help="write the report as Markdown")

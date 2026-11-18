@@ -39,12 +39,13 @@ import scipy.signal as ss
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT), str(ROOT / "benchmarks")]
 
+from precision_mutants import LENGTHS, _run_stream  # noqa: E402
+
 import dsp_props as dp  # noqa: E402
 from dsp_props.core.calibration import _probe_signals, extended_dft, relative_error  # noqa: E402
 from dsp_props.core.iir import longdouble_lfilter  # noqa: E402
 from mutants import precision_mutants as pm  # noqa: E402
 from mutants.streaming_mutants import MovingSum  # noqa: E402
-from precision_mutants import LENGTHS, _run_stream  # noqa: E402
 
 CALIBRATION_LENGTHS = sorted(set(range(1, 65)) | set(LENGTHS) | set(range(64, 513, 16)))
 

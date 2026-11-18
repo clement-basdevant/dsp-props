@@ -22,9 +22,9 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path[:0] = [str(HERE), str(ROOT / "src"), str(ROOT)]
 
+import approaches  # noqa: E402
 import numpy as np  # noqa: E402
 
-import approaches  # noqa: E402
 from mutants import ALL_MUTANTS, REFERENCES  # noqa: E402
 
 

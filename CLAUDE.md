@@ -49,11 +49,19 @@ la DCT), filtres LTI (fonction de transfert et borne de gain optionnelles), ré�
 rationnels, processeurs en streaming ou à état. Adaptateurs NumPy, SciPy, PyTorch, et C via
 ctypes.
 
+Plugin pytest (`dsp_props/pytest_plugin.py`, point d'entrée `pytest11`) : un opérateur déclaré
+dans un module de test (ou listé dans `dsp_props_operators`) devient un test par relation
+(`test_x.py::my_fft::parseval`). Profils de coût : `fast` (30 entrées), `default` (200),
+`nightly` (2000), par `--dsp-props-profile`, `--profile`, `profile=` ou `DSP_PROPS_PROFILE` ;
+un `max_examples` explicite l'emporte. Base d'exemples Hypothesis `.hypothesis/examples`
+rejouée en premier (inactive avec `seed=` ou `derandomize`). Doc : `docs/pytest.md`.
+
 ## Commandes
 
 ```bash
 python -m pip install -e ".[dev]"      # installation de développement
-python -m pytest -q                    # suite de tests interne (142 tests, ~5 min)
+python -m pytest -q                    # suite de tests interne (~5 min ; profil fast en CI : DSP_PROPS_PROFILE=fast)
+ruff check . && mypy                   # lint et types (job CI lint)
 dsp-props check module_or_file.py      # découvre les opérateurs déclarés, code de sortie ≠ 0 si échec
 python mutants/run_mutants.py          # suite de mutation (31 mutants, 6 familles)
 python benchmarks/precision_mutants.py # mutants de précision : plus petite perte détectée (~10 min)
@@ -64,8 +72,10 @@ python benchmarks/error_profile.py     # profil d'erreur FFT, N = 2..1200
 python benchmarks/make_results.py      # chiffres cités (results.md/.tex, marqueurs <!-- r:clé -->) ; --check en CI
 ```
 
-La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI sur
-`examples/filters.py` et la construction du paquet, sous Python 3.10, 3.12 et 3.13.
+La CI (`.github/workflows/ci.yml`) lance pytest (profil fast, couverture, base d'exemples en
+cache), la suite de mutation, la CLI sur `examples/filters.py` et la construction du paquet,
+sous Python 3.10, 3.12 et 3.13 ; un job lint (ruff, mypy, `make_results.py --check`). Chaque
+nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les exemples.
 
 ## Règles du projet
 

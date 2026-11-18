@@ -67,6 +67,10 @@ class MyFilter:
 dp.stateful(lambda block, z: scipy.signal.lfilter(b, a, block, zi=z), init_state=np.zeros(2))
 ```
 
+## pytest
+
+Installing dsp-props adds a pytest plugin: a declared operator in a test module becomes one test per relation (`test_filters.py::my_fft::parseval`), with its minimal counterexample in the pytest report. Cost profiles set the search depth (`--dsp-props-profile fast`, 30 inputs per relation, for every commit; `nightly`, 2000, for scheduled runs), and failing inputs are saved in Hypothesis's example database and replayed first on the next run. See [Running with pytest](https://dsp-props.readthedocs.io/en/latest/pytest/).
+
 ## Command line
 
 `dsp-props check` finds every operator declared in a module or file and verifies it:
@@ -84,7 +88,7 @@ ok   examples/filters.py:resample_2_3  (5 relations, 2.8s)
 3/4 operators pass
 ```
 
-Targets: `package.module`, `file.py`, `module:operator`. Options: `--json`, `--markdown`, `--html`, `--examples N`, `--derandomize` (reproducible inputs in CI). The exit code is 1 if a relation fails, which is enough to block a CI run.
+Targets: `package.module`, `file.py`, `module:operator`. Options: `--json`, `--markdown`, `--html`, `--examples N`, `--profile fast|default|nightly`, `--database DIR` (replay saved counterexamples), `--derandomize` (reproducible inputs in CI). The exit code is 1 if a relation fails, which is enough to block a CI run.
 
 ## C code
 
@@ -204,12 +208,11 @@ python -m pytest
 
 The six phases of the [development plan](https://github.com/clement-basdevant/dsp-props/blob/main/docs/schema-directeur.md) (foundations, tolerance engine, advanced relations, mutant suite, shrinking and reporting, auto-discovery and C adapter) are done. Next:
 
-1. **Test-suite integration**: a pytest plugin (one test per relation, replayed example database) and cost profiles for CI and nightly runs *(in progress)*.
-2. **Regression tests generated from counterexamples**, replayed without Hypothesis.
-3. **Calibration by default**, with a versioned tolerance profile and a mode that compares the accuracy of two versions of a library.
-4. **Single against double precision** and subnormal inputs, which close the blind spot of rounded resampler coefficients.
-5. **Generated parameters**: filter orders from 0 up, poles close to the unit circle, rates L/M with L = M = 1.
-6. **External evidence**: a corpus of historical bugs in `numpy.fft`, `scipy.signal`, librosa and torchaudio, and automatic mutation of real DSP code.
+1. **Regression tests generated from counterexamples**, replayed without Hypothesis.
+2. **Calibration by default**, with a versioned tolerance profile and a mode that compares the accuracy of two versions of a library.
+3. **Single against double precision** and subnormal inputs, which close the blind spot of rounded resampler coefficients.
+4. **Generated parameters**: filter orders from 0 up, poles close to the unit circle, rates L/M with L = M = 1.
+5. **External evidence**: a corpus of historical bugs in `numpy.fft`, `scipy.signal`, librosa and torchaudio, and automatic mutation of real DSP code.
 
 ## Measured numbers
 

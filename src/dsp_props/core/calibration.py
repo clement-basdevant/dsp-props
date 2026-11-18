@@ -20,7 +20,7 @@ elsewhere: long double is float64 under MSVC and on macOS arm64, and NumPy
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import lru_cache
+from functools import cache
 
 import numpy as np
 
@@ -33,7 +33,7 @@ def longdouble_dft(x):
     return np.fft.fft(np.asarray(x).astype(np.clongdouble))
 
 
-@lru_cache(maxsize=None)
+@cache
 def longdouble_fft_is_extended():
     """True when ``longdouble_dft`` is more accurate than float64 on this platform.
 

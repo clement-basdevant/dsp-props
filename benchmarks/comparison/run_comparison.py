@@ -39,10 +39,9 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path[:0] = [str(HERE), str(ROOT / "src")]
 
-import numpy as np  # noqa: E402
-
 import approaches  # noqa: E402
 import mutate  # noqa: E402
+import numpy as np  # noqa: E402
 import suites  # noqa: E402
 
 DEFAULT_OUT = HERE / "results.jsonl"

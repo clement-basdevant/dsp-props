@@ -120,7 +120,7 @@ def _apply(tree, target, action):
                             value[k] = node.operand
     elif kind == "delete":
         for parent in ast.walk(new_tree):
-            for field, value in ast.iter_fields(parent):
+            for _field, value in ast.iter_fields(parent):
                 if isinstance(value, list):
                     for k, item in enumerate(value):
                         if item is node:

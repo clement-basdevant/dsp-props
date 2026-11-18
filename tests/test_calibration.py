@@ -2,7 +2,18 @@ import numpy as np
 import pytest
 
 import dsp_props as dp
-from dsp_props.core import CalibratedTolerance, CalibrationError, longdouble_dft, norm, relative_error
+from dsp_props.core import (
+    CalibratedTolerance,
+    CalibrationError,
+    DoubleDouble,
+    doubledouble_dft,
+    extended_dft,
+    longdouble_dft,
+    longdouble_fft_is_extended,
+    norm,
+    relative_error,
+)
+from dsp_props.core import calibration as calmod
 from dsp_props.core.tolerance import FFTTolerance
 
 
@@ -31,6 +42,7 @@ def test_relative_error_of_exact_operator_is_zero():
     assert relative_error(np.fft.fft, longdouble_dft, x) == 0.0
 
 
+@pytest.mark.full_examples
 def test_calibrated_tolerance_still_catches_mutants():
     from mutants.fft_mutants import MUTANTS
 
@@ -50,6 +62,7 @@ def test_calibration_keeps_the_default_floor_unless_asked():
     assert tight.ratios == tol.ratios
 
 
+@pytest.mark.full_examples
 def test_tight_calibration_catches_an_fft_the_default_tolerance_lets_through():
     """Twiddles by recurrence (about 20 eps) pass the default model, not a tolerance calibrated on NumPy."""
     from mutants.precision_mutants import declare_fft, radix2_recursive_twiddles
@@ -64,8 +77,6 @@ def test_tight_calibration_catches_an_fft_the_default_tolerance_lets_through():
 
 # --------------------------------------------------------------- reference without extended long double
 
-from dsp_props.core import calibration as calmod
-from dsp_props.core import DoubleDouble, doubledouble_dft, extended_dft, longdouble_fft_is_extended
 
 needs_extended_longdouble = pytest.mark.skipif(
     not longdouble_fft_is_extended(), reason="long double FFT is not extended on this platform"
@@ -113,6 +124,7 @@ def test_doubledouble_agrees_with_longdouble():
     assert err < 1e-2 * np.finfo(float).eps
 
 
+@pytest.mark.full_examples
 def test_complex128_longdouble_fft_is_detected(no_extended_longdouble):
     assert not calmod.longdouble_fft_is_extended()
     assert isinstance(extended_dft(np.ones(8)), DoubleDouble)

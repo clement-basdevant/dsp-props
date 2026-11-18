@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
+import os
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from typing import Any
 
 import numpy as np
-
-from hypothesis import HealthCheck, given, seed as _seed, settings
+from hypothesis import HealthCheck, given, settings
+from hypothesis import seed as _seed
 from hypothesis.errors import FlakyFailure, HypothesisException
 
 from .core.tolerance import FFTTolerance, ToleranceModel
-from .report import Failure, PropertyViolation, Report
 from .relations import LTI_RELATIONS, MULTIRATE_RELATIONS, STREAMING_RELATIONS, TRANSFORM_RELATIONS
-
+from .report import Failure, PropertyViolation, Report
 
 KINDS = ("dft", "rdft", "generic")
 
@@ -52,7 +53,7 @@ class TransformSpec:
     """
 
     func: Callable
-    inverse: Optional[Callable] = None
+    inverse: Callable | None = None
     kind: str = "dft"
     linear: bool = True
     parseval: bool = False
@@ -83,6 +84,7 @@ class TransformSpec:
         return y
 
     def invert(self, X, n):
+        assert self.inverse is not None
         return np.asarray(self.inverse(X, n) if self.inverse_takes_length else self.inverse(X))
 
 
@@ -113,8 +115,8 @@ class LTISpec:
 
     func: Callable
     causal: bool = True
-    transfer: Optional[tuple] = None
-    max_gain: Optional[float] = None
+    transfer: tuple | None = None
+    max_gain: float | None = None
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
@@ -177,10 +179,10 @@ class MultirateSpec:
     up: int = 1
     down: int = 1
     causal: bool = False
-    length: Optional[Callable[[int], int]] = None
-    dc_gain: Optional[float] = 1.0
+    length: Callable[[int], int] | None = None
+    dc_gain: float | None = 1.0
     ripple: float = 1e-2
-    stopband: Optional[float] = 0.1
+    stopband: float | None = 0.1
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
     precision: np.dtype = np.dtype(np.float64)
@@ -190,6 +192,7 @@ class MultirateSpec:
         return [r for r in MULTIRATE_RELATIONS if r.applies(self)]
 
     def expected_length(self, n):
+        assert self.length is not None
         return self.length(n)
 
 
@@ -256,7 +259,15 @@ class _StatefulProcessor:
 
 def stateful(func, init_state, **kwargs):
     """Wrap ``func(block, state) -> (out, state)`` (e.g. lfilter with zi) as a streaming operator."""
-    return streaming(**kwargs)(lambda: _StatefulProcessor(func, init_state))
+
+    def make():
+        return _StatefulProcessor(func, init_state)
+
+    # report and collect it under the wrapped function's name and module (pytest plugin)
+    for attr in ("__module__", "__name__", "__qualname__"):
+        if hasattr(func, attr):
+            setattr(make, attr, getattr(func, attr))
+    return streaming(**kwargs)(make)
 
 
 def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval_scale=None,
@@ -299,12 +310,57 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
     return decorate
 
 
-def _hypothesis_test(rel, spec, max_examples, derandomize, seed=None):
-    @settings(max_examples=max_examples, deadline=None, database=None,
-              derandomize=derandomize, suppress_health_check=list(HealthCheck),
-              print_blob=False)
-    @given(rel.inputs(spec))
-    def run(inputs):
+@dataclass(frozen=True)
+class Profile:
+    """A cost profile: how hard ``verify`` searches when no ``max_examples`` is given."""
+
+    name: str
+    max_examples: int
+    description: str = ""
+
+
+PROFILES = {
+    "fast": Profile("fast", 30, "a few seconds per operator, for every commit"),
+    "default": Profile("default", 200, "the default search"),
+    "nightly": Profile("nightly", 2000, "bug hunting, for scheduled runs"),
+}
+PROFILE_ENV = "DSP_PROPS_PROFILE"
+_active_profile: str | None = None
+
+
+def set_profile(name: str | None) -> None:
+    """Make ``name`` (``"fast"``, ``"default"`` or ``"nightly"``) the profile ``verify`` uses.
+
+    ``None`` goes back to the ``DSP_PROPS_PROFILE`` environment variable, then ``"default"``.
+    An explicit ``max_examples`` always wins over the profile.
+    """
+    global _active_profile
+    if name is not None:
+        get_profile(name)
+    _active_profile = name
+
+
+def get_profile(name: str | None = None) -> Profile:
+    """The profile named ``name``, or the active one (``set_profile``, ``DSP_PROPS_PROFILE``, ``"default"``)."""
+    import os
+
+    name = name or _active_profile or os.environ.get(PROFILE_ENV) or "default"
+    try:
+        return PROFILES[name]
+    except KeyError:
+        raise ValueError(f"unknown dsp-props profile {name!r}; choose one of {sorted(PROFILES)}") from None
+
+
+def _database(database):
+    if database is None or not isinstance(database, (str, os.PathLike)):
+        return database
+    from hypothesis.database import DirectoryBasedExampleDatabase
+
+    return DirectoryBasedExampleDatabase(os.fspath(database))
+
+
+def _hypothesis_test(rel, spec, max_examples, derandomize, seed=None, database=None, key=b""):
+    def run_inner(inputs):
         trace["calls"] += 1
         try:
             rel.check(spec, inputs)
@@ -315,27 +371,60 @@ def _hypothesis_test(rel, spec, max_examples, derandomize, seed=None):
                 trace["first_failure"] = trace["calls"]
             raise
 
+    # Every relation shares this source, so the example database needs its own key for each
+    # (operator, relation) pair, or saved counterexamples would be replayed on the wrong test.
+    run_inner._hypothesis_internal_add_digest = key + b"\0" + rel.name.encode()  # type: ignore[attr-defined]
+    run = settings(max_examples=max_examples, deadline=None, database=database,
+                   derandomize=derandomize, suppress_health_check=list(HealthCheck),
+                   print_blob=False)(given(rel.inputs(spec))(run_inner))
     if seed is not None:
         run = _seed(seed)(run)
-    trace = {"calls": 0, "example": None, "first_failure": None}
+    trace: dict[str, Any] = {"calls": 0, "example": None, "first_failure": None}
     return run, trace
 
 
-def verify(func, *, max_examples=200, raise_on_failure=True, derandomize=False, seed=None) -> Report:
+def _operator_key(func):
+    module = getattr(func, "__module__", "") or ""
+    name = getattr(func, "__qualname__", None) or getattr(func, "__name__", None) or repr(func)
+    return f"{module}:{name}".encode()
+
+
+def verify(func, *, max_examples=None, raise_on_failure=True, derandomize=False, seed=None,
+           profile=None, relations=None, database=None) -> Report:
     """Run every relation declared for ``func`` and return a report.
 
+    ``max_examples`` is the number of inputs per relation; without it, the
+    cost profile decides (``profile``, else ``set_profile``, else the
+    ``DSP_PROPS_PROFILE`` environment variable): ``"fast"`` 30, ``"default"``
+    200, ``"nightly"`` 2000.
     ``seed`` makes the run reproducible (the same inputs are drawn), which
     the benchmarks use to repeat experiments over independent seeds.
+    ``relations`` restricts the run to the relations with these names.
+    ``database`` is a Hypothesis example database, or a directory for one:
+    failing inputs are saved there and replayed first on the next run
+    (``None``, the default, saves nothing).
     """
     spec = getattr(func, "__dsp_props__", None)
     if spec is None:
         raise TypeError(f"{func!r} has no dsp-props declaration (use @dp.transform, @dp.lti_filter, @dp.resampler or @dp.streaming)")
+    if max_examples is None:
+        max_examples = get_profile(profile).max_examples
+    selected = spec.relations
+    if relations is not None:
+        wanted = [relations] if isinstance(relations, str) else list(relations)
+        unknown = set(wanted) - {r.name for r in selected}
+        if unknown:
+            raise ValueError(f"{sorted(unknown)} not among the relations of this declaration: "
+                             f"{[r.name for r in selected]}")
+        selected = [r for r in selected if r.name in wanted]
+    database = _database(database)
+    key = _operator_key(func)
     failures, checked, seconds = [], [], {}
-    for rel in spec.relations:
+    for rel in selected:
         checked.append(rel.name)
-        run, trace = _hypothesis_test(rel, spec, max_examples, derandomize, seed)
+        run, trace = _hypothesis_test(rel, spec, max_examples, derandomize, seed, database, key)
         t0 = time.perf_counter()
-        error = None
+        error: BaseException | None = None
         try:
             run()
         except FlakyFailure as exc:

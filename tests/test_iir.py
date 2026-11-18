@@ -32,6 +32,7 @@ def test_lti_filter_api_on_scipy_lfilter():
     assert dp.verify(f, max_examples=100).ok
 
 
+@pytest.mark.full_examples
 def test_non_causal_filter_declared_causal_is_caught():
     f = dp.lti_filter(causal=True)(lambda x: np.convolve(x, [0.25, 0.5, 0.25], mode="same"))
     report = dp.verify(f, max_examples=100, raise_on_failure=False)
@@ -72,6 +73,7 @@ def test_correct_filter_with_pole_near_unit_circle_passes(name):
     assert report.ok, report
 
 
+@pytest.mark.full_examples
 @pytest.mark.parametrize("wrong", ["pole", "gain"])
 def test_wrong_filter_with_pole_near_unit_circle_is_caught(wrong):
     b, a = [1.0, -1.0], [1.0, -0.9999]
