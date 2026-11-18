@@ -61,6 +61,7 @@ python benchmarks/precision_oracles.py # mêmes mutants contre 4 oracles (A9, ~1
 python benchmarks/calibrated_tolerance.py # tolérance calibrée : fausses alarmes, 5 filtres, 4 rapports (~1 h)
 python benchmarks/campaign.py          # campagne sur 46 cibles réelles
 python benchmarks/error_profile.py     # profil d'erreur FFT, N = 2..1200
+python benchmarks/make_results.py      # chiffres cités (results.md/.tex, marqueurs <!-- r:clé -->) ; --check en CI
 ```
 
 La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI sur
@@ -73,14 +74,16 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
   `dp.calibrate` refuse volontairement les erreurs implausibles plutôt que de les absorber.
 - **Chaque chiffre du papier vient d'un script du dépôt** (les trois ci-dessus). Après toute
   modification des relations, des générateurs ou des tolérances, relancer les scripts et
-  mettre à jour le papier si les chiffres changent.
+  mettre à jour le papier si les chiffres changent. Dans le README, `CLAUDE.md` et `docs/`, un chiffre issu d'un
+  benchmark s'écrit `<!-- r:clé -->valeur<!-- /r -->` (clés dans `benchmarks/results.md`) ;
+  `python benchmarks/make_results.py` les réécrit depuis les JSON, la CI vérifie (`--check`).
 - Un contre-exemple n'est utile que s'il est petit : surveiller la qualité du shrinking
   (actuellement médiane de 2 échantillons).
 - L'API déclarative doit rester légère : un décorateur par opérateur.
 
 ## État actuel (octobre 2026)
 
-- Mutants : 31/31 détectés avec 200 entrées par relation. Ils sont écrits à la main, dans le
+- Mutants : <!-- r:mutants.killed -->31<!-- /r -->/<!-- r:mutants.total -->31<!-- /r --> détectés avec <!-- r:mutants.examples -->200<!-- /r --> entrées par relation. Ils sont écrits à la main, dans le
   vocabulaire des relations : le score mesure que les relations attrapent les fautes pour
   lesquelles elles ont été conçues. `run_mutants.py` ne fixe pas de graine ; avec
   `dp.verify(seed=0)`, 28/31 échouent dans les 3 premières entrées et 26/30 contre-exemples
@@ -88,20 +91,20 @@ La CI (`.github/workflows/ci.yml`) lance pytest, la suite de mutation, la CLI su
   et causal, détecté dès qu'on déclare sa fonction de transfert.
 - Mutants de précision (action M-1, `mutants/precision_mutants.py`) : mêmes propriétés, moins
   de bits significatifs (0 à 24 bits perdus). Avec la tolérance par défaut, 3 graines : FFT
-  attrapée à partir d'environ 90 ε (21 ε passe, twiddles récursifs à 19 ε passent), streaming
-  à partir de 7e3 ε, rééchantillonneur (arithmétique) de 1e5 ε, IIR de 7e5 ε (coefficients) à
-  3e6 ε (arithmétique). Coefficients arrondis d'un rééchantillonneur : jamais attrapés.
+  attrapée à partir d'environ <!-- r:precision.fft_twiddles.default -->90 ε<!-- /r --> (<!-- r:precision.fft_twiddles.passes_up_to -->21 ε<!-- /r --> passe, twiddles récursifs à <!-- r:precision.realistic.fft_radix2_recursive_twiddles.loss -->19 ε<!-- /r --> passent), streaming
+  à partir de <!-- r:precision.streaming_state.default -->7.1e3 ε<!-- /r -->, rééchantillonneur (arithmétique) de <!-- r:precision.resampler_arithmetic.default -->1.1e5 ε<!-- /r -->, IIR de <!-- r:precision.iir_coefficients.default -->7.1e5 ε<!-- /r --> (coefficients) à
+  <!-- r:precision.iir_arithmetic.default -->3.0e6 ε<!-- /r --> (arithmétique). Coefficients arrondis d'un rééchantillonneur : jamais attrapés.
   Détail dans `docs/blind-spots.md`.
 - A9 (`benchmarks/precision_oracles.py`) : tolérance fixe 1e-7 ne détecte aucun de ces
   mutants ; tolérance calibrée sur l'implémentation de confiance, sans plancher analytique
-  (`CalibratedTolerance(..., base=FFTTolerance(c=0))`) : FFT dès 21 ε, streaming 28 ε, filtres
-  430 à 3e3 ε, sans fausse alarme (3 graines). `dp.calibrate` garde par défaut le plancher
+  (`CalibratedTolerance(..., base=FFTTolerance(c=0))`) : FFT dès <!-- r:oracles.fft_twiddles.calibrated -->21 ε<!-- /r -->, streaming <!-- r:oracles.streaming_state.calibrated -->28 ε<!-- /r -->, filtres
+  <!-- r:oracles.resampler_arithmetic.calibrated -->430 ε<!-- /r --> à <!-- r:oracles.iir_arithmetic.calibrated -->2.9e3 ε<!-- /r -->, sans fausse alarme (3 graines). `dp.calibrate` garde par défaut le plancher
   20 ε log2 N (il élargit seulement) ; `base=None` le retire. `assert_allclose` différentiel :
   inégal. `benchmarks/calibrated_tolerance.py` : tolérance calibrée sans plancher sur
-  l'implémentation de confiance, aucune fausse alarme sur 12 autres implémentations correctes
+  l'implémentation de confiance, aucune fausse alarme sur <!-- r:calibrated.correct_without_alarm -->13<!-- /r --> autres implémentations correctes
   (scipy.fft, radix-2, DFT directe, sosfilt sur 5 filtres, polyphase sur 4 rapports, convolve) ;
-  seule la FFT PyTorch (156 ε contre 2,7 ε pour NumPy) est signalée. Sur 5 filtres et 4
-  rapports, calibré 7 à 3400 fois plus fin que le défaut : le modèle IIR dérivé est pessimiste.
+  seule la FFT PyTorch (<!-- r:calibrated.torch_fft -->156 ε<!-- /r --> contre <!-- r:calibrated.numpy_fft -->2.7 ε<!-- /r --> pour NumPy) est signalée. Sur 5 filtres et 4
+  rapports, calibré <!-- r:calibrated.gain_min -->7<!-- /r --> à <!-- r:calibrated.gain_max -->3400<!-- /r --> fois plus fin que le défaut : le modèle IIR dérivé est pessimiste.
   La calibration suppose une implémentation de confiance et une référence étendue.
 - Changements récents (PR #7 à #10, fusionnées) :
   - #8 : la relation « transfer function » borne la queue tronquée de la réponse
