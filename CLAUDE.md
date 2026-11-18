@@ -150,10 +150,9 @@ nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les 
   - SciPy applique une politique IA : tickets et PR rédigés par l'auteur, pas par une IA.
 - FFT CPU de PyTorch : jusqu'à 195 ε pour certaines longueurs à grands facteurs premiers
   (N = 596), contre environ 4 ε pour NumPy/SciPy.
-- `benchmarks/validation.py --only false-positives` est cassé depuis #10 : sa sonde
-  `_instrumented_assert_close` n'accepte pas l'argument `precision=` (TypeError sur 62 des
-  100 lignes avec `--seeds 1`). Les 2000 exécutions sans fausse alarme de
-  `benchmarks/validation.json` datent d'avant #7 à #10.
+- Fausses alarmes : `benchmarks/validation.json` (relancé après #7 à #10) donne 2000
+  exécutions sur du code correct, aucun échec. `python benchmarks/validation.py --only
+  false-positives --seeds 1` refait la vérification en environ 2 min (100 exécutions).
 
 ## Pistes ouvertes (fiche de projet)
 
