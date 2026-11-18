@@ -69,10 +69,12 @@ def test_tight_calibration_catches_an_fft_the_default_tolerance_lets_through():
 
     lengths = range(1, 513)
     tight = dp.calibrate(np.fft.fft, lengths=lengths, trials=2, base=None)
-    assert dp.verify(declare_fft(radix2_recursive_twiddles), max_examples=50, seed=0, raise_on_failure=False).ok
-    assert not dp.verify(declare_fft(radix2_recursive_twiddles, tight), max_examples=50, seed=0,
+    # 200 inputs, not 50: at about 20 eps the mutant sits close to the calibrated bound, and with 50
+    # inputs seed 0 caught it on x86-64 (one relation) but not on macOS arm64; 200 catch it with two
+    assert dp.verify(declare_fft(radix2_recursive_twiddles), max_examples=200, seed=0, raise_on_failure=False).ok
+    assert not dp.verify(declare_fft(radix2_recursive_twiddles, tight), max_examples=200, seed=0,
                          raise_on_failure=False).ok
-    assert dp.verify(declare_fft(np.fft.fft, tight), max_examples=50, seed=0, raise_on_failure=False).ok
+    assert dp.verify(declare_fft(np.fft.fft, tight), max_examples=200, seed=0, raise_on_failure=False).ok
 
 
 # --------------------------------------------------------------- reference without extended long double
