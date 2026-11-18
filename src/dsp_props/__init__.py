@@ -19,6 +19,7 @@ from .api import (
     transform,
     verify,
 )
+from .array_api import array_api
 from .core import calibrate
 from .family import FamilySpec, family
 from .regression import write_regression_tests
@@ -32,6 +33,7 @@ __all__ = [
     "relations",
     "transform",
     "calibrate",
+    "array_api",
     "streaming",
     "lti_filter",
     "LTISpec",
