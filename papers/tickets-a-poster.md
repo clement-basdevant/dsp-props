@@ -9,6 +9,7 @@ Brouillons prêts, à poster depuis le compte GitHub du projet. Une fois posté,
 | 2 | scipy/scipy : tf2sos supprime les retards purs | posté : [scipy#26417](https://github.com/scipy/scipy/issues/26417) |
 | 3 | commentaire sur scipy#26406 : impact librosa | posté le 15/10/2026 sur [scipy#26406](https://github.com/scipy/scipy/issues/26406) |
 | 4 | scipy/scipy : filtfilt(method="gust") et zéros en fin de `a` ou `b` | posté le 04/11/2026 : [scipy#26610](https://github.com/scipy/scipy/issues/26610), correctif proposé dans [scipy#26624](https://github.com/scipy/scipy/pull/26624) (ouverte le 05/11/2026, en attente de revue) |
+| 5 | scipy/scipy : filtfilt(method="gust") imprécis avec des pôles proches de zéro | **à poster** (section 5) |
 
 ---
 
@@ -89,4 +90,64 @@ Additional impact downstream: `librosa.effects.preemphasis` (librosa 1.0.0) uses
 import numpy as np, librosa
 librosa.effects.preemphasis(np.array([]), coef=0.5, zi=np.zeros(1), return_zf=True)
 # ValueError: v cannot be empty   (from scipy/signal/_signaltools.py, lfilter FIR path)
+```
+
+---
+
+## 5. scipy/scipy : filtfilt(method="gust") et pôles proches de zéro
+
+**Le texte doit être écrit par toi** (politique IA de SciPy, comme pour la section 2). Ci-dessous,
+les faits et le code ; à toi la rédaction.
+
+Lien : https://github.com/scipy/scipy/issues/new/choose (Bug report). Un nouveau ticket plutôt
+qu'un commentaire sur #26610 : la PR #26624 ferme #26610 en retirant les zéros exacts, et ce cas
+n'est pas couvert par elle. Le citer comme lié.
+
+Faits vérifiés le 18/11/2026 sur SciPy 1.18.1, NumPy 2.5.3, Python 3.13
+(script complet : `benchmarks/gust_near_zero_poles.py`) :
+- Filtre a = poly([0.5, p, p]) (un pôle à 0,5 et un pôle double en p), b = [1], N = 97.
+  Quand p tend vers 0, la sortie exacte tend vers celle de a = [1, -0.5] (écart d'environ 3,6 p
+  en relatif). Celle de SciPy s'en éloigne : 5,4e-3 en relatif pour p = 1e-7, contre 3,6e-7
+  attendu.
+- La propriété documentée y_fb == y_bf (et donc le renversement temporel) est cassée : écart
+  2,6e-7 (p = 1e-6) et 6,5e-5 (p = 1e-7) en relatif.
+- Le problème est bien conditionné (nombre de conditionnement d'environ 1 en x et 2 en `a`,
+  mesuré en 80 chiffres). C'est l'algorithme qui perd les chiffres : erreur de 7,3e9 ε pour
+  p = 1e-6 contre une référence en précision étendue de l'algorithme de SciPy lui-même.
+- Cause : la matrice M du moindre carré de `_filtfilt_gust` devient quasi singulière
+  (cond ≈ 5e12 pour p = 1e-6) ; les arrondis du second membre `y_bf - y_fb` sont amplifiés
+  par 1/σ_min. Une troncature de la SVD (`cond=` de `lstsq`) ne corrige pas, elle dégrade.
+- C'est la version continue de #26610 : p = 0 exactement donne des zéros en fin de `a`.
+- Trouvé par la campagne dsp-props (relation : filtfilt gust commute avec le renversement
+  temporel) sur un filtre d'ordre 6 à deux pôles à 0,001.
+- Pas de correctif évident à proposer : le seuil « coefficient négligeable » n'a pas de valeur
+  naturelle ; une formulation mieux conditionnée des états initiaux serait la vraie réparation.
+  On peut le dire dans le ticket sans proposer de PR.
+
+Code pour reproduire (sans dépendance autre que SciPy) :
+
+```python
+import numpy as np
+from scipy.signal import filtfilt
+
+x = np.random.default_rng(0).standard_normal(97)
+y0 = filtfilt([1.0], [1.0, -0.5], x, method="gust")   # limit p -> 0
+for p in [1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
+    a = np.poly([0.5, p, p])
+    y = filtfilt([1.0], a, x, method="gust")
+    yr = filtfilt([1.0], a, x[::-1], method="gust")[::-1]
+    print(f"p={p:.0e}  |y - y0|/|y0| = {np.linalg.norm(y - y0) / np.linalg.norm(y0):.1e}"
+          f"   reversal gap = {np.linalg.norm(y - yr) / np.linalg.norm(y0):.1e}")
+# |y - y0|/|y0| should be about 3.6 p; it is 7.0e-06 at p=1e-6 and 5.4e-03 at p=1e-7
+```
+
+Sortie obtenue :
+
+```
+p=1e-02  |y - y0|/|y0| = 3.7e-02   reversal gap = 6.7e-15
+p=1e-03  |y - y0|/|y0| = 3.6e-03   reversal gap = 9.2e-13
+p=1e-04  |y - y0|/|y0| = 3.6e-04   reversal gap = 1.4e-10
+p=1e-05  |y - y0|/|y0| = 3.6e-05   reversal gap = 9.1e-09
+p=1e-06  |y - y0|/|y0| = 7.0e-06   reversal gap = 2.6e-07
+p=1e-07  |y - y0|/|y0| = 5.4e-03   reversal gap = 6.5e-05
 ```

@@ -146,6 +146,11 @@ nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les 
   - `filtfilt(method="gust")` dépend de l'écriture du filtre (scipy/scipy#26610) : des
     zéros en fin de `a` ou `b` gonflent l'ordre, ajoutent une impulsion aux bords (0,54 sur
     un exemple) et rendent le système des moindres carrés singulier. Reproduit de 1.15 à 1.18.1.
+  - Prolongement non signalé (campagne 3, trié le 18/11) : des pôles proches de zéro, sans
+    être nuls, rendent ce système quasi singulier et `gust` perd des chiffres sur un problème
+    bien conditionné ; la PR scipy#26624 (zéros exacts) ne le couvre pas. Analyse :
+    `benchmarks/gust_near_zero_poles.py` ; ticket à poster par l'auteur
+    (`papers/tickets-a-poster.md`, section 5).
   - SciPy applique une politique IA : tickets et PR rédigés par l'auteur, pas par une IA.
 - FFT CPU de PyTorch : jusqu'à 195 ε pour certaines longueurs à grands facteurs premiers
   (N = 596), contre environ 4 ε pour NumPy/SciPy.
