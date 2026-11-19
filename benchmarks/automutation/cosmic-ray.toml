@@ -1,0 +1,21 @@
+# Mutant generation for run.py (cosmic-ray init + cr-filter-operators). run.py applies each mutant
+# itself and runs the three suites; test-command is what `cosmic-ray exec` would run for upstream.
+[cosmic-ray]
+module-path = "target/scipy_subset.py"
+timeout = 300.0
+excluded-modules = []
+test-command = "python -m pytest -x -q -p no:cacheprovider -p scipy_patch --pyargs scipy.signal.tests.test_signaltools -k 'TestResample or TestDecimate or TestHilbert'"
+
+[cosmic-ray.distributor]
+name = "local"
+
+[cosmic-ray.filters.operators-filter]
+# Arithmetic replaced by arithmetic only (no bitwise, shift, power or modulo), and none of the
+# operators that insert or rename variables at random.
+exclude-operators = [
+    "core/ReplaceBinaryOperator_.*_(BitOr|BitAnd|BitXor|LShift|RShift|Pow|Mod)$",
+    "core/ReplaceBinaryOperator_(BitOr|BitAnd|BitXor|LShift|RShift|Pow|Mod)_.*",
+    "core/VariableReplacer",
+    "core/VariableInserter",
+    "core/RemoveDecorator",
+]
