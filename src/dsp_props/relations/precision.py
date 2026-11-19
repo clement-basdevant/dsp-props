@@ -11,8 +11,8 @@ from .base import Relation
 
 
 @st.composite
-def _float32_signal(draw, max_n):
-    n = draw(lengths(max_n))
+def _float32_signal(draw, max_n, min_n=1):
+    n = draw(lengths(max_n, min_n))
     return draw(signals(n, np.float32))
 
 
@@ -45,7 +45,7 @@ class Float32Consistency(Relation):
         return getattr(spec, "float32", False) and np.dtype(spec.precision) == np.float64
 
     def inputs(self, spec):
-        return _float32_signal(spec.max_n)
+        return _float32_signal(spec.max_n, min_n=spec.min_n)
 
     def check(self, spec, x):
         from ..api import LTISpec

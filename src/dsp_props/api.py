@@ -29,6 +29,13 @@ def _precision(dtype):
     return np.finfo(np.result_type(dt, np.float32)).dtype  # float16 is checked as float32, like the bounds
 
 
+def _min_n(min_n, max_n):
+    """Check the declared input-length range ``[min_n, max_n]`` and return ``min_n``."""
+    if not 1 <= int(min_n) <= int(max_n):
+        raise ValueError(f"min_n must be between 1 and max_n = {max_n}, got {min_n}")
+    return int(min_n)
+
+
 def hermitian_extend(half, n):
     """Full length-``n`` DFT from the ``n // 2 + 1`` bins of a real-input DFT.
 
@@ -64,6 +71,7 @@ class TransformSpec:
     inverse_takes_length: bool = False
     tolerance: ToleranceModel = field(default_factory=FFTTolerance)
     max_n: int = 512
+    min_n: int = 1  # shortest input the operator accepts (the relations draw no shorter one)
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
     float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
@@ -102,6 +110,7 @@ class StreamingSpec:
     make: Callable
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
+    min_n: int = 1  # shortest input the operator accepts (the relations draw no shorter one)
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
     float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
@@ -124,6 +133,7 @@ class LTISpec:
     max_gain: float | None = None
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
+    min_n: int = 1  # shortest input the operator accepts (the relations draw no shorter one)
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
     float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
@@ -134,7 +144,7 @@ class LTISpec:
 
 
 def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max_n=512,
-               precision=np.float64, float32=False):
+               precision=np.float64, float32=False, min_n=1):
     """Declare a linear time-invariant filter applied with zero initial state.
 
     Checks linearity, time invariance and (if ``causal``) causality. With
@@ -158,8 +168,15 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     ``float32 consistency`` relation checks that its output on a float32 input
     agrees with its output on the same values in float64, to float32
     accuracy, and is at least float32.
+
+    ``min_n`` (every declaration takes it, default 1) is the shortest input
+    the operator is documented to accept, such as ``filtfilt``, which needs
+    more samples than its padding: the relations then draw lengths in
+    ``[min_n, max_n]`` only. Leave it at 1 unless the documentation rules
+    shorter inputs out, since short inputs are where many faults show.
     """
     precision = _precision(precision)
+    min_n = _min_n(min_n, max_n)
     declared = tolerance is not None
     if transfer is not None:
         from .core.iir import check_stable
@@ -176,7 +193,8 @@ def lti_filter(*, causal=True, transfer=None, max_gain=None, tolerance=None, max
     def decorate(func):
         func.__dsp_props__ = LTISpec(func=func, causal=causal, transfer=transfer, max_gain=max_gain,
                                      tolerance=tolerance, max_n=max_n, precision=precision,
-                                     tolerance_declared=declared, float32=float32)
+                                     tolerance_declared=declared, float32=float32,
+                                     min_n=min_n)
         return func
 
     return decorate
@@ -200,6 +218,7 @@ class MultirateSpec:
     stopband: float | None = 0.1
     tolerance: ToleranceModel = field(default_factory=lambda: FFTTolerance(c=1000.0))
     max_n: int = 512
+    min_n: int = 1  # shortest input the operator accepts (the relations draw no shorter one)
     precision: np.dtype = np.dtype(np.float64)
     tolerance_declared: bool = False  # a tolerance given in the declaration wins over a tolerance file
     float32: bool = False  # the operator also runs in single precision (float32 consistency relation)
@@ -214,7 +233,7 @@ class MultirateSpec:
 
 
 def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=1e-2,
-              stopband=0.1, tolerance=None, max_n=512, precision=np.float64, float32=False):
+              stopband=0.1, tolerance=None, max_n=512, precision=np.float64, float32=False, min_n=1):
     """Declare a rational resampler (up by ``up``, down by ``down``), like ``resample_poly``.
 
     Checks linearity and periodic time invariance (an input delay of
@@ -226,6 +245,7 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
     and ``float32`` as for ``lti_filter``.
     """
     precision = _precision(precision)
+    min_n = _min_n(min_n, max_n)
     if up < 1 or down < 1:
         raise ValueError("up and down must be positive integers")
     rules = {
@@ -240,13 +260,13 @@ def resampler(up=1, down=1, *, causal=False, length="ceil", dc_gain=1.0, ripple=
                                            dc_gain=dc_gain, ripple=ripple, stopband=stopband,
                                            tolerance=tolerance or FFTTolerance(c=1000.0), max_n=max_n,
                                            precision=precision, tolerance_declared=tolerance is not None,
-                                           float32=float32)
+                                           float32=float32, min_n=min_n)
         return func
 
     return decorate
 
 
-def streaming(*, tolerance=None, max_n=512, precision=np.float64, float32=False):
+def streaming(*, tolerance=None, max_n=512, precision=np.float64, float32=False, min_n=1):
     """Declare a block processor: a class (or factory) whose instances have ``process(block)``.
 
     ``dp.verify`` then checks that a split into blocks gives the same output
@@ -256,11 +276,13 @@ def streaming(*, tolerance=None, max_n=512, precision=np.float64, float32=False)
     ``precision`` and ``float32`` as for ``lti_filter``.
     """
     precision = _precision(precision)
+    min_n = _min_n(min_n, max_n)
 
     def decorate(make):
         make.__dsp_props__ = StreamingSpec(make=make, tolerance=tolerance or FFTTolerance(c=1000.0),
                                            max_n=max_n, precision=precision,
-                                           tolerance_declared=tolerance is not None, float32=float32)
+                                           tolerance_declared=tolerance is not None, float32=float32,
+                                           min_n=min_n)
         return make
 
     return decorate
@@ -291,7 +313,7 @@ def stateful(func, init_state, **kwargs):
 
 def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval_scale=None,
               real_input_hermitian=False, real_input_only=None, inverse_takes_length=None,
-              tolerance=None, max_n=512, precision=np.float64, float32=False):
+              tolerance=None, max_n=512, precision=np.float64, float32=False, min_n=1):
     """Declare a function as a transform; ``dp.verify`` then checks it.
 
     ``kind="dft"``: complex DFT (shift and convolution theorems apply).
@@ -302,6 +324,7 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
     ``precision`` and ``float32`` as for ``lti_filter``.
     """
     precision = _precision(precision)
+    min_n = _min_n(min_n, max_n)
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}, got {kind!r}")
     if real_input_only is None:
@@ -325,6 +348,7 @@ def transform(inverse=None, *, kind="dft", linear=True, parseval=False, parseval
             precision=precision,
             tolerance_declared=tolerance is not None,
             float32=float32,
+            min_n=min_n,
         )
         return func
 

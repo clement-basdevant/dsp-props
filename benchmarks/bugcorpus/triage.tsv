@@ -1,0 +1,248 @@
+# history read at: librosa 036ecbc20f, numpy 32283e0844, scipy 3c17522207, torchaudio 9b19155e6f
+library	commit	date	subject	files	class	reason
+librosa	2750213ec0	2019-12-17	fix typos in reassignment docstring	librosa/core/spectrum.py	not-behaviour	docstring
+librosa	b64d696513	2020-01-06	fixed #1030, deprecation cycle for filters.mel(norm) parameter	librosa/filters.py	not-behaviour	deprecation cycle
+librosa	bb76f86de3	2020-01-09	fixed #1053, length of generated tones	librosa/core/audio.py	out-of-category	tone synthesis length
+librosa	187131414f	2020-02-12	(maybe) fix pitch shift docs	librosa/effects.py	not-behaviour	documentation
+librosa	cd85952e39	2020-05-22	Fixes #977: Adding reference pitch to tuning conversion utils (#1120)	librosa/core/__init__.py librosa/core/time_frequency.py	out-of-category	tuning conversions
+librosa	3887e982fb	2020-06-09	Fix hopsize issue for iirt (#1157)	librosa/core/spectrum.py	out-of-category	iirt filterbank spectrogram
+librosa	f997b6a333	2020-06-26	fixed #1189 (#1190)	librosa/core/constantq.py	out-of-category	constant-Q transform
+librosa	38c5a2edc8	2020-06-27	Documentation updates and other fixes (#1178)	librosa/core/__init__.py librosa/core/audio.py librosa/core/constantq.py librosa/core/fft.py librosa/core/harmonic.py librosa/core/pitch.py librosa/core/spectrum.py librosa/core/time_frequency.py librosa/effects.py librosa/filters.py	not-behaviour	documentation
+librosa	4ccee9d972	2020-06-29	Fix padding for IIRT (#1196)	librosa/core/spectrum.py	out-of-category	iirt filterbank spectrogram
+librosa	5fb622c0ad	2020-09-11	docs: Fix simple typo, recomended -> recommended (#1237)	librosa/core/pitch.py	not-behaviour	typo
+librosa	a1015d2fc8	2021-04-02	docs: Fix dim calculate error (#1298)	librosa/core/audio.py	not-behaviour	documentation
+librosa	80c50e6298	2021-05-24	support np.integer wherever we support int, fixes #1275 (#1340)	librosa/core/audio.py librosa/core/spectrum.py librosa/filters.py	out-of-domain	NumPy integer arguments
+librosa	a9598f9d5a	2021-10-27	fixed #1350, explicit dtype precisions (#1390)	librosa/core/constantq.py librosa/core/convert.py librosa/core/spectrum.py librosa/filters.py	not-behaviour	deprecated NumPy type names
+librosa	bc09736dc7	2021-11-04	fixed #1398, user can control resampling in iirt (#1401)	librosa/core/spectrum.py	out-of-category	iirt filterbank spectrogram
+librosa	a42d3ef74c	2021-12-28	tiny fix (#1427)	librosa/core/spectrum.py	not-behaviour	documentation example
+librosa	68232f7e5b	2021-12-30	fixed off-by-one in yin/pyin difference calculation, fixes #1425 (#1428)	librosa/core/pitch.py	out-of-category	yin/pyin
+librosa	072ccf8c4f	2022-02-15	doc update, fix #1445	librosa/effects.py	not-behaviour	documentation
+librosa	9bff37233f	2022-04-09	Fix db_to_amplitude docs (#1469)	librosa/core/spectrum.py	not-behaviour	documentation
+librosa	a19da50756	2022-06-01	Fix function name in docs of STFT (#1487)	librosa/core/spectrum.py	not-behaviour	documentation
+librosa	7ac022a849	2022-06-02	fixed #1489 for multichannel splitting (#1493)	librosa/effects.py	out-of-category	effects.split
+librosa	23f4f16726	2022-07-29	Fixes docstring for 'note_to_midi' function in librosa/core/convert.py (#1545)	librosa/core/convert.py	not-behaviour	docstring
+librosa	f101492a5b	2022-08-25	fixes #1527, corrects bandwidth calculation and adds documentation (#1560)	librosa/filters.py	out-of-category	window bandwidth
+librosa	ed422f8ab7	2022-09-09	call rfft when appropriate in autocorrelate, fixes #1526 (#1565)	librosa/core/audio.py	out-of-category	autocorrelate (not linear)
+librosa	876d852aaf	2023-05-11	fixed bins_per_octave's docs type float to int (#1703)	librosa/effects.py	not-behaviour	documentation
+librosa	6e0d0f5f44	2023-12-21	Fix sample rate type annotations (#1789)	librosa/core/audio.py librosa/core/convert.py	not-behaviour	type annotations
+librosa	d0a12c87cd	2024-07-02	fix #1849 (#1851)	librosa/core/constantq.py	out-of-category	constant-Q transform (sparse matrices)
+librosa	e403272fc9	2025-05-19	fix: correct typo in core/convert.py line:1658 (#1932)	librosa/core/convert.py	not-behaviour	typo
+librosa	2d3f282e45	2026-09-20	Fix docstring order, power_to_db axes doc, and numpydoc glob	librosa/core/audio.py librosa/core/convert.py librosa/core/notation.py librosa/core/spectrum.py librosa/effects.py librosa/filters.py	not-behaviour	documentation
+numpy	ec62be21cf	2020-06-08	BUG: Remove non-threadsafe sigint handling from fft calculation	numpy/fft/_pocketfft.c	out-of-domain	thread safety of SIGINT handling
+numpy	f0322c83c8	2024-01-23	BUG: correct irfft with n not equal to the input size	numpy/fft/_pocketfft_umath.c	unreleased	irfft with n != size in the NumPy 2.0 development rewrite, fixed before 2.0.0
+numpy	aaf2c12dbb	2024-02-13	BUG: ensure that FFT routines can deal with integer and bool arrays	numpy/fft/_pocketfft.py	out-of-domain	integer and boolean inputs
+numpy	075e3df1af	2024-02-26	BUG: fix code comment typos in numpy/ directory	numpy/fft/_pocketfft.py	not-behaviour	comment typos
+numpy	760a1892ce	2024-03-24	BUG: update pocketfft to unconditionaly disable use of aligned_alloc	numpy/fft/pocketfft	out-of-domain	platform (aligned_alloc)
+numpy	63a4f61f16	2024-04-26	BUG: Fix rfft for even input length.	numpy/fft/_pocketfft_umath.cpp	out-of-domain	rfft(x, n) with n < len(x) (truncating argument): Nyquist bin not real, NumPy 2.0.0
+numpy	0c36d5592d	2024-06-24	BUG: Ensure output order follows input in numpy.fft	numpy/fft/_pocketfft.py	out-of-domain	memory order of the output
+numpy	22c791356d	2024-09-28	BUG: fftn axis bug (#27466)	numpy/fft/_pocketfft.py	out-of-domain	N-D (fftn axes)
+numpy	c910b6157a	2025-01-08	BUG: Include Python-including headers first in common.hpp	numpy/fft/_pocketfft_umath.cpp	not-behaviour	build (header order)
+numpy	19f2a720d8	2025-09-22	BUG: Fix pocketfft umath strides for AIX compatibility (#29768)	numpy/fft/_pocketfft_umath.cpp	out-of-domain	platform (AIX strides)
+numpy	845f93ce51	2026-03-01	BUG: fft: Fix handling of out parameter for hfft, ifft2 and irfft2.	numpy/fft/_pocketfft.py	out-of-domain	out= argument
+scipy	5681835ec5	2019-11-06	BUG: signal: fixed issue #10360 (#10988)	scipy/signal/fir_filter_design.py	out-of-category	FIR filter design
+scipy	7893dba235	2019-12-26	BUG: Explicit dtype specification in _upfirdn.py (#11229)	scipy/signal/_upfirdn.py	out-of-domain	platform (32-bit integer overflow in upfirdn allocation)
+scipy	b890b8f502	2020-02-17	FIX: Allow non-native byte order inputs to scipy.fft	scipy/fft/_pocketfft/helper.py	out-of-domain	non-native byte order
+scipy	81697624f3	2020-04-20	BUG: avoid error in R2R FFTs of complex inputs when overwrite_x=True	scipy/fft/_pocketfft/realtransforms.py	out-of-domain	dct/dst of complex input with overwrite_x=True
+scipy	47d6700e99	2020-05-04	BUG: Reshape oaconvolve output even when no axes convolved (#11974)	scipy/signal/signaltools.py	out-of-domain	N-D (oaconvolve with no axes convolved)
+scipy	a167a5475e	2020-05-10	BUG: Fix dropping dt in signal.StateSpace	scipy/signal/ltisys.py	out-of-category	StateSpace object
+scipy	fd966a4007	2020-05-17	BUG, MAINT: address issue 11095	scipy/signal/_peak_finding.py scipy/signal/wavelets.py	out-of-category	peak finding, wavelets
+scipy	42f85a977c	2020-05-18	BUG: Better protection	scipy/signal/_upfirdn_apply.pyx	in-scope	upfirdn output length: same pull request as 6bc1c1c6df (scipy-upfirdn-length)
+scipy	6bc1c1c6df	2020-05-18	BUG: Fix length calculation in upfirdn	scipy/signal/_upfirdn.py scipy/signal/_upfirdn_apply.pyx	in-scope	scipy-upfirdn-length
+scipy	eab4cb57e1	2020-05-27	BUG: Fix exit condition for QUICK_SELECT pivot	scipy/signal/medianfilter.c	out-of-category	median filter
+scipy	fd3e8c0b87	2020-05-27	BUG: Use 64-bit indexing in convolve2d to avoid overflow	scipy/signal/firfilter.c	out-of-domain	2-D (convolve2d indexing overflow)
+scipy	0b5921ed6b	2020-06-27	BUG: use ellipkm1, and bracketed solvers, in elliptic filter design	scipy/signal/filter_design.py	out-of-category	elliptic filter design
+scipy	a620bfcdab	2020-08-11	BUG: Improve input validation for sepfir2d	scipy/signal/splinemodule.c	out-of-category	2-D spline filter
+scipy	aa3a12dc0b	2020-10-20	BUG: fft.next_fast_len should accept keyword arguments	scipy/fft/_pocketfft/pypocketfft.cxx	out-of-category	next_fast_len helper (keyword arguments)
+scipy	55a13f5d6f	2020-11-17	BUG: Fix GIL handling in _sosfilt	scipy/signal/_sosfilt.pyx	out-of-domain	threads (GIL handling in sosfilt)
+scipy	8a149f29e2	2020-11-25	BUG: signal: Fix data type of the numerator returned by ss2tf.	scipy/signal/lti_conversion.py scipy/signal/ltisys.py	out-of-category	ss2tf conversion
+scipy	702dba36b6	2020-12-18	BUG: correct signal.medfilt comparison for dtype=object	scipy/signal/sigtoolsmodule.c	out-of-category	median filter
+scipy	983be289dc	2020-12-18	BUG: make signal.medfilt output dtype match input dtype	scipy/signal/signaltools.py	out-of-category	median filter
+scipy	9cc5ac8172	2020-12-18	BUG: signal.medfilt2d falls back to .medfilt for unhandled dtypes	scipy/signal/signaltools.py	out-of-category	median filter
+scipy	996062192e	2021-01-04	BUG: fftpack doesn't work with ndarray shape argument	scipy/fftpack/helper.py	out-of-domain	fftpack shape given as an ndarray
+scipy	b5495d813d	2021-04-23	BUG: signal: fix get_window argument handling and add tests. (#13879)	scipy/signal/windows/windows.py	out-of-category	get_window
+scipy	e10a76dac4	2021-04-23	BUG: DOC: signal: fix need argument config and add missing doc link for `signal.get_window`	scipy/signal/windows/windows.py	out-of-category	get_window
+scipy	54fdcaafb2	2021-05-03	BUG: update median averaging in signal.csd (#12676)	scipy/signal/spectral.py	out-of-category	csd (spectral estimation)
+scipy	da33c0c973	2021-06-30	BUG: medfilt can access beyond the end of an array	scipy/signal/sigtoolsmodule.c	out-of-category	median filter
+scipy	5e80b2886d	2021-07-11	BUG: Check for NULL pointer in `memmove`  (#14367)	scipy/signal/C_bspline_util.c scipy/signal/D_bspline_util.c scipy/signal/S_bspline_util.c scipy/signal/Z_bspline_util.c	out-of-category	B-spline utilities
+scipy	bd98068207	2021-09-20	BUG:signal: matching window dtype to input (#14737)	scipy/signal/signaltools.py	out-of-domain	dtype preservation of resample_poly (float32 input gave float64)
+scipy	5fc8ab679f	2021-11-30	BUG: correct frequency checks in signal.iirdesign and .iirfilter (#15092)	scipy/signal/_filter_design.py	out-of-category	IIR filter design
+scipy	2461f2b9b6	2021-12-06	BUG: Fix group delay singularity check (#13419)	scipy/signal/_filter_design.py	out-of-category	group delay
+scipy	d5497bdc3c	2022-01-10	FIX: Deconvolve method does not work with signals with more than 1D (#15130)	scipy/signal/_signaltools.py	out-of-domain	N-D (deconvolve)
+scipy	ad09488269	2022-02-17	BUG: Fix median bias in csd(..., average="median") (scipy#15601)	scipy/signal/_spectral_py.py	out-of-category	csd (spectral estimation)
+scipy	88270c078e	2022-03-12	BUG: improve exceptions for private attributes in refactored `__all__` dicts (#15766)	scipy/signal/filter_design.py scipy/signal/signaltools.py scipy/signal/spectral.py	not-behaviour	exceptions for private attributes
+scipy	672619a7d7	2022-03-18	BUG: Adding parameter `scaling` to signal.stft() and signal.istft()  (#15704)	scipy/signal/_spectral_py.py	api-change	stft/istft gain a scaling parameter
+scipy	e7322848cf	2022-04-20	BUG: Remove the need to specify window_size for find_peaks_cwt(). (#15826)	scipy/signal/_peak_finding.py scipy/signal/_wavelets.py	out-of-category	find_peaks_cwt
+scipy	8ae563f541	2022-04-22	FIX: show warning when passing NAN or INF into inputs of scipy.convolve. Add notes of the warning to the docs.	scipy/signal/_signaltools.py	not-behaviour	warning for NaN or inf in convolve
+scipy	44ec457ae1	2022-05-06	BUG: signal: Fix calculation of extended image indices in convolve2d.	scipy/signal/_firfilter.c	out-of-domain	2-D (convolve2d image indices)
+scipy	0336363269	2022-05-13	BUG: fix extension module initialization, needs use of `PyMODINIT_FUNC` (#16165)	scipy/signal/_sigtoolsmodule.c scipy/signal/_splinemodule.c	not-behaviour	extension module initialisation
+scipy	cbec046260	2022-05-20	BUG: check that iirfilter argument Wn satisfies Wn[0] < Wn[1] (#15886)	scipy/signal/_filter_design.py	out-of-category	IIR filter design
+scipy	ba77fbd0f4	2022-06-16	BUG Fix signature of `*_IIR_forback` in `signal._bspline_util` (#15955)	scipy/signal/_bspline_util.c.in scipy/signal/_splinemodule.c scipy/signal/_splinemodule.h	out-of-category	B-spline utilities
+scipy	e2f796365d	2022-07-16	BUG Enables find_peaks to work on read-only data	scipy/signal/_peak_finding_utils.pyx	out-of-category	find_peaks
+scipy	c1ce773461	2022-07-24	BUG: signal: Compare window_length to correct axis in savgol_filter (#16658)	scipy/signal/_savitzky_golay.py	out-of-category	Savitzky-Golay filter (N-D window length check)
+scipy	d513ce7c46	2022-08-31	BUG: Set nperseg size to the size of an already-initialized window on periodogram (#16776)	scipy/signal/_spectral_py.py	out-of-category	periodogram
+scipy	95f173c7d9	2022-09-23	BUG: fix `signal.sosfilt` issue with complex dtypes and Intel compiler	scipy/signal/_sosfilt.pyx	out-of-domain	platform (Intel compiler, complex sosfilt)
+scipy	58e90e37ea	2022-11-11	BUG: signal: Change types in the upfirdn utility function _output_len() (#17397)	scipy/signal/_upfirdn_apply.pyx	out-of-domain	platform (32-bit, Cython on Windows) in upfirdn length
+scipy	010196647b	2022-11-20	BUG: use SOS filters in decimate for numerical stability (#16096)	scipy/signal/_signaltools.py	in-scope	scipy-decimate-iir-stability
+scipy	4463eb0d3f	2023-01-15	BUG: signal: fix check_malloc extern declaration type (#17790)	scipy/signal/_medianfilter.c	not-behaviour	build (check_malloc declaration)
+scipy	cf1999530f	2023-04-10	BUG: Fix handling on user-supplied filters in `signal.decimate` (#17881)	scipy/signal/_signaltools.py	in-scope	scipy-decimate-dlti
+scipy	97de33f753	2023-06-14	BUG: signal: fix detrend with array-like bp (#18676)	scipy/signal/_signaltools.py	out-of-domain	detrend with an array-like breakpoint list
+scipy	bdfa4683f9	2023-06-14	BUG: signal: use correct filter kind in filter order optimization	scipy/signal/_filter_design.py	out-of-category	filter order selection
+scipy	299df543da	2023-06-15	BUG: fix ortho mode in DST type 2/3 (#18613)	scipy/fft/_pocketfft/pocketfft_hdronly.h scipy/fft/_realtransforms.py	in-scope	scipy-dst-ortho
+scipy	07f9217488	2023-09-13	BUG: Remove removed item from `__all__` (#19236)	scipy/signal/filter_design.py scipy/signal/ltisys.py	not-behaviour	__all__
+scipy	a0801b8ff4	2023-09-20	BUG: signal: freqz rfft grid fix (#19208)	scipy/signal/_filter_design.py	out-of-category	freqz
+scipy	fe967c70d7	2024-02-02	BUG: Add proper error message for `ShortTimeFFT` for onesided FFTs and complex signals. (#20010)	scipy/signal/_short_time_fft.py	not-behaviour	error message for complex input to ShortTimeFFT
+scipy	54b53022da	2024-03-06	BUG: Fixed `fftshift()` in `ShortTimeFFT`.	scipy/signal/_short_time_fft.py	out-of-domain	N-D (ShortTimeFFT fftshift over every axis)
+scipy	74f607d97b	2024-03-15	FIX: Add missing datatypes, remove symiirorder functions from C module and fix initial state handling	scipy/signal/__init__.py scipy/signal/_bspline_util.c.in scipy/signal/_bsplines.py scipy/signal/_splinemodule.c scipy/signal/_splinemodule.h scipy/signal/_splines.py	out-of-category	symiirorder (mirror-symmetric IIR smoothing, not time-invariant at the edges)
+scipy	b0cf648b3c	2024-03-20	FIX: Remove cspline2d and qspline2d from the spline namespace	scipy/signal/spline.py	out-of-category	spline namespace
+scipy	cd60e810c1	2024-03-20	BUG: signal: correctly compute group_delay for complex-coefficient TFs (#19627)	scipy/signal/_filter_design.py	out-of-category	group delay
+scipy	1a48b79ba5	2024-03-24	BUG: signal: Fix scalar input issue of signal.lfilter (#20318)	scipy/signal/_signaltools.py	out-of-domain	0-d (scalar) input to lfilter
+scipy	67f338ac55	2024-04-02	FIX: Properly compute precision for qspline and cspline	scipy/signal/_bsplines.py	out-of-category	spline filters
+scipy	86c3a5bf8d	2024-04-10	BUG: signal: corrections to `iir{peak,notch,comb}` filter gain (#20418)	scipy/signal/_filter_design.py	out-of-category	iirpeak/iirnotch/iircomb design
+scipy	e41cf1e227	2024-04-10	FIX: Address compatibility with integer inputs	scipy/signal/_splines.py	out-of-category	spline filters
+scipy	ed85ac13c3	2024-04-10	FIX: Replace dtype.char by checking in a list	scipy/signal/_bsplines.py	out-of-category	spline filters
+scipy	cb1fb36dd3	2024-04-11	FIX: Cast directly to float64	scipy/signal/_splines.py	out-of-category	spline filters
+scipy	efff26b056	2024-04-12	BUG: signal.iirfilter: avoid integer overflow (#20456)	scipy/signal/_filter_design.py	out-of-category	IIR filter design
+scipy	b67fdec29c	2024-07-11	BUG: signal: fix crash under free-threaded CPython in medfilt2d	scipy/signal/_medianfilter.c scipy/signal/_sigtoolsmodule.c	out-of-category	median filter
+scipy	77060bc96b	2024-07-18	BUG: fft: fix array-like input (#21209)	scipy/fft/_basic_backend.py scipy/fft/_fftlog_backend.py	out-of-domain	array-like (list) input
+scipy	4cca348df2	2024-09-05	BUG: fft: fix real input to standard funcs	scipy/fft/_basic_backend.py	out-of-domain	other array backends
+scipy	b2d624cac3	2024-09-09	FIX: scipy.fft tests are  now passing using multiple threads	scipy/fftpack/_pseudo_diffs.py	not-behaviour	tests under threads
+scipy	b384546727	2024-09-25	BUG:signal: Fix passing lti as system to cont2discrete	scipy/signal/_lti_conversion.py	out-of-category	cont2discrete
+scipy	297f6cd82d	2024-10-07	BUG: signal.ShortTimeFFT: fix multichannel roundtrip with mfft set	scipy/signal/_short_time_fft.py	out-of-domain	multichannel ShortTimeFFT round trip
+scipy	fec5d20126	2024-10-15	BUG: int handling for `resample_poly` (#21686)	scipy/signal/_signaltools.py	out-of-domain	integer input to resample_poly
+scipy	170f9e69a5	2024-10-31	BUG: fft.fht: set `u.imag[-1] = 0` only when `n` is even (#21668)	scipy/fft/_fftlog_backend.py	in-scope	scipy-fht-odd
+scipy	7e5dd6f18b	2024-11-01	BUG: signal: Fix `ShortTimeFFT.extent()` for `fft_mode == 'centered'` (#21780)	scipy/signal/_short_time_fft.py	out-of-category	ShortTimeFFT.extent (plot axes)
+scipy	35ad5912fa	2024-11-05	BUG: signal: correlation_lags, fail with meaningful error message if the mode is unknown (#21808)	scipy/signal/_signaltools.py	not-behaviour	error message
+scipy	60be494b5d	2024-12-01	BUG: signal: actually reject objects in correlate/convolve (#21984)	scipy/signal/_signaltools.py	out-of-domain	object arrays
+scipy	bb0cf02135	2024-12-10	BUG: signal: restore (and test for) array-like list inputs	scipy/signal/_signaltools.py	out-of-domain	list inputs
+scipy	50c1dfe3ce	2024-12-20	BUG: signal: fix delegation for LTI-consuming polymorphism	scipy/signal/_delegators.py	out-of-domain	other array backends (delegation)
+scipy	c471c8d337	2024-12-20	BUG: signal: only wrap functions, not classes	scipy/signal/__init__.py scipy/signal/_delegators.py scipy/signal/_signal_api.py scipy/signal/_support_alternative_backends.py	out-of-domain	other array backends (delegation)
+scipy	0a67523f98	2025-01-17	BUG: Fix bug with dpss degenerate case (#22344)	scipy/signal/windows/_windows.py	out-of-category	dpss window
+scipy	83e59a9067	2025-01-19	BUG: signal.bilinear handles complex input, and strips leading zeros (#22313)	scipy/signal/_filter_design.py	out-of-category	bilinear transform
+scipy	87241476bd	2025-02-03	BUG: signal.ShortTimeFFT: make attributes `win` and `dual_win` immutable (#22454)	scipy/signal/_short_time_fft.py	out-of-domain	mutable ShortTimeFFT attributes
+scipy	e8a26f037c	2025-03-07	BUG: `lfiltic`'s handling of `a[0] != 1` differs from `lfilter`'s  (#22554)	scipy/signal/_signaltools.py	out-of-category	lfiltic (initial-state helper)
+scipy	5791cea612	2025-03-14	BUG: resample_poly dtype preservation	scipy/signal/_signaltools.py	out-of-domain	dtype preservation of resample_poly (complex input)
+scipy	4b2460eae7	2025-04-04	BUG: `signal.windows._windows.kaiser_bessel_derived`: use `asarray` instead of `array` (#22801)	scipy/signal/windows/_windows.py	out-of-category	window
+scipy	b434b47b8a	2025-04-04	BUG: signal.ShortTimeFFT.upper_border_begin: Document parameter `n`. (#22792)	scipy/signal/_short_time_fft.py	not-behaviour	documentation
+scipy	34cf1d9e16	2025-04-08	BUG: signal.resample: Fix complex-valued signal problems.	scipy/signal/_signaltools.py	in-scope	scipy-resample-complex
+scipy	c4cee6140a	2025-04-10	BUG: signal: make normalize accept object arrays, fix _align_num	scipy/signal/_filter_design.py	out-of-category	normalize
+scipy	378ca7a6b6	2025-04-26	BUG: add a fudge factor for jax in findfreqs	scipy/signal/_filter_design.py	out-of-domain	JAX backend
+scipy	42471a4c94	2025-04-29	BUG: signal: more robust real check in _pu.poly	scipy/signal/_polyutils.py	out-of-category	polynomial utilities
+scipy	07d9d03b0c	2025-04-30	BUG: signal: pop the xp kwarg in delegating to cupy/jax	scipy/signal/_support_alternative_backends.py	out-of-domain	CuPy/JAX delegation
+scipy	a3c73a5b9f	2025-04-30	BUG: signal: cater for jax immutable arrays	scipy/signal/_filter_design.py	out-of-domain	JAX backend
+scipy	a723f335b4	2025-05-13	BUG: signal: fix incorrect vendoring of npp_polyval	scipy/signal/_polyutils.py	out-of-category	polynomial utilities
+scipy	2efb7a66ca	2025-05-14	BUG: signal: fix issues for the float32 default	scipy/signal/_fir_filter_design.py scipy/signal/_signaltools.py	out-of-domain	array backends with a float32 default
+scipy	bb68857d7e	2025-05-14	BUG: signal: fix firwin for non-numpy inputs	scipy/signal/_fir_filter_design.py	out-of-domain	non-NumPy inputs to firwin
+scipy	3905d029d3	2025-06-04	BUG: signal.csd: Zero-pad for different size inputs (#23047)	scipy/signal/_spectral_py.py	out-of-category	csd (spectral estimation)
+scipy	f311a50667	2025-07-10	BUG: signal.remez: fix handling of `weight` array (#23266)	scipy/signal/_fir_filter_design.py	out-of-category	remez
+scipy	fa4f00d896	2025-07-31	BUG: signal: Avoid unbounded cache for ShortTimeFFT	scipy/signal/_short_time_fft.py	not-behaviour	memory (cache)
+scipy	51c848eb0f	2025-08-11	BUG: signal.ShortTimeFFT: Remove `@lru_cache` decorators	scipy/signal/_short_time_fft.py	not-behaviour	memory (cache)
+scipy	e368cd42ce	2025-08-18	BUG: signal.lombscargle: replace in-place input adjustments (#23475)	scipy/signal/_spectral_py.py	out-of-category	lombscargle
+scipy	923eb9f15a	2025-09-12	BUG: signal.deconvolve: More meaningful error messages for invalid parameters.	scipy/signal/_signaltools.py	not-behaviour	error messages
+scipy	75412843e1	2025-09-13	BUG: signal.lfilter: More meaningful error messages for invalid parameters. (#23607)	scipy/signal/_signaltools.py	not-behaviour	error messages
+scipy	d92f54e6f6	2025-12-19	BUG: signal: Control output dtypes in `abcd_normalize` by adding new … (#23554)	scipy/signal/_delegators.py scipy/signal/_filter_design.py scipy/signal/_lti_conversion.py scipy/signal/_ltisys.py scipy/signal/_signaltools.py scipy/signal/_support_alternative_backends.py	out-of-category	LTI system conversions
+scipy	9f823b9ebe	2025-12-20	BUG: signal/_firfilter.cc: fix out-of-bounds read in pylab_convolve_2d	scipy/signal/_firfilter.cc	out-of-domain	2-D (convolve2d out-of-bounds read)
+scipy	1875094f55	2026-01-16	BUG: signal: fix zpk2tf with non-integer gain (#24385)	scipy/signal/_filter_design.py	out-of-category	zpk2tf
+scipy	0b20cb99a5	2026-01-26	BUG: signal._peak_finding._identify_ridge_lines: correct sorting of lines by row number  (#24428)	scipy/signal/_peak_finding.py	out-of-category	peak finding
+scipy	7399ad96c2	2026-01-29	BUG: Fix zpk2tf with complex-valued k and multi-dim z (#24426)	scipy/signal/_filter_design.py	out-of-category	zpk2tf
+scipy	dd4723ba8b	2026-03-13	BUG: signal.minimum_phase: correct calculation (#24749)	scipy/signal/_fir_filter_design.py	out-of-category	minimum_phase (FIR design)
+scipy	7b67444a6a	2026-03-28	BUG: signal: fix peak widths zero division error (#24817)	scipy/signal/_peak_finding_utils.pyx	out-of-category	peak widths
+scipy	3c6a853b7f	2026-05-13	BUG: signal: backwards compat in savgol/lstsq (#25134)	scipy/signal/_polyutils.py	out-of-category	Savitzky-Golay least squares
+scipy	15d7f976e5	2026-05-17	BUG: fix lp2bp/lp2bs Array API scalar assignment	scipy/signal/_filter_design.py	out-of-domain	array API scalar assignment in lp2bp/lp2bs
+scipy	c1badd5cc6	2026-06-07	BUG: signal: handle empty input array in lfilter	scipy/signal/_signaltools.py	in-scope	scipy-lfilter-empty
+scipy	75fa652835	2026-06-08	BUG: signal.hilbert2: keep Nyquist bin for even-length axes (gh-25176) (#25267)	scipy/signal/_signaltools.py	out-of-domain	2-D (hilbert2)
+scipy	00ea7de703	2026-07-12	BUG: signal: fix segfault in remez for too-narrow bands (#25602)	scipy/signal/_sigtoolsmodule.cc	out-of-category	remez
+scipy	8e2ddfdfe3	2026-07-18	BUG: signal.decimate: check zeros for complex coeffs, not poles twice	scipy/signal/_signaltools.py	in-scope	scipy-decimate-complex-zeros
+scipy	d9b45feb89	2026-07-20	BUG: signal: accept scalar initial conditions in lfiltic	scipy/signal/_signaltools.py	out-of-category	lfiltic (initial-state helper)
+scipy	bf7fe3324b	2026-08-30	BUG: forward options in firwin_2d	scipy/signal/_fir_filter_design.py	out-of-category	firwin_2d
+scipy	b2adf6626c	2026-09-01	BUG: signal.placepoles: Always return complex-valued `computed_poles`. (#26004)	scipy/signal/_ltisys.py	out-of-category	place_poles
+scipy	c61a7be607	2026-09-02	BUG: signal.sepfir2d: reject filters too long for the input axis (#26001)	scipy/signal/_splinemodule.cc	out-of-category	2-D spline filter
+scipy	5ccd743e5e	2026-10-23	BUG: signal.lfilter, signal.sosfilt: handle all empty inputs (#26415)	scipy/signal/_signaltools.py	in-scope	scipy-sosfilt-empty
+scipy	a11c360740	2026-10-23	BUG: signal.ShortTimeFFT: Fix padding for short signal slices. (#26418)	scipy/signal/_short_time_fft.py	in-scope	scipy-shorttimefft-padding
+torchaudio	fb3ef9ba42	2020-11-20	Fix typo in docstring - double "a" (#1056)	torchaudio/functional/functional.py	not-behaviour	docstring
+torchaudio	2a02d7f539	2020-12-04	[Doc] Add missing modules and minor fixes (#1022)	torchaudio/functional/filtering.py torchaudio/functional/functional.py	not-behaviour	documentation
+torchaudio	a7797d5cae	2021-01-06	Fix nan gradient by using native complex abs op (#1013)	torchaudio/functional/functional.py	out-of-domain	gradients (NaN gradient of abs)
+torchaudio	4e99c12dc0	2021-02-04	Fix `amplitude_to_DB` clamping behaviour on batches (#1113)	torchaudio/functional/functional.py	out-of-category	amplitude_to_DB
+torchaudio	457148ea93	2021-02-26	Fixes #1314 (#1316)	torchaudio/functional/functional.py	not-behaviour	documentation of apply_codec
+torchaudio	16de2b5b79	2021-03-11	Fix docstring of `sliding_window_cmn` (#1383)	torchaudio/functional/functional.py	not-behaviour	docstring
+torchaudio	4100ad893b	2021-03-17	fix a few typos/grammar (#1397)	torchaudio/functional/filtering.py	not-behaviour	typos
+torchaudio	4863030259	2021-04-15	Fixed floor_divide deprecation warnings seen in pytest output (#1455)	torchaudio/functional/filtering.py	not-behaviour	deprecation warnings
+torchaudio	faf5523508	2021-04-23	Fix typo in README (#1471)	torchaudio/functional/functional.py	not-behaviour	typo
+torchaudio	cb40dd72e0	2021-10-18	[DOC] Standardization and minor fixes (#1892)	torchaudio/functional/filtering.py torchaudio/functional/functional.py	not-behaviour	documentation
+torchaudio	2f4eb4ac2f	2022-05-10	Fix return dtype in MVDR module (#2376)	torchaudio/transforms/_transforms.py	out-of-category	MVDR beamforming
+torchaudio	05d2580a68	2022-07-11	Fix docstring (#2540)	torchaudio/functional/functional.py	not-behaviour	docstring
+torchaudio	c18a103b78	2022-07-21	fix resample (#2561)	torchaudio/functional/functional.py	out-of-domain	device of the resampling kernel
+torchaudio	1634ed01bc	2022-07-25	[BC-breaking] Fix momentum in transforms.GriffinLim (#2568)	torchaudio/functional/functional.py torchaudio/transforms/_transforms.py	out-of-category	Griffin-Lim
+torchaudio	c15eee2396	2022-08-08	Fix stylecheck (#2606)	torchaudio/transforms/_transforms.py	not-behaviour	style
+torchaudio	fb4eb981a4	2022-08-10	Fixed argument validation in TorchAudio filtering (#2609)	torchaudio/functional/filtering.py	not-behaviour	argument validation messages
+torchaudio	5428e28399	2023-01-05	Fix filtering function fallback mechanism (#2953)	torchaudio/functional/filtering.py	out-of-domain	build without the C++ extension (fallback)
+torchaudio	6ab1325a55	2023-02-21	Fix contiguous error when backpropagating through lfilter (#3080)	torchaudio/csrc/lfilter.cpp	out-of-domain	gradients (backward through lfilter)
+torchaudio	85cb37e262	2023-03-08	Fix documentation of functional and transforms (#3134)	torchaudio/functional/functional.py torchaudio/transforms/_transforms.py	not-behaviour	documentation
+torchaudio	a8dc4de5fa	2023-05-05	fix doc of specaugment transform (#3314)	torchaudio/transforms/_transforms.py	not-behaviour	documentation
+torchaudio	04f6754668	2023-05-15	[Doc] Fix a word in documents (#3334)	torchaudio/transforms/_transforms.py	not-behaviour	documentation
+torchaudio	1dfac46980	2023-06-01	Fix apply_codec to use named file (#3397)	torchaudio/functional/functional.py	out-of-category	apply_codec
+torchaudio	4771677223	2023-06-07	Fix style to prep #3414 (#3415)	torchaudio/functional/functional.py	not-behaviour	style
+torchaudio	0f682c7722	2023-06-13	Fix build doc (#3435)	torchaudio/functional/functional.py	not-behaviour	documentation build
+torchaudio	18b20f77ba	2023-07-11	Fix doc style (#3468)	torchaudio/functional/functional.py	not-behaviour	documentation
+torchaudio	a3b6bfb699	2023-07-12	Fix resampling to support dynamic input lengths for onnx exports. (#3473)	torchaudio/functional/functional.py	out-of-domain	ONNX export
+torchaudio	135cb7ba5e	2023-07-25	Fix typo in melscale_fbank (#3487)	torchaudio/functional/functional.py	not-behaviour	typo
+torchaudio	df2a6bcda7	2023-11-09	Fix vad to return zero output for zero input (#3685)	src/torchaudio/functional/filtering.py	out-of-category	voice activity detection
+torchaudio	7f6209b44a	2024-06-24	fix: use reshape for noncontiguous dy (#3794)	src/libtorchaudio/lfilter.cpp	out-of-domain	gradients (non-contiguous dy)
+torchaudio	265bc5ca97	2024-12-12	Fix incorrect audio trimming with negative index	src/torchaudio/functional/filtering.py	out-of-category	voice activity detection (trimming)
+torchaudio	b6d4675c7a	2024-12-20	Fix vad return zero output when nonzero pre_trigger_time is requested	src/torchaudio/functional/filtering.py	out-of-category	voice activity detection
+torchaudio	20378a7f24	2025-08-21	[torchaudio] Fix jitting error	src/torchaudio/functional/functional.py	not-behaviour	TorchScript (jit) error
+torchaudio	fa5142928e	2025-09-09	Fix pre-commit and enable Lint CI workflow. (#4099)	src/libtorchaudio/lfilter.cpp src/torchaudio/functional/filtering.py src/torchaudio/functional/functional.py src/torchaudio/transforms/__init__.py src/torchaudio/transforms/_transforms.py	not-behaviour	lint
+torchaudio	3fc07b5427	2025-12-12	Fix torchscript related test failures. (#4069)	src/torchaudio/functional/filtering.py src/torchaudio/functional/functional.py src/torchaudio/transforms/_transforms.py	not-behaviour	TorchScript test failures
+librosa	changelog:2122	v1.0.1	`util._nnls`: use dtype-aware cutoff in pinv initialization. *Brian McFee*	docs/changelog.rst	out-of-category	nnls
+librosa	changelog:2119	v1.0.1	Fix Numba TypingError when passing tuple intervals to `effects.remix`. *Jyotishman Das*	docs/changelog.rst	out-of-category	effects.remix
+librosa	changelog:2109+2107	v1.0.1	Replace `**kwargs` with explicit STFT params in time_stretch/pitch_shift. *Rajit Sareen*	docs/changelog.rst	out-of-category	time_stretch/pitch_shift arguments
+librosa	changelog:2106+2099	v1.0.1	Preserve float32 in spectral features; add dtype= to frequency constructors. *Gavin Branaa*	docs/changelog.rst	out-of-category	spectral features
+librosa	changelog:2097+2096	v1.0.1	Forward `window` to `stft` and `istft` in `effects.hpss, harmonic and percussive`. *Isaac Hernandez*	docs/changelog.rst	out-of-category	hpss arguments
+librosa	changelog:2087	v1.0.0	Added a check for valid audio buffers in `feature.rms`. *Kayvan Zaihiri*	docs/changelog.rst	out-of-category	feature.rms
+librosa	changelog:2085	v1.0.0	Fixed an incompatibility in `librosa.util.nnls` initialization by moving from `np.linalg.pinv` to `scipy.linalg.pinv`. *Brian McFee*	docs/changelog.rst	out-of-category	nnls
+librosa	changelog:2063	v1.0.0	Fixed array bounds error on `librosa.sequence.rqa` with single-axis inputs.  *Suhas Holla Karkada Chandrashekar*	docs/changelog.rst	out-of-category	rqa
+librosa	changelog:2039	v1.0.0	Avoid promoting scalars to 0-d arrays. *Joren Hammudoglu*	docs/changelog.rst	out-of-domain	scalar inputs
+librosa	changelog:2026	v1.0.0	Fixed error in label ordering for Tonnetz displays. *Brian McFee*	docs/changelog.rst	out-of-category	display
+librosa	changelog:1992	v1.0.0	Fixed garbage collection error in `librosa.display.waveshow`. *Daniel Haas B*	docs/changelog.rst	out-of-category	display
+librosa	changelog:1947	v1.0.0	Removed default quantization in `note_to_hz`. *Brian McFee*	docs/changelog.rst	out-of-category	note_to_hz
+librosa	changelog:1916	v0.11.0	Utility decorators now preserve type annotations properly. *Brian McFee*	docs/changelog.rst	not-behaviour	type annotations of decorators
+librosa	changelog:1900	v0.11.0	Fixed an error in pooch registry definition. *Brian McFee*	docs/changelog.rst	not-behaviour	example data registry
+librosa	changelog:1897	v0.11.0	Accommodate dependency resolution issues with `uv`. *David Südholt*	docs/changelog.rst	not-behaviour	packaging
+librosa	changelog:1878	v0.11.0	Improved accuracy for `yin` and `pyin`. *David Südholt*	docs/changelog.rst	out-of-category	yin/pyin
+librosa	changelog:1851	v0.11.0	Fixed sparse matrix compatibility for scipy>=1.14. *Brian McFee*	docs/changelog.rst	out-of-category	constant-Q
+librosa	changelog:1844	v0.11.0	Fixed parameter name collision for norm argument in `feature.mfcc`. *Slava Chaunin*	docs/changelog.rst	out-of-category	mfcc
+librosa	changelog:1814	v0.10.2	Corrected an off-by-one error when computing phase advance in `librosa.phase_vocoder`. *Brian McFee*	docs/changelog.rst	out-of-category	phase vocoder
+librosa	changelog:1784	v0.10.2	Improved handling of warnings in the test suite, and fixed a bug in dtype propagation through `ivqt`. *Brian McFee*	docs/changelog.rst	out-of-category	ivqt
+librosa	changelog:1733	v0.10.2	Fixed an off-by-one error in trimming of detected beats. *Brian McFee*	docs/changelog.rst	out-of-category	beat tracking
+librosa	changelog:1755	v0.10.2	Avoid deprecated features in matplotlib and ensure compatibility with mpl 3.8. *Brian McFee*	docs/changelog.rst	not-behaviour	matplotlib compatibility
+librosa	changelog:1677	v0.10.1	Correct handling of octave boundaries in Variable-Q transform. *Brian McFee*	docs/changelog.rst	out-of-category	variable-Q transform
+librosa	changelog:1693	v0.10.1	Stricter checks on yin and pyin parameters. *Brian McFee*	docs/changelog.rst	out-of-category	yin/pyin
+librosa	changelog:1726	v0.10.1	Enforce consistency of time-to-sample unit conversion. *Brian McFee*	docs/changelog.rst	out-of-category	time conversions
+librosa	changelog:1560	v0.10.0	Corrected an error in bandwidth estimation for window functions that take on negative sample values. *Brian McFee*	docs/changelog.rst	out-of-category	window bandwidth
+librosa	changelog:1571	v0.10.0	Fixed rounding error in multirate filterbank calculation of sampling rates. *Brian McFee*	docs/changelog.rst	out-of-category	multirate filterbank design
+librosa	changelog:1594	v0.10.0	Fixed incorrect use of deprecated numpy numerical types. *Mattia Di Gangi*	docs/changelog.rst	not-behaviour	deprecated NumPy types
+librosa	changelog:1596	v0.10.0	Fixed harmonic interpolation for recent scipy releases. *Brian McFee*	docs/changelog.rst	out-of-category	harmonic interpolation
+librosa	changelog:1457	v0.9.2	Fixed `librosa.show_versions` to match package dependencies. *Brian McFee*	docs/changelog.rst	not-behaviour	show_versions
+librosa	changelog:1493	v0.9.2	Fixed a bug in `librosa.effects.split` when applied to multichannel data.  *Brian McFee*	docs/changelog.rst	out-of-category	effects.split
+librosa	changelog:1387	v0.9.0	Fixed errors in support of odd frame lengths in various functions. *Brian McFee*	docs/changelog.rst	api-change	odd frame lengths: istft and others gain an n_fft parameter
+librosa	changelog:1273	v0.9.0	Minor corrections to constants in perceptual weighting functions. *Brian McFee*	docs/changelog.rst	out-of-category	perceptual weighting
+librosa	changelog:1350	v0.9.0	Removed uses of deprecated numpy numerical types. *Brian McFee*	docs/changelog.rst	not-behaviour	deprecated NumPy types
+librosa	changelog:1361	v0.9.0	Maximum frequency is now correctly inferred as Nyquist in onset strength calculation. *Brian McFee*	docs/changelog.rst	out-of-category	onset strength
+librosa	changelog:1362	v0.9.0	`librosa.effects.deemphasis` no longer modifies the input signal in-place. *Brian McFee*	docs/changelog.rst	in-scope	librosa-deemphasis-inplace
+librosa	changelog:1375	v0.9.0	`librosa.util.frame` now correctly works for arbitrary memory layouts and numbers of axes. *Brian McFee*	docs/changelog.rst	out-of-domain	memory layout and number of axes of util.frame
+librosa	changelog:1425	v0.9.0	Fixed an off-by-one error in `librosa.yin` and `librosa.pyin`. *@philstem, Brian McFee*	docs/changelog.rst	out-of-category	yin/pyin
+librosa	changelog:1430	v0.9.0	Removed unnecessary `__all__` specifications to better support static analysis. *Fabian Keller*	docs/changelog.rst	not-behaviour	__all__
+librosa	changelog:1407	v0.9.0	Corrected a normalization error in inverse CQT. *Brian McFee, Vincent Lostanlen*	docs/changelog.rst	out-of-category	inverse constant-Q transform
+librosa	changelog:1290	v0.8.1	`librosa.display.specshow` fixed a bug in format and tick locations for CQT plots. *Brian McFee*	docs/changelog.rst	out-of-category	display
+librosa	changelog:1240	v0.8.1	`librosa.display.specshow` now correctly infers `fmax` for mel frequency axes. *Brian McFee, Bea Steers*	docs/changelog.rst	out-of-category	display
+librosa	changelog:1311	v0.8.1	`librosa.filters.chroma` fixed an error in how chromagrams were generated when `n_chroma!=12` and `base_c=True`. *Joon Lim*	docs/changelog.rst	out-of-category	chroma filterbank
+librosa	changelog:1322	v0.8.1	`librosa.feature.inverse.mel_to_audio` now infers `hop_length` by default in a way that is consistent with the rest of the package. *Dan Ellis*	docs/changelog.rst	out-of-category	mel_to_audio
+librosa	changelog:1341	v0.8.1	`librosa.onset.onset_detect` no longer modifies user-provided onset envelopes. *Brian McFee*	docs/changelog.rst	out-of-category	onset_detect
+librosa	changelog:1078	v0.8.0	fixed edge-padding errors in `librosa.feature.stack_memory`. *beantowel*	docs/changelog.rst	out-of-category	stack_memory
+librosa	changelog:1091	v0.8.0	fixed joblib version requirements. *Thor Whalen*	docs/changelog.rst	not-behaviour	joblib requirement
+librosa	changelog:1094	v0.8.0	fixed STFT bug when using large window sizes. *Frank Zalkow*	docs/changelog.rst	in-scope	librosa-stft-large-window
+librosa	changelog:1157+1196	v0.8.0	fixed an alignment bug in `librosa.iirt`. *Frank Zalkow*	docs/changelog.rst	out-of-category	iirt filterbank spectrogram
+librosa	changelog:1159	v0.8.0	fixed a warm-up glitch in `librosa.effects.preemphasis`. *Brian McFee*	docs/changelog.rst	in-scope	librosa-preemphasis-glitch
+librosa	changelog:1179	v0.8.0	fixed memory initialization in unit tests. *Brian McFee*	docs/changelog.rst	not-behaviour	unit tests
+librosa	changelog:1031	v0.7.2	fixed errors in dynamic time warping with `NaN` inputs and detection	docs/changelog.rst	out-of-category	dynamic time warping
+librosa	changelog:1041	v0.7.2	fixed frame-length normalization in spectrogram-based RMS energy	docs/changelog.rst	out-of-category	rms
+librosa	changelog:1054	v0.7.2	fixed the length of signals produced by `librosa.tone`. *Brian McFee*	docs/changelog.rst	out-of-category	tone

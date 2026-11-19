@@ -110,7 +110,7 @@ class FamilySpec:
     @cached_property
     def relations(self):
         """The relations that apply to at least one member (searched over ``max_tries`` parameters)."""
-        quiet = settings(max_examples=self.max_tries, database=None, derandomize=True,
+        quiet = settings(max_examples=self.max_tries, database=None, derandomize=True, deadline=None,
                          suppress_health_check=list(HealthCheck))
         found = []
         for rel in _all_relations():

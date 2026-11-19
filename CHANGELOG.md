@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- `min_n=` on every declaration (`transform`, `lti_filter`, `resampler`, `streaming`, `stateful`):
+  the shortest input the operator accepts, for functions with a documented minimum length
+  (`filtfilt` and its `padlen`, a short-time transform and its window). Every relation draws
+  lengths in `[min_n, max_n]`; pathological lengths outside the range are dropped. Default 1.
+- Fix: `dp.family` built a member inside a Hypothesis search that kept the default deadline, so a
+  factory slower than 200 ms (a filter design, a remote call) raised `FlakyFailure` instead of
+  checking the member.
+- Rediscovery campaign (`benchmarks/rediscovery.py`, `docs/rediscovery.md`): a corpus of
+  historical bugs of SciPy and librosa, mined mechanically from the projects' histories
+  (`benchmarks/bugcorpus/`), each checked on the last faulty release and the first fixed one,
+  installed in their own environments. By-product: `benchmarks/decimate_dlti_route.py` measures a
+  remaining accuracy defect of `scipy.signal.decimate` with a real IIR `dlti` filter.
+
 - `IIRTolerance(b, a, structure="df2t")`: a first-order bound for the transposed direct form II
   of `scipy.signal.lfilter` (three roundings per state instead of the length of the whole
   recursion), 1 to 3 times tighter than the direct form I bound on usual designs

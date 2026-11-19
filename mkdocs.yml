@@ -76,6 +76,7 @@ nav:
   - Choosing a tolerance: tolerances.md
   - What the relations don't see: blind-spots.md
   - "Gallery: bugs in real libraries": gallery.md
+  - Rediscovering historical bugs: rediscovery.md
   - API reference:
       - Overview: api/index.md
       - dsp_props: api/dsp_props.md

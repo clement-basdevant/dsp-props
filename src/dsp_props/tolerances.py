@@ -302,7 +302,7 @@ class ToleranceFile:
         if reference is None:
             ref_name, reference = default_reference(spec)
         if lengths is None:
-            lengths = range(1, min(max(DEFAULT_LENGTHS), spec.max_n) + 1)
+            lengths = range(getattr(spec, "min_n", 1), min(max(DEFAULT_LENGTHS), spec.max_n) + 1)
         lengths = _lengths_list(lengths)
         tol = calibrate(_measured(spec), reference=reference, lengths=lengths, trials=trials, margin=margin,
                         seed=seed, max_plausible=max_plausible, base=FFTTolerance(c=floor))

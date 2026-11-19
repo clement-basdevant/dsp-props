@@ -1,0 +1,49 @@
+{
+ "scipy": "1.18.1",
+ "numpy": "2.5.3",
+ "n": 1024,
+ "rows": [
+  {
+   "q": 2,
+   "dlti_error": 2.0139719351662434e-14,
+   "default_error": 2.721513441132004e-16,
+   "poles_complex": true,
+   "coefficients_real": true
+  },
+  {
+   "q": 4,
+   "dlti_error": 5.145567840040341e-13,
+   "default_error": 3.8665206967639925e-16,
+   "poles_complex": true,
+   "coefficients_real": true
+  },
+  {
+   "q": 8,
+   "dlti_error": 4.626771853562766e-11,
+   "default_error": 6.329665950074766e-16,
+   "poles_complex": true,
+   "coefficients_real": true
+  },
+  {
+   "q": 12,
+   "dlti_error": 2.039303081703169e-09,
+   "default_error": 7.93961325975967e-16,
+   "poles_complex": true,
+   "coefficients_real": true
+  },
+  {
+   "q": 16,
+   "dlti_error": 2.439091831270537e-08,
+   "default_error": 7.948042075335779e-16,
+   "poles_complex": true,
+   "coefficients_real": true
+  },
+  {
+   "q": 20,
+   "dlti_error": 1.6126540145377822e-07,
+   "default_error": 9.059617744663655e-16,
+   "poles_complex": true,
+   "coefficients_real": true
+  }
+ ]
+}

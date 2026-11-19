@@ -153,3 +153,59 @@ p=1e-05  |y - y0|/|y0| = 3.6e-05   reversal gap = 9.1e-09
 p=1e-06  |y - y0|/|y0| = 7.0e-06   reversal gap = 2.6e-07
 p=1e-07  |y - y0|/|y0| = 5.4e-03   reversal gap = 6.5e-05
 ```
+
+## 6. scipy/scipy : decimate avec un filtre `dlti` IIR réel passe par `lfilter(b, a)`
+
+**Pas posté.** Comme pour les sections 2 et 5, le texte est à écrire par toi (politique IA de
+SciPy). Avant de poster : chercher un ticket existant (« decimate dlti iscomplex », « decimate
+sosfilt dlti ») ; #17845 et la PR #17881 sont les plus proches.
+
+Trouvé pendant la campagne de redécouverte (action 3.1, `benchmarks/rediscovery.py`) : le membre
+`dlti-iir` de la famille `decimate` sortait de la tolérance du filtre déclaré sur les deux versions
+(1.10.1 et 1.11.0), donc ce n'était pas le bug #17845 mais autre chose.
+
+Faits vérifiés le 18/11/2026 sur SciPy 1.18.1, NumPy 2.5.3, Python 3.13 (script :
+`benchmarks/decimate_dlti_route.py`, résultat `benchmarks/decimate_dlti_route.json`) :
+- Dans `decimate` (`scipy/signal/_signaltools.py`, toujours présent sur `main` le 16/11/2026),
+  un filtre `dlti` IIR passe par `lfilter(b, a)` au lieu de `sosfilt` si
+  `any(np.iscomplex(system.poles)) or any(np.iscomplex(system.poles)) or np.iscomplex(system.gain)`.
+  Le commentaire dit « sosfilt & sosfiltfilt don't handle complex coeffs » : le test voulu porte
+  sur des *coefficients* complexes, mais il teste les *pôles*. Les pôles d'un filtre réel vont par
+  paires conjuguées : tout passe-bas IIR réel d'ordre ≥ 2 prend la forme (b, a).
+- La forme (b, a) est justement celle que scipy#16096 (SciPy 1.10) a remplacée par des sections
+  du second ordre pour le filtre par défaut, parce qu'elle perd en précision quand q grandit.
+- La ligne vérifie deux fois les pôles et jamais les zéros (c'est le bug « complex zeros » du
+  corpus, corrigé sur `main`). Il reste le choix du test lui-même.
+- Mesure, filtre par défaut documenté (Chebyshev I d'ordre 8, 0,05 dB, coupure 0,8/q), N = 1024,
+  erreur relative contre les mêmes sections du second ordre appliquées en `long double` :
+
+  | q | `ftype=dlti(z, p, k)` | filtre par défaut (`sosfilt`) |
+  |---|---|---|
+  | 2 | 2,0e-14 | 2,7e-16 |
+  | 4 | 5,1e-13 | 3,9e-16 |
+  | 8 | 4,6e-11 | 6,3e-16 |
+  | 12 | 2,0e-9 | 7,9e-16 |
+  | 16 | 2,4e-8 | 7,9e-16 |
+  | 20 | 1,6e-7 | 9,1e-16 |
+
+  Même filtre, même signal : passer le filtre par défaut sous forme `dlti` coûte jusqu'à 8 ordres
+  de grandeur de précision.
+- Correctif possible : tester les coefficients plutôt que les racines, c'est-à-dire passer par
+  `zpk2sos` dès que `np.poly(zeros)`, `np.poly(poles)` et `gain` sont réels (à tolérance près),
+  et garder `lfilter` seulement pour des coefficients vraiment complexes. À discuter dans le
+  ticket plutôt qu'à imposer.
+
+Code pour reproduire :
+
+```python
+import numpy as np
+import scipy.signal as ss
+
+x = np.random.default_rng(0).standard_normal(1024)
+for q in [2, 8, 20]:
+    z, p, k = ss.cheby1(8, 0.05, 0.8 / q, output="zpk")
+    y_dlti = ss.decimate(x, q, ftype=ss.dlti(z, p, k), zero_phase=False)
+    y_sos = ss.sosfilt(ss.zpk2sos(z, p, k), x)[::q]     # what decimate does for its own filter
+    print(q, np.linalg.norm(y_dlti - y_sos) / np.linalg.norm(x))
+# grows from about 2e-14 (q=2) to about 2e-7 (q=20)
+```
