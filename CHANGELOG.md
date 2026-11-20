@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Automatic mutation of SciPy code (`benchmarks/automutation/`, `docs/automutation.md`): 701
+  cosmic-ray mutants of a verbatim copy of `resample`, `resample_poly`, `decimate` and `hilbert`
+  (SciPy 1.18.1), checked with SciPy's own tests and with dsp-props declarations. SciPy's tests kill
+  78 % of them, dsp-props 57 %, and both together 82 %. Most of the mutants only SciPy's tests
+  catch are on code that the declarations never execute (options, `axis`, argument checks); most
+  of those only dsp-props catches are in the odd-length branch of `hilbert`.
+
 - `min_n=` on every declaration (`transform`, `lti_filter`, `resampler`, `streaming`, `stateful`):
   the shortest input the operator accepts, for functions with a documented minimum length
   (`filtfilt` and its `padlen`, a short-time transform and its window). Every relation draws

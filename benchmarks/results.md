@@ -118,3 +118,24 @@ scripts; do not edit. A number quoted in the documentation is marked
 | `rediscovery.counterexample_median` | 2 | `rediscovery.json` |
 | `rediscovery.found_seeds` | 20 | `rediscovery.json` |
 | `rediscovery.small_counterexamples` | 15 | `rediscovery.json` |
+| `automutation.mutants` | 701 | `automutation/summary.json` |
+| `automutation.upstream` | 550 | `automutation/summary.json` |
+| `automutation.dsp_default` | 398 | `automutation/summary.json` |
+| `automutation.union` | 575 | `automutation/summary.json` |
+| `automutation.both` | 373 | `automutation/summary.json` |
+| `automutation.upstream_only` | 177 | `automutation/summary.json` |
+| `automutation.dsp_only` | 25 | `automutation/summary.json` |
+| `automutation.neither` | 126 | `automutation/summary.json` |
+| `automutation.upstream_rate` | 78 % | `automutation/summary.json` |
+| `automutation.dsp_default_rate` | 57 % | `automutation/summary.json` |
+| `automutation.union_rate` | 82 % | `automutation/summary.json` |
+| `automutation.upstream_only_not_reached` | 113 | `automutation/summary.json` |
+| `automutation.upstream_only_reached` | 64 | `automutation/summary.json` |
+| `automutation.dsp_survived_not_reached` | 144 | `automutation/summary.json` |
+| `automutation.dsp_survived_reached` | 159 | `automutation/summary.json` |
+| `automutation.hilbert_dsp_only` | 23 | `automutation/summary.json` |
+| `automutation.hilbert_upstream_rate` | 65 % | `automutation/summary.json` |
+| `automutation.hilbert_dsp_rate` | 83 % | `automutation/summary.json` |
+| `automutation.dsp_fast` | 397 | `automutation/summary.json` |
+| `automutation.lines_upstream` | 185 | `automutation/summary.json` |
+| `automutation.lines_dsp` | 132 | `automutation/summary.json` |

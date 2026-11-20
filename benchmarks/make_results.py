@@ -5,7 +5,7 @@
 
 Reads the JSON and CSV files the benchmark scripts write (``mutant_results.json``,
 ``precision_mutants.json``, ``precision_oracles.json``, ``calibrated_tolerance.json``,
-``validation.json``, ``error_profile.csv``, ``rediscovery.json``) and derives one value per key, such as
+``validation.json``, ``error_profile.csv``, ``rediscovery.json``, ``automutation/summary.json``) and derives one value per key, such as
 ``precision.fft_twiddles.default`` = ``90 ε``. It then
 
 - writes ``benchmarks/results.md`` (one table: key, value, source file) and
@@ -211,10 +211,33 @@ def rediscovery(r: Results):
     r.add("rediscovery.small_counterexamples", sum(n <= 2 for n in sizes), src)
 
 
+def automutation(r: Results):
+    src = "automutation/summary.json"
+    d = load(src)
+    o = d["overall"]
+    r.add("automutation.mutants", o["mutants"], src)
+    for key in ("upstream", "dsp_default", "union", "both", "upstream_only", "dsp_only", "neither"):
+        r.add(f"automutation.{key}", o[key], src)
+    for key in ("upstream", "dsp_default", "union"):
+        r.add(f"automutation.{key}_rate", f"{100 * o[key] / o['mutants']:.0f} %", src)
+    r.add("automutation.upstream_only_not_reached",
+          o["upstream_only"] - o["upstream_only_reached_by_dsp"], src)
+    r.add("automutation.upstream_only_reached", o["upstream_only_reached_by_dsp"], src)
+    r.add("automutation.dsp_survived_not_reached", o["dsp_survived_not_reached"], src)
+    r.add("automutation.dsp_survived_reached", o["dsp_survived_reached"], src)
+    h = d["by_function"]["hilbert"]
+    r.add("automutation.hilbert_dsp_only", h["dsp_only"], src)
+    r.add("automutation.hilbert_upstream_rate", f"{100 * h['upstream'] / h['mutants']:.0f} %", src)
+    r.add("automutation.hilbert_dsp_rate", f"{100 * h['dsp_default'] / h['mutants']:.0f} %", src)
+    r.add("automutation.dsp_fast", o["dsp_fast"], src)
+    r.add("automutation.lines_upstream", d["lines"]["upstream"], src)
+    r.add("automutation.lines_dsp", d["lines"]["dsp_default"], src)
+
+
 def collect() -> Results:
     r = Results()
     for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison, iir_structure,
-                 rediscovery):
+                 rediscovery, automutation):
         part(r)
     return r
 

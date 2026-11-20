@@ -77,6 +77,7 @@ nav:
   - What the relations don't see: blind-spots.md
   - "Gallery: bugs in real libraries": gallery.md
   - Rediscovering historical bugs: rediscovery.md
+  - Automatic mutation of SciPy code: automutation.md
   - API reference:
       - Overview: api/index.md
       - dsp_props: api/dsp_props.md

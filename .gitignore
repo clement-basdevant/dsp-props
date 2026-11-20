@@ -9,3 +9,4 @@ dist/
 site/
 .coverage
 coverage.xml
+benchmarks/automutation/partial.jsonl
