@@ -1,0 +1,6 @@
+.git
+.hypothesis
+**/__pycache__
+.venv
+site
+dist

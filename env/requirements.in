@@ -1,0 +1,11 @@
+# Inputs of the frozen environment (plan 3.6). Compile with env/lock.sh, never edit the .txt by hand.
+# The package itself and its development, documentation and benchmark dependencies.
+-e .[dev,docs]
+# build backend, pinned so that the editable install needs no network (--no-build-isolation)
+hatchling
+# benchmarks: comparison with other libraries, oracles, figures
+torch
+torchaudio
+librosa
+mpmath
+matplotlib
