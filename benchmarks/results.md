@@ -139,3 +139,15 @@ scripts; do not edit. A number quoted in the documentation is marked
 | `automutation.dsp_fast` | 397 | `automutation/summary.json` |
 | `automutation.lines_upstream` | 185 | `automutation/summary.json` |
 | `automutation.lines_dsp` | 132 | `automutation/summary.json` |
+| `gpu_fft.numpy_cpu.c128.worst` | 3.6 ε | `gpu_fft_profile.json` |
+| `gpu_fft.numpy_cpu.c128.worst_n` | 1094 | `gpu_fft_profile.json` |
+| `gpu_fft.numpy_cpu.c128.median` | 1.2 ε | `gpu_fft_profile.json` |
+| `gpu_fft.numpy_cpu.c64.worst` | 0.34 ε | `gpu_fft_profile.json` |
+| `gpu_fft.numpy_cpu.c64.worst_n` | 3 | `gpu_fft_profile.json` |
+| `gpu_fft.numpy_cpu.c64.median` | 0.22 ε | `gpu_fft_profile.json` |
+| `gpu_fft.cupy_gpu.c128.worst` | 3.6 ε | `gpu_fft_profile.json` |
+| `gpu_fft.cupy_gpu.c128.worst_n` | 1094 | `gpu_fft_profile.json` |
+| `gpu_fft.cupy_gpu.c128.median` | 1.5 ε | `gpu_fft_profile.json` |
+| `gpu_fft.cupy_gpu.c64.worst` | 3.0 ε | `gpu_fft_profile.json` |
+| `gpu_fft.cupy_gpu.c64.worst_n` | 124 | `gpu_fft_profile.json` |
+| `gpu_fft.cupy_gpu.c64.median` | 1.5 ε | `gpu_fft_profile.json` |

@@ -45,3 +45,24 @@ The profile tells you which tolerance a GPU FFT needs: the default model (20 ε 
 calibration (`dp.calibrate` with the wrapped operator, see [Choosing a tolerance](tolerances.md)). On
 the CPU, PyTorch's FFT already needs a calibration at some lengths: see the
 [gallery](gallery.md#pytorchs-fft-at-lengths-with-a-large-prime-factor).
+
+### Measured: CuPy on an RTX 5070
+
+One profile, run on 20 November 2026 (`benchmarks/gpu_fft_profile.json`): CuPy 14.2.0 with CUDA
+12.9 on an NVIDIA GeForce RTX 5070 under Windows 11, and NumPy 2.5.3 on the same machine's CPU.
+PyTorch was not installed, so its GPU FFT is not measured yet. The table gives the worst error over
+N = 2 to 1200 (3 random signals per length) and the median over all lengths, in epsilons of the
+input's precision:
+
+| Backend | complex128 worst | complex128 median | complex64 worst | complex64 median |
+| --- | --- | --- | --- | --- |
+| CuPy (cuFFT, GPU) | <!-- r:gpu_fft.cupy_gpu.c128.worst -->3.6 ε<!-- /r --> (N = <!-- r:gpu_fft.cupy_gpu.c128.worst_n -->1094<!-- /r -->) | <!-- r:gpu_fft.cupy_gpu.c128.median -->1.5 ε<!-- /r --> | <!-- r:gpu_fft.cupy_gpu.c64.worst -->3.0 ε<!-- /r --> (N = <!-- r:gpu_fft.cupy_gpu.c64.worst_n -->124<!-- /r -->) | <!-- r:gpu_fft.cupy_gpu.c64.median -->1.5 ε<!-- /r --> |
+| NumPy (CPU) | <!-- r:gpu_fft.numpy_cpu.c128.worst -->3.6 ε<!-- /r --> (N = <!-- r:gpu_fft.numpy_cpu.c128.worst_n -->1094<!-- /r -->) | <!-- r:gpu_fft.numpy_cpu.c128.median -->1.2 ε<!-- /r --> | <!-- r:gpu_fft.numpy_cpu.c64.worst -->0.34 ε<!-- /r --> | <!-- r:gpu_fft.numpy_cpu.c64.median -->0.22 ε<!-- /r --> |
+
+- cuFFT computes float64 transforms in double precision. It does not fall back to single
+  precision, and its errors stay within a few ε of NumPy's.
+- The default tolerance (20 ε log2 N) covers it with a wide margin at every length measured. A
+  GPU FFT behaves here like a CPU one and needs no calibration.
+- NumPy's complex64 transforms come out at a third of an ε. This is consistent with an FFT
+  computed in double precision and rounded once at the end, which a float32 declaration would
+  not notice.
