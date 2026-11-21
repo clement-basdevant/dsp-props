@@ -74,6 +74,7 @@ nav:
   - Running with pytest: pytest.md
   - Relations catalogue: relations.md
   - Choosing a tolerance: tolerances.md
+  - Other array libraries and GPUs: array-api.md
   - What the relations don't see: blind-spots.md
   - "Gallery: bugs in real libraries": gallery.md
   - Rediscovering historical bugs: rediscovery.md

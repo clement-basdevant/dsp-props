@@ -5,7 +5,7 @@
 
 Reads the JSON and CSV files the benchmark scripts write (``mutant_results.json``,
 ``precision_mutants.json``, ``precision_oracles.json``, ``calibrated_tolerance.json``,
-``validation.json``, ``error_profile.csv``, ``rediscovery.json``, ``automutation/summary.json``) and derives one value per key, such as
+``validation.json``, ``error_profile.csv``, ``rediscovery.json``, ``automutation/summary.json``, ``gpu_fft_profile.json``) and derives one value per key, such as
 ``precision.fft_twiddles.default`` = ``90 ε``. It then
 
 - writes ``benchmarks/results.md`` (one table: key, value, source file) and
@@ -234,10 +234,24 @@ def automutation(r: Results):
     r.add("automutation.lines_dsp", d["lines"]["dsp_default"], src)
 
 
+def gpu_fft(r: Results):
+    src = "gpu_fft_profile.json"
+    d = load(src)
+    for name, b in d["backends"].items():
+        lib = name.split()[0] + ("_gpu" if "cpu" not in name else "_cpu")
+        for dtype, row in b["rows"].items():
+            if "error" in row:
+                continue
+            key = f"gpu_fft.{lib}.{'c128' if dtype == 'complex128' else 'c64'}"
+            r.add(f"{key}.worst", eps(row["worst_eps"]), src)
+            r.add(f"{key}.worst_n", row["worst_n"], src)
+            r.add(f"{key}.median", eps(row["median_eps"]), src)
+
+
 def collect() -> Results:
     r = Results()
     for part in (mutants, precision, oracles, calibrated, validation, error_profile, comparison, iir_structure,
-                 rediscovery, automutation):
+                 rediscovery, automutation, gpu_fft):
         part(r)
     return r
 

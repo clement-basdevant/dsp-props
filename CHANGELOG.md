@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- `dp.array_api(func, xp=..., device=...)`: an operator written for PyTorch, CuPy, JAX or any Array
+  API namespace takes and returns NumPy arrays, so that it can be declared like any other. Arguments
+  and outputs are converted recursively (a `(y, state)` pair stays a pair), and dtypes are kept.
+  `benchmarks/gpu_fft_profile.py` measures the FFT error of each GPU backend found (CUDA, MPS, CuPy,
+  JAX) against an extended-precision DFT. First profile (CuPy on an RTX 5070): at most 3.6 ε in
+  complex128, the same as NumPy on the CPU. Docs: `docs/array-api.md`.
 - Automatic mutation of SciPy code (`benchmarks/automutation/`, `docs/automutation.md`): 701
   cosmic-ray mutants of a verbatim copy of `resample`, `resample_poly`, `decimate` and `hilbert`
   (SciPy 1.18.1), checked with SciPy's own tests and with dsp-props declarations. SciPy's tests kill
