@@ -241,7 +241,9 @@ algorithm with the factorisation of N (mixed radix, naive small DFTs,
 Bluestein), and its error then varies by two orders of magnitude between
 neighbouring lengths. Over N = 2…1200, PyTorch's CPU FFT reaches 195 ε for some
 lengths with large prime factors (N = 596 = 4 × 149), against about 4 ε for
-NumPy and SciPy:
+NumPy and SciPy. The figure depends on the CPU, not only on the versions: on an
+AMD Ryzen 7 9800X3D with torch 2.15.0+cpu, the same length gives 1.6 ε. A
+calibration is valid for the machine it was measured on:
 
 ![Relative FFT error as a function of N, NumPy against PyTorch](figures/error_profile.png)
 
