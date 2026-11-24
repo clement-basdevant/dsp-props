@@ -130,8 +130,8 @@ behaviours: `tf2sos` drops pure delays (scipy/scipy#26417), and torchaudio's
 over lengths 2 to 1200 shows PyTorch's CPU FFT reaching about 200 ε at some
 lengths with a large prime factor (195 ε at N = 596 in the committed profile,
 214 ε at N = 1048 on another x86-64 machine), against at most about 4 ε for
-NumPy and SciPy. The gap depends on the hardware, not only on the versions: on
-an AMD Ryzen 7 9800X3D with torch 2.15.0, PyTorch gives 1.6 ε at N = 596.
+NumPy and SciPy. The gap depends on the processor, not only on the versions:
+on some machines PyTorch is as accurate as NumPy at the same lengths.
 Tolerances must be calibrated per implementation and platform rather than
 fixed.
 
