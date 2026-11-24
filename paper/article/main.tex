@@ -792,8 +792,9 @@ returns an identity section, so \code{sosfilt(tf2sos(b, a), x)} differs from
 \numpyMaxEps$\,\eps$ for NumPy over $N=2,\dots,1200$
 (Fig.~\ref{fig:profile}); this is not a fault, but it shows why one fixed
 tolerance cannot fit every library. The gap also depends on the processor, not
-only on the versions: on some machines PyTorch is as accurate as NumPy at the
-same lengths, so a calibration holds for the machine it was measured on.
+only on the versions: on an AMD Ryzen~7 9800X3D with PyTorch~2.15.0, the same
+length gives $1.6\,\eps$, so a calibration holds for the machine it was
+measured on.
 \end{itemize}
 The campaign also produced \campaignTriaged{} alarms that triage traced to
 errors in our own declarations (\eg \code{filtfilt} is not symmetric under time
