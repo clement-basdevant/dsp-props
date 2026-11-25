@@ -207,5 +207,5 @@ for q in [2, 8, 20]:
     y_dlti = ss.decimate(x, q, ftype=ss.dlti(z, p, k), zero_phase=False)
     y_sos = ss.sosfilt(ss.zpk2sos(z, p, k), x)[::q]     # what decimate does for its own filter
     print(q, np.linalg.norm(y_dlti - y_sos) / np.linalg.norm(x))
-# grows from about 2e-14 (q=2) to about 2e-7 (q=20)
+# grows from about 1e-14 (q=2) to about 2e-7 (q=20)
 ```
