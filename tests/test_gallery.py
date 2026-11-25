@@ -62,4 +62,12 @@ def test_torch_fft_precision():
     pytest.importorskip("torch")
     g = _load("torch_fft_precision")
     numpy_eps, torch_eps = g.worst_eps(g.np.fft.fft, [596]), g.worst_eps(g.torch_fft, [596])
-    assert numpy_eps[596] < 5 and torch_eps[596] > 50
+    assert numpy_eps[596] < 5
+    # The gap depends on the CPU and on the code path PyTorch's FFT backend picks
+    # for it, not only on versions: 195 eps in the committed profile, 214 eps at
+    # N = 1048 on another x86-64 machine, 1.6 eps on an AMD Ryzen 7 9800X3D
+    # (torch 2.15.0+cpu). The page describes the machines that show it.
+    if torch_eps[596] <= 50:
+        pytest.skip(f"PyTorch's FFT is {torch_eps[596]:.1f} eps at N = 596 on this machine: "
+                    "no gap to show on this hardware")
+    assert torch_eps[596] > 50

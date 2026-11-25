@@ -6,6 +6,9 @@
   documentation and benchmark dependency pinned with its hash (compiled by `env/lock.sh` from
   `env/requirements.in`), and a `Dockerfile` on a base image pinned by digest. The nightly CI job
   installs the lock and runs the tests in it.
+- `test_torch_fft_precision` is skipped on machines where PyTorch's CPU FFT shows no accuracy gap at
+  N = 596: the gap depends on the processor, not only on versions (1.6 ε on an AMD Ryzen 7 9800X3D
+  with torch 2.15.0+cpu, against 195 ε in the committed profile). Paper and docs say so.
 - `dp.array_api(func, xp=..., device=...)`: an operator written for PyTorch, CuPy, JAX or any Array
   API namespace takes and returns NumPy arrays, so that it can be declared like any other. Arguments
   and outputs are converted recursively (a `(y, state)` pair stays a pair), and dtypes are kept.

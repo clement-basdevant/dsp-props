@@ -182,7 +182,9 @@ nuit (2 h 17 UTC) : suite au profil default et chasse au profil nightly sur les 
     `benchmarks/gust_near_zero_poles.py`.
   - SciPy applique une politique IA : tickets et PR rédigés par l'auteur, pas par une IA.
 - FFT CPU de PyTorch : jusqu'à 195 ε pour certaines longueurs à grands facteurs premiers
-  (N = 596), contre environ 4 ε pour NumPy/SciPy.
+  (N = 596), contre environ 4 ε pour NumPy/SciPy. Dépend du processeur, pas seulement des
+  versions : 1,6 ε à N = 596 sur un AMD Ryzen 7 9800X3D (torch 2.15.0+cpu, Docker) ;
+  `test_torch_fft_precision` est sauté sur une machine sans l'écart.
 - Fausses alarmes : `benchmarks/validation.json` (relancé après #7 à #10) donne 2000
   exécutions sur du code correct, aucun échec. `python benchmarks/validation.py --only
   false-positives --seeds 1` refait la vérification en environ 2 min (100 exécutions).

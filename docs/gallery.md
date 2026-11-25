@@ -125,5 +125,11 @@ N= 1021  numpy    2.2 eps   torch    2.1 eps
 ```
 
 The script uses 4 random signals per length. The full profile uses more,
-which is why it finds a larger worst case. `dsp-props calibrate --compare`
+which is why it finds a larger worst case.
+
+The gap depends on the hardware, not only on the library versions. The
+output above and the committed profile come from machines where it shows; on
+an AMD Ryzen 7 9800X3D with torch 2.15.0+cpu, PyTorch's FFT is 1.6 ε at
+N = 596, as accurate as NumPy's. `tests/test_gallery.py` therefore skips its
+PyTorch check on machines without the gap instead of assuming a fixed figure. `dsp-props calibrate --compare`
 turns this measurement into a check between two versions of a library.
