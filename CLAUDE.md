@@ -98,6 +98,7 @@ python benchmarks/calibrated_tolerance.py # tolérance calibrée : fausses alarm
 python benchmarks/campaign.py          # campagne sur 46 cibles réelles
 python benchmarks/error_profile.py     # profil d'erreur FFT, N = 2..1200
 dsp-props calibrate mod.py --tolerances tolerances.json [--compare]  # calibration versionnée
+env/lock.sh                            # recompile le verrou env/requirements-py312-linux.txt (uv, hachages) ; Dockerfile à la racine
 python benchmarks/make_results.py      # chiffres cités (results.md/.tex, marqueurs <!-- r:clé -->) ; --check en CI
 ```
 
