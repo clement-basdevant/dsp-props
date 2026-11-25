@@ -25,7 +25,7 @@ from .family import FamilySpec, family
 from .regression import write_regression_tests
 from .tolerances import PrecisionComparison, ToleranceFile
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 __all__ = [
     "core",
